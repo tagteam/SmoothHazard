@@ -1,6 +1,6 @@
 Package: SmoothHazard
 Title: Smooth hazard Weibull regression
-Version: 1.0.4
+Version: 1.0.5
 Author: Pierre Joly, Thomas A. Gerds
 Description: User friendly Weibull regression for interval censored data
 Depends: R (>= 1.9.1), prodlim
