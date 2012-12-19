@@ -1,21 +1,21 @@
 !------------------------  FONCT  -------------------------
-       subroutine fonct(x,p,risq,glam,surv)
-       
-            implicit none
-            double precision,dimension(2)::p
-            double precision::x,dens,surv,risq,glam
+subroutine fonct(x,p,risq,glam,surv)
 
-              surv = dexp(-(p(2)*x)**p(1))
+        implicit none
 
-              glam = (p(2)*x)**p(1)
+        double precision,dimension(2)::p
+        double precision::x,surv,risq,glam
 
-              risq = p(1)*(p(2)**p(1))*(x**(p(1)-1.d0))
+        surv = dexp(-(p(2)*x)**p(1))
+        glam = (p(2)*x)**p(1)
+        risq = p(1)*(p(2)**p(1))*(x**(p(1)-1.d0))
 
-              if (x.le.0.d0) then
-                 surv = 1.d0
-                 glam = 0.d0
-                 risq = 0.d0
-              endif 
-	        
-              return
-        end subroutine fonct
+        if (x.le.0.d0) then
+                surv = 1.d0
+                glam = 0.d0
+                risq = 0.d0
+        endif
+
+        return
+
+end subroutine fonct

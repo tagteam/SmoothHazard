@@ -7,7 +7,7 @@
       double precision ro,sx
       integer id
       double precision f,v1,v2,s,dls,ro2
-      double precision x1,x2,uniran,rand
+      double precision x1,x2,rand,dsqrt,log
 !      write(*,*)'dans bgos'
 
 5     continue

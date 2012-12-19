@@ -141,9 +141,8 @@ names(d) <- c("dementia","mort","entry","L","R","time","cep")
 
 fit.weib <- idm(formula02=Hist(time,event=mort,entry=entry)~cep,
 		formula01=Hist(time=list(L,R),event=dementia)~cep,
-		data=d[sample(1:1540,size=400),])
+		data=d)
 
-		data=d[sample(1:1540,size=400),])
 
 fit.weib <- idm(formula02=Hist(time,event=mort,entry=entry)~cep,
 formula01=Hist(time=list(L,R),event=dementia)~cep,data=d) 

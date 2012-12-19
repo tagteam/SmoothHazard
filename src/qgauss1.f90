@@ -5,7 +5,7 @@
          double precision dx,xm,xr,w(5),x(5),res,v01,v02,v12
          double precision xx,f1,su01,ri01,ri12,f2,su12,su02,ri02
          double precision gl01,gl12,gl02
-         integer j,cas
+         integer j
          save w,x
          data w/0.2955242247d0,0.2692667193d0,0.2190863625d0,0.1494513491d0,0.0666713443d0/
          data x/0.1488743389d0,0.4333953941d0,0.6794095682d0,0.8650633666d0,0.9739065285d0/
