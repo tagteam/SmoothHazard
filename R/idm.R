@@ -3,8 +3,8 @@ idm <- function(formula01,formula02,formula12,data,maxiter=200,eps=c(5,5,3),
 
   # {{{ check formulae
 	call <- match.call()
-	cat("\n")
-	cat("Be patient. The program is computing... \n") 
+	## cat("\n")
+	## cat("Be patient. The program is computing... \n") 
 	flush.console()
 	ptm<-proc.time()
 	if(missing(formula01))stop("The argument formula01 needs a formula.")
@@ -422,6 +422,6 @@ idm <- function(formula01,formula02,formula12,data,maxiter=200,eps=c(5,5,3),
 	}  
 	
 	cost<-proc.time()-ptm
-	cat("The program took", round(cost[3],2), "seconds \n")
+	## cat("The program took", round(cost[3],2), "seconds \n")
 	fit
 }

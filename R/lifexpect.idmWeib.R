@@ -9,9 +9,9 @@ lifexpect.idmWeib <- function(object,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
 		nvar01 <- xx$NC[1]
 		nvar02 <- xx$NC[2]
 		nvar12 <- xx$NC[3]
-		if(missing(Z01) && nvar01>0) cat("value(s) used for covariate(s) on transition 01: 0 \n")
-		if(missing(Z02) && nvar02>0) cat("value(s) used for covariate(s) on transition 02: 0 \n")
-		if(missing(Z12) && nvar12>0) cat("value(s) used for covariate(s) on transition 12: 0 \n")
+		if(missing(Z01) && nvar01>0) warning("value(s) used for covariate(s) on transition 01: 0 \n")
+		if(missing(Z02) && nvar02>0) warning("value(s) used for covariate(s) on transition 02: 0 \n")
+		if(missing(Z12) && nvar12>0) warning("value(s) used for covariate(s) on transition 12: 0 \n")
 		a01 <- xx$modelPar[1]
 		b01 <- xx$modelPar[2]
 		a02 <- xx$modelPar[3]

@@ -13,9 +13,9 @@ predict.idmPl <- function(object,s,t,Z01,Z02,Z12,nsim=2000,CI=TRUE,...) {
 		nvar01 <- x$NC[1]
 		nvar02 <- x$NC[2]
 		nvar12 <- x$NC[3]
-		if(missing(Z01) && nvar01>0) cat("value(s) used for covariate(s) on transition 01: 0 \n")
-		if(missing(Z02) && nvar02>0) cat("value(s) used for covariate(s) on transition 02: 0 \n")
-		if(missing(Z12) && nvar12>0) cat("value(s) used for covariate(s) on transition 12: 0 \n")
+		if(missing(Z01) && nvar01>0) warning("value(s) used for covariate(s) on transition 01: 0 \n")
+		if(missing(Z02) && nvar02>0) warning("value(s) used for covariate(s) on transition 02: 0 \n")
+		if(missing(Z12) && nvar12>0) warning("value(s) used for covariate(s) on transition 12: 0 \n")
 		nz01 <- x$nknots01
 		nz02 <- x$nknots02
 		nz12 <- x$nknots12

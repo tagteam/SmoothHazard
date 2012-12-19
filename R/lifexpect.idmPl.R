@@ -9,9 +9,9 @@ lifexpect.idmPl <- function(object,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
 		nvar01 <- xx$NC[1]
 		nvar02 <- xx$NC[2]
 		nvar12 <- xx$NC[3]
-		if(missing(Z01) && nvar01>0) cat("value(s) used for covariate(s) on transition 01: 0 \n")
-		if(missing(Z02) && nvar02>0) cat("value(s) used for covariate(s) on transition 02: 0 \n")
-		if(missing(Z12) && nvar12>0) cat("value(s) used for covariate(s) on transition 12: 0 \n")
+		if(missing(Z01) && nvar01>0) warning("value(s) used for covariate(s) on transition 01: 0 \n")
+		if(missing(Z02) && nvar02>0) warning("value(s) used for covariate(s) on transition 02: 0 \n")
+		if(missing(Z12) && nvar12>0) warning("value(s) used for covariate(s) on transition 12: 0 \n")
 		nz01 <- xx$nknots01
 		nz02 <- xx$nknots02
 		nz12 <- xx$nknots12
