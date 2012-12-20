@@ -45,7 +45,7 @@ J. Pierre
 \dontrun{
 # Weibull survival model 
 data(test)
-fit.su <- surv(Hist(time=list(l,r),id)~cov,data=test) 
+fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test) 
 fit.su 
 }
 }
