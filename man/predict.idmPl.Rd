@@ -46,12 +46,12 @@ J. Pierre
 
 \examples{
 \dontrun{
-data(Dem15_h_3)
-d <- Dem15_h_3
-names(d) <- c("dementia","mort","entry","L","R","time","cep")
+data(Paq1000)
+d <- Paq1000
+names(d) <- c("dementia","mort","entry","L","R","time","certif","death")
 
-fit <- idm(formula02=Hist(time,event=mort,entry=entry)~cep,
-formula01=Hist(time=list(L,R),event=dementia)~cep,data=d,hazard="Splines") 
+fit <- idm(formula02=Hist(time,event=mort,entry=entry)~certif,
+formula01=Hist(time=list(L,R),event=dementia)~certif,data=d,hazard="Splines") 
 
 pred <- predict(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
 }

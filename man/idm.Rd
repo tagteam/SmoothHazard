@@ -135,17 +135,17 @@ J. Pierre
 
 \examples{
 # Weibull illness deaths model 
-data(Dem15_h_3)
-d <- Dem15_h_3
-names(d) <- c("dementia","mort","entry","L","R","time","cep")
+data(Paq1000)
+d <- Paq1000
+names(d) <- c("dementia","death","entry","L","R","time","certif","gender")
 
-fit.weib <- idm(formula02=Hist(time,event=mort,entry=entry)~cep,
-		formula01=Hist(time=list(L,R),event=dementia)~cep,
+fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
+		formula01=Hist(time=list(L,R),event=dementia)~certif,
 		data=d)
 
 
-fit.weib <- idm(formula02=Hist(time,event=mort,entry=entry)~cep,
-formula01=Hist(time=list(L,R),event=dementia)~cep,data=d) 
+fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
+formula01=Hist(time=list(L,R),event=dementia)~certif,data=d) 
 
 ## to print
 fit.weib
