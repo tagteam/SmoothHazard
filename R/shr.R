@@ -239,13 +239,13 @@ shr <- function(formula,
     names(betaCoef) <- Xnames
     fit$coef <- betaCoef
     fit$HR <- exp(betaCoef)
-    V <- matrix(ffit$v,nr=NC,nc=NC,byrow=T)
+    V <- matrix(ffit$v,nrow=NC,ncol=NC,byrow=T)
     colnames(V) <- Xnames
     rownames(V) <- Xnames
     fit$se <- sqrt(diag(V))
     fit$V_cov <- V
   }
-  V <- matrix(ffit$V_tot,nr=size_V,nc=size_V,byrow=T)
+  V <- matrix(ffit$V_tot,nrow=size_V,ncol=size_V,byrow=T)
   if(hazard=="Weib"){
     colnames(V) <- c("sqrt(a)","sqrt(b)",Xnames)
     rownames(V) <- c("sqrt(a)","sqrt(b)",Xnames)

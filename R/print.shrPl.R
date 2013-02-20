@@ -22,7 +22,7 @@ print.shrPl <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 			rownames(tmp) <- names(x$coef)
 		}
 
-		tmp1 <- matrix(x$loglik,nr=1)
+		tmp1 <- matrix(x$loglik,nrow=1)
 		dimnames(tmp1) <- list("Log likelihood", c("Without cov", "With cov"))		
 		
 		cat("Survival model using a penalized likelihood approach with splines approximation for the hazard function.\n")
@@ -37,7 +37,7 @@ print.shrPl <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 		if(x$irec == 1){
 			cat("Smoothing parameters estimated by Cross validation: ",x$kappa,"\n")
 			cat("Cross validation criterion:",x$CVcrit,"\n")
-			cat("DoF: ", formatC(-x$DoF, format="f",dig=2),"\n")
+			cat("DoF: ", formatC(-x$DoF, format="f",digits=2),"\n")
 		}else{
 			cat("Smoothing parameters: ",x$kappa,"\n")
 		}

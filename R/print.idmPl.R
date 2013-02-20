@@ -21,7 +21,7 @@ print.idmPl <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 			"Wald"=format(wald,digits),"p-value"=format.pval(1 - pchisq(wald, 1),digits=pvalDigits,eps=eps))
 			rownames(tmp) <- Xnames
 		}
-		tmp1 <- matrix(x$loglik,nr=1)
+		tmp1 <- matrix(x$loglik,nrow=1)
 		dimnames(tmp1) <- list("Penalized log likelihood", c("Without cov", "With cov"))		
 		
 		cat("Illness-death model using a penalized likelihood approach with splines approximation for the intensity functions.\n")
@@ -40,7 +40,7 @@ print.idmPl <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 			cat("Smoothing parameters estimated by cross validation:\n")
 			print(tmp2,row.names=T)
 			cat("Cross validation criterion:",x$CVcrit,"\n")
-			cat("DoF: ", formatC(-x$DoF, format="f",dig=2),"\n")
+			cat("DoF: ", formatC(-x$DoF, format="f",digits=2),"\n")
 		}else{
 			cat("Smoothing parameters:\n")
 			print(tmp2,row.names=T)

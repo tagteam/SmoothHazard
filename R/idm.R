@@ -285,7 +285,7 @@ idm <- function(formula01,formula02,formula12,data,maxiter=200,eps=c(5,5,3),
 			converged=as.integer(0),
 			cv=as.double(rep(0,3)),
 			niter=as.integer(0),
-			t=as.double(matrix(0,nr=99,nc=3)),
+			t=as.double(matrix(0,nrow=99,ncol=3)),
 			a01=as.double(rep(0,99)),
 			a01_l=as.double(rep(0,99)),
 			a01_u=as.double(rep(0,99)),
@@ -349,7 +349,7 @@ idm <- function(formula01,formula02,formula12,data,maxiter=200,eps=c(5,5,3),
   fit$responseAbs <- responseAbs
   fit$responseTrans <- responseTrans
   if(hazard=="Splines"){
-  	fit$time <- matrix(ffit$t,nc=3) 
+  	fit$time <- matrix(ffit$t,ncol=3) 
   }else{
   	fit$time <- ffit$t 
   }
@@ -370,13 +370,13 @@ idm <- function(formula01,formula02,formula12,data,maxiter=200,eps=c(5,5,3),
    	names(betaCoef) <- c(Xnames01,Xnames02,Xnames12)
    	fit$coef <- betaCoef
    	fit$HR <- exp(betaCoef)
-   	V <- matrix(ffit$v,nr=size1,nc=size1,byrow=T) 
+   	V <- matrix(ffit$v,nrow=size1,ncol=size1,byrow=T) 
 	colnames(V) <- c(Xnames01,Xnames02,Xnames12)
 	rownames(V) <- c(Xnames01,Xnames02,Xnames12)
    	fit$V_cov <- V
    	fit$se <- sqrt(diag(fit$V))
    }  	
-   V <- matrix(ffit$V_tot,nr=size_V,nc=size_V,byrow=T)
+   V <- matrix(ffit$V_tot,nrow=size_V,ncol=size_V,byrow=T)
    if(hazard=="Weib"){
    	colnames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
 	rownames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))

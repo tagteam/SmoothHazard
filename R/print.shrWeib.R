@@ -16,7 +16,7 @@ print.shrWeib <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 			rownames(tmp) <- names(x$coef)
 		}
 
-		tmp1 <- matrix(x$loglik,nr=1)
+		tmp1 <- matrix(x$loglik,nrow=1)
 		dimnames(tmp1) <- list("Log likelihood", c("Without cov", "With cov"))		
 		
 		cat("Survival model using a parametric approach with a Weibull distribution for the hazard function.\n")

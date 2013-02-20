@@ -167,11 +167,11 @@
         
         rl1=rl
         
-        if(print_iter == 1) then
-                write(*,*)'Iteration process ',ni,' Log_likelihood ',rl
+!        if(print_iter == 1) then
+!                write(*,*)'Iteration process ',ni,' Log_likelihood ',rl
 !               write(*,*)'--- b '
 !               write(*,*)(b(i),i=1,m)
-        end if
+!        end if
 
         dd = 0.d0
         fu=0.D0

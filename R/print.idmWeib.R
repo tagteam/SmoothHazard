@@ -19,7 +19,7 @@ print.idmWeib <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 			rownames(tmp) <- Xnames
 		}
 
-		tmp1 <- matrix(x$loglik,nr=1)
+		tmp1 <- matrix(x$loglik,nrow=1)
 		dimnames(tmp1) <- list("Log likelihood", c("Without cov", "With cov"))		
 		
 		cat("Illness-death Model using a parametric approach with a Weibull distribution for the intensity functions.\n")
@@ -41,7 +41,7 @@ print.idmWeib <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 		prmatrix(tmp1)
 		cat("\n")
 		cat("Parameters of the Weibull distribution: 'S(t) = exp(-(b*t)^a)'\n")
-		tmp <- matrix(x$modelPar,nr=2)
+		tmp <- matrix(x$modelPar,nrow=2)
 		dimnames(tmp) <- list(c("a","b"),c("alpha01", "alpha02", "alpha12"))
 		prmatrix(tmp)
 		cat("\n")
