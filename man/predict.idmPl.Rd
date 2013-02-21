@@ -41,7 +41,9 @@ Predictions for an illness-death model using the penalized likelihood approach.
 }
 
 \author{
-J. Pierre
+R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>
+Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
+
 }
 
 \examples{

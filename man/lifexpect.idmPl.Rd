@@ -36,7 +36,9 @@ Predictions of life expectancies from an illness-death model using a penalized l
 }
 
 \author{
-J. Pierre
+R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>
+Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
+
 }
 
 \examples{

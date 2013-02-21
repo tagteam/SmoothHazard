@@ -123,7 +123,9 @@ D. Marquardt (1963). An algorithm for least-squares estimation of nonlinear para
 }
 
 \author{
-J. Pierre
+R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>
+Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
+
 }
 
 \seealso{
