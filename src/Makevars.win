@@ -1,0 +1,43 @@
+all: $(SHLIB)
+
+aacommun.o : aacommun.f90
+	$(F77) $(SAFE_FFLAGS) -c -o aacommun.o aacommun.f90
+aaoptim.o: aaoptim.f90
+	$(F77) $(SAFE_FFLAGS) -c -o aaoptim.o aaoptim.f90
+arecKappa.o: arecKappa.f90
+	$(F77) $(SAFE_FFLAGS) -c -o arecKappa.o arecKappa.f90
+bgos.o: bgos.f90
+	$(F77) $(SAFE_FFLAGS) -c -o bgos.o bgos.f90
+distance.o: distance.f90
+	$(F77) $(SAFE_FFLAGS) -c -o distance.o distance.f90
+estimv.o: estimv.f90
+	$(F77) $(SAFE_FFLAGS) -c -o estimv.o estimv.f90
+fonct.o: fonct.f90
+	$(F77) $(SAFE_FFLAGS) -c -o fonct.o fonct.f90
+idmLikelihood.o: idmLikelihood.f90
+	$(F77) $(SAFE_FFLAGS) -c -o idmLikelihood.o idmLikelihood.f90
+idmPl.o: idmPl.f90
+	$(F77) $(SAFE_FFLAGS) -c -o idmPl.o idmPl.f90
+idmPlLikelihood.o: idmPlLikelihood.f90
+	$(F77) $(SAFE_FFLAGS) -c -o idmPlLikelihood.o idmPlLikelihood.f90
+idmPlLikelihood0.o: idmPlLikelihood0.f90
+	$(F77) $(SAFE_FFLAGS) -c -o idmPlLikelihood0.o idmPlLikelihood0.f90
+idmPlLikelihood2.o: idmPlLikelihood2.f90
+	$(F77) $(SAFE_FFLAGS) -c -o idmPlLikelihood2.o idmPlLikelihood2.f90
+idmWeib.o: idmWeib.f90
+	$(F77) $(SAFE_FFLAGS) -c -o idmWeib.o idmWeib.f90
+qgauss1.o: qgauss1.f90
+	$(F77) $(SAFE_FFLAGS) -c -o qgauss1.o qgauss1.f90
+survLikelihood.o: survLikelihood.f90
+	$(F77) $(SAFE_FFLAGS) -c -o survLikelihood.o survLikelihood.f90
+survPl.o: survPl.f90
+	$(F77) $(SAFE_FFLAGS) -c -o survPl.o survPl.f90
+survPlLikelihood.o: survPlLikelihood.f90
+	$(F77) $(SAFE_FFLAGS) -c -o survPlLikelihood.o survPlLikelihood.f90
+survWeib.o: survWeib.f90
+	$(F77) $(SAFE_FFLAGS) -c -o survWeib.o survWeib.f90
+tri.o: tri.f90
+	$(F77) $(SAFE_FFLAGS) -c -o tri.o tri.f90
+useSurv.o: useSurv.f90
+	$(F77) $(SAFE_FFLAGS) -c -o useSurv.o useSurv.f90
+	
