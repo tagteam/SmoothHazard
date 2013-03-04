@@ -1,8 +1,8 @@
 Package: SmoothHazard
-Title: Smooth hazard Weibull regression
+Title: Fitting illness-death model for interval-censored data
 Version: 1.0.7
 Author: Celia Touraine, Pierre Joly, Thomas A. Gerds
-Description: User friendly Weibull regression for interval censored data
+Description: SmoothHazard is a package for fitting illness-death (and survival) model with possibly interval-censored data for transition toward transient state. Left-truncated and right-censored data are also allowed. Proportional intensities regression models allow for covariates on each of the 3 transitions. We use either a parametric approach with Weibull baseline intensities or a semi-parametric approach with M-splines approximation of baseline intensities in order to obtain smooth estimates. Estimation of parameters is conducted by likelihood maximization in the parametric approach or penalized likelihood maximization in the semi-parametric approach.
 Depends: R (>= 1.9.1), prodlim, mvtnorm
 Maintainer: Thomas A. Gerds <tag@biostat.ku.dk>
 License: GPL (>= 2)
