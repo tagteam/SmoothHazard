@@ -3,7 +3,7 @@
 !                                 Weibull
 !                              20/05/10
 !            last              08/04/11
-        subroutine survWeib(entrytime,l,r,status,x,N,P,truncated,interval,eps,&
+        subroutine survWeib(entrytime,l,r,status,x,n,p,truncated,interval,eps,&
         maxiter0,loglik,basepar,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,prt,hess_tot)
 !noVar
         use survCommun  
@@ -39,17 +39,17 @@
         double precision,dimension(p+2,p+2)::vsup
         double precision,dimension(p+2)::b
         double precision,dimension((p+2)*(p+2+3)/2)::v1
-        double precision,dimension(P+2,P+2)::hes
+        double precision,dimension(p+2,p+2)::hes
         double precision::ca,cb,dd
         integer::ier,npw,np,j,k,jj,i,kk,kkk,istop,noVar
         double precision,external::survLikelihood   
         double precision::som,ts
-        double precision,dimension(P+2,P+2),intent(out)::hess_tot
+        double precision,dimension(p+2,p+2),intent(out)::hess_tot
 !!! CT 26sept2012
 !        integer,intent(in)::noVar
 !!! fin CT 26sept2012
 
-        if(P.gt.0)then
+        if(p.gt.0)then
         noVar=0
         else
         noVar=1
@@ -61,7 +61,7 @@
         no=N
         
         if(noVar.ne.1) then
-                nva=P
+                nva=p
         else
                 nva=0
         end if
@@ -200,7 +200,7 @@
 
         
         if(noVar.ne.1) then
-                nva=P
+                nva=p
                 np = npw + nva
                 do i=npw+1,np
                         b(i)=0.d0
@@ -308,13 +308,13 @@
 
                 do jj=1,2000
                         do i=1,np
-                                call BGOS(1.d0,0,x1,x2,0.d0)
+                                call bgos(1.d0,0,x1,x2,0.d0)
                                 xi(i)=x1
                         end do
         
                         do i=1,np
                                 ut(i)=0.d0
-                                do j=0,np
+                                do j=1,np
                                         ut(i) = ut(i)+(vinf(i,j)*xi(j))
                                 end do   
                         end do 
