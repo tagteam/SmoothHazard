@@ -6,14 +6,15 @@
       implicit none 
       double precision ro,sx
       integer id
+      double precision x1,x2
       double precision f,v1,v2,s,dls,ro2
-      double precision x1,x2,rand,dsqrt,log
+      double precision dsqrt,log
 !      write(*,*)'dans bgos'
 
 5     continue
 
-      x1=dble(rand(0)) 
-      x2=dble(rand(0))   
+      call random_number(harvest=x1)
+      call random_number(harvest=x2)   
       if(id.ne.1) go to 10
       f=2.d0*dsqrt(3.d0)
       x1=(x1-0.5d0)*f
@@ -32,8 +33,6 @@
       if(dabs(ro).gt.1.d-10)x2=(x1+x2*dsqrt(1.d0/ro2-1.d0))*ro
       x1=x1*sx
       x2=x2*sx
-
-
 
       return
       end subroutine bgos
