@@ -5,9 +5,9 @@
 
         use commun,only:m3m3a,m2m2a,m1m1a,mmma,m3m1a,m3ma,m2m1a,m2ma,m3m3b,m2m2b,m1m1b,mmmb, &
         m3m1b,m3mb,m2m1b,m2mb,m3m2a,m1ma,m3m2b,m1mb,m3m3c,m2m2c,m1m1c,mmmc,m3m1c,m3mc,m2m1c,m2mc, &
-        m3m2c,m1mc,mm3a,mm2a,mm1a,mma,im3a,im2a,im1a,ima,mm3b,mm2b,mm1b,mmb,im3b,im2b,im1b,imb,&
-        mm3c,mm2c,mm1c,mmc,im3c,im2c,im1c,imc,zi01,zi12,zi02,c,no,nz01,nz12,nz02,ve01,ve12,ve02,&
-        nva01,nva12,nva02,pe,t0,t1,t2,t3,t4,k0,troncature
+        m3m2c,m1mc,&
+        zi01,zi12,zi02,c,no,nz01,nz12,nz02,ve01,ve12,ve02,&
+        nva01,nva12,nva02,pe,t0,t1,t2,t3,k0,troncature
 
         implicit none
          

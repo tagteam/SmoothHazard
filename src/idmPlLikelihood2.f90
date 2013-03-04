@@ -1,9 +1,8 @@
 
 !========================          idmPlLikelihood2         ====================
       double precision function idmPlLikelihood2(b,np,id,thi,jd,thj)
-        use commun,only:mm3a,mm2a,mm1a,mma,im3a,im2a,im1a,ima,mm3b,mm2b,mm1b,mmb, &
-        im3b,im2b,im1b,imb,mm3c,mm2c,mm1c,mmc,im3c,im2c,im1c,imc,zi01,zi12,zi02, &
-        c,no,nz01,nz12,nz02,t0,t1,t2,t3,t4
+        use commun,only:zi01,zi12,zi02, &
+        c,no,nz01,nz12,nz02,t1,t2,t3
          implicit none
          
          integer::np,id,jd,i,j

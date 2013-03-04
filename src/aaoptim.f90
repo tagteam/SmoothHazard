@@ -113,7 +113,7 @@
 !  4: Erreur
 
       use parameters
-      use commun,only:k0,hessienne,ind_hess,pl
+      use commun,only:hessienne,ind_hess,pl
     
       IMPLICIT NONE
 

@@ -7,7 +7,7 @@
         
         subroutine sub_rec(b,omeg01,omeg12,omeg02)
         
-        use commun,only:nn,nz01,nz12,nz02,k0    
+        use commun,only:nz01,nz12,nz02,k0    
         use tailles
         
         implicit none

@@ -1,9 +1,8 @@
           
 !========================          idmPlLikelihood0         ====================
         double precision function idmPlLikelihood0(b,np)
-        use commun,only:mm3a,mm2a,mm1a,mma,im3a,im2a,im1a,ima,mm3b,mm2b,mm1b,mmb, &
-        im3b,im2b,im1b,imb,mm3c,mm2c,mm1c,mmc,im3c,im2c,im1c,imc,zi01,zi12,zi02, &
-        c,no,nz01,nz12,nz02,ve01,ve12,ve02,nva01,nva12,nva02,pe,t0,t1,t2,t3,t4,troncature
+        use commun,only:zi01,zi12,zi02, &
+        c,no,nz01,nz12,nz02,ve01,ve12,ve02,nva01,nva12,nva02,t0,t1,t2,t3,troncature
 
         implicit none
         
