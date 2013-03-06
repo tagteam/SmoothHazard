@@ -24,6 +24,5 @@ Paquid data set composed of 1000 subjects selected randomly from the Paquid data
 
 \examples{
 data(Paq1000)
-head(1000)
 }
 \keyword{datasets}

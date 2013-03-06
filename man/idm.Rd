@@ -136,6 +136,7 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 }
 
 \examples{
+\dontrun{
 # Weibull illness deaths model 
 data(Paq1000)
 d <- Paq1000
@@ -154,7 +155,7 @@ fit.weib
 
 ## to summary
 summary(fit.weib)
-
+}
 }
 
 \keyword{ilness-death}

@@ -44,12 +44,12 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 }
 
 \examples{
-
+\dontrun{
 # Weibull survival model 
 data(test)
 fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test) 
 summary(fit.su) 
-}
+}}
 
 
 \keyword{methods}

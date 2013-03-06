@@ -51,7 +51,6 @@ fit <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
 formula01=Hist(time=list(L,R),event=dementia)~certif,data=d,hazard="Splines") 
 
 pred <- lifexpect.idmPl(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
-
 }
 }
 
