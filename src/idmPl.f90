@@ -46,7 +46,7 @@
 
         implicit none
         
-        integer::npar,ver,nvat12,nvat02,j,k,ii,i,ic,ier,nvat01,irep,truncated,maxiter0,istop
+        integer::npar,ver,nvat12,nvat02,j,k,ii,i,ic,ier,nvat01,truncated,maxiter0,istop
         double precision::min,max,maxt1,estimv,maxt2,maxt3,mint1,mint2,mint3,ca,cb,dd,res
         double precision::mdf_int
         double precision,dimension(:),allocatable::b2
@@ -572,7 +572,6 @@
         end if
 
         loglik(1)=res
-        irep = igraph
 
         ind_hess = 0    
         
@@ -696,12 +695,12 @@
 !               write(*,*)nomfichregr,' fichier variables explicatives'
 !               write(*,*)' '
 
-        if(irep.eq.1)then
+        if(igraph.eq.1)then
                 call distance(nz01,nz02,nz12,b,t,a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u)
         end if
 
         deallocate(hessienne)
-        if(irep.ne.1)then       
+        if(igraph.ne.1)then       
                 t=0.d0
                 a01=0.d0
                 a01_l=0.d0
