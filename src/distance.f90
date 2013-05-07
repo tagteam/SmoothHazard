@@ -1,4 +1,3 @@
-
 !================ Distance pour idmPl
 
         subroutine distance(nz01,nz02,nz12,b,t,a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u)

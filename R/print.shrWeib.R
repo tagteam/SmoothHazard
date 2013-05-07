@@ -21,8 +21,9 @@ print.shrWeib <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 		
 		cat("Survival model using a parametric approach with a Weibull distribution for the hazard function.\n")
 		cat("\n")
-		cat("number of subjects: ", x$N,"\n")
-		cat("number of events: ", x$events,"\n")
+		## cat("number of subjects: ", x$N,"\n")
+		## cat("number of events: ", x$events,"\n")
+                print(x$modelResponse)
 		cat("number of covariates: ", x$NC,"\n")
 		if(length(x$na.action))cat("number of deleted observations due to missing: ",length(x$na.action),"\n")
 

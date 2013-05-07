@@ -9,14 +9,14 @@ Plot method for an illness-death model.
 }
 \usage{
 
-\method{plot}{idm}(x, conf.bands=FALSE, ylim,
+\method{plot}{idm}(x, conf.int=FALSE, ylim,
  pos.legend = "topleft", main, transition, ...)
 
 }
 \arguments{
   \item{x}{a \code{idmWeib} class object or a \code{idmPl} class object (output from calling \code{\link{idm}}
     function).}
-  \item{conf.bands}{logical value. Determines whether confidence bands will be plotted. The default is FALSE.}
+  \item{conf.int}{logical value. Determines whether confidence bands will be plotted. The default is FALSE.}
   \item{ylim}{vector containing the y limites (min, max) of the plot. The default is the min and the max of all the values of the three transition intensities}  
  \item{pos.legend}{The location of the legend can be specified by setting this argument to a single keyword from the 
  list "bottomright", "bottom", "bottomleft", "left", "topleft", "top", "topright", "right" and
@@ -55,7 +55,7 @@ formula01=Hist(time=list(L,R),event=dementia)~cep,data=d)
 plot(fit.weib)
 
 # confidence bands for transition 0 --> 1
-plot(fit.weib,conf.bands=TRUE,transition="01")
+plot(fit.weib,conf.int=TRUE,transition="01")
 }
 }
 

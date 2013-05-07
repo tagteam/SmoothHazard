@@ -96,12 +96,12 @@ shr <- function(formula,
     Ltime <- as.double(event.history[,"time",drop=TRUE])
     Rtime <- rep(0,N)
   }
-	
   id <- event.history[,"status"]
   # }}}
   # {{{ call Fortran function weib and collect results
-  
 
+  # do not give infinite values to fortran
+  Rtime[is.infinite(Rtime)] <- Ltime[is.infinite(Rtime)]
 
   if (hazard == "Weib"){	
     size1 <- NC
@@ -223,7 +223,6 @@ shr <- function(formula,
   }
   fit$N <- N
   fit$NC <- NC
-  fit$events <- sum(id)
   fit$modelResponse <- event.history
   fit$converged <- ffit$converged
   fit$time <- ffit$t

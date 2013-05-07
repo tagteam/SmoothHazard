@@ -33,8 +33,8 @@
 
         subroutine idmPl(entrytime,l,r,d,idm,idd,x01,x02,x12,N,P01,P02,P12,truncated,eps &
         ,maxiter0,loglik,regpar,v,converged,cv,niter,t,a01,a01_l,a01_u,a02,a02_l,a02_u,a12, &
-        a12_l,a12_u,nknots01,nknots02,nknots12,irec,kappa0,kappa,igraph,CVcrit,mdf,ti01,ti02, &
-        ti12,theta01,theta02,theta12,prt,hess_tot)
+        a12_l,a12_u,nknots01,knots01,nknots02,knots02,nknots12,knots12,irec,kappa0,kappa,igraph,CVcrit,mdf, &
+        theta01,theta02,theta12,prt,hess_tot)
         
         use tailles
         use propre
@@ -64,20 +64,31 @@
         double precision,dimension((p01+p02+p12)*(p01+p02+p12)),intent(out)::v
         double precision,dimension(2),intent(out)::loglik       
         integer,intent(out)::converged,niter
-! istop
         double precision,dimension(99,3),intent(out)::t
         double precision,dimension(99),intent(out)::a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u
         double precision,external::idmPlLikelihood
         double precision,intent(out)::CVcrit,mdf
-        double precision,dimension(nknots01+6),intent(out)::ti01
-        double precision,dimension(nknots12+6),intent(out)::ti12
-        double precision,dimension(nknots02+6),intent(out)::ti02
+        double precision,dimension(nknots01+6),intent(in)::knots01
+        double precision,dimension(nknots12+6),intent(in)::knots12
+        double precision,dimension(nknots02+6),intent(in)::knots02
         double precision,dimension(nknots01+2),intent(out)::theta01
         double precision,dimension(nknots12+2),intent(out)::theta12
         double precision,dimension(nknots02+2),intent(out)::theta02
         double precision,dimension(p01+p02+p12+nknots01+nknots12+nknots02+6,&
         p01+p02+p12+nknots01+nknots12+nknots02+6),intent(out)::hess_tot
         integer,dimension(3)::noVar
+
+        nz01 = nknots01
+        nz12 = nknots12
+        nz02 = nknots02 
+
+        allocate(zi01(-2:(nz01+3)))        
+        allocate(zi02(-2:(nz02+3)))
+        allocate(zi12(-2:(nz12+3)))
+        
+        zi01 = knots01
+        zi12 = knots12
+        zi02 = knots02 
 
         if(P01.gt.0)then
         noVar(1)=0
@@ -374,120 +385,6 @@
         mint1=max
 ! fin ajout
 
-        nz01 = nknots01
-        nz12 = nknots12
-        nz02 = nknots02 
-!-------------------------------------------------------------------
-        allocate(zi01(-2:(nz01+3)))
-!       write(*,*)'taille de zi01',size(zi01)
-!-------------------------------------------------------------------
-
-        zi01(-2) = mint1
-        zi01(-1) = mint1
-        zi01(0) = mint1
-        zi01(1) = mint1
-
-        do i=2,nz01-1
-                zi01(i) =zi01(i-1)+((maxt1)-mint1)/dble(nz01-1)
-        end do   
-
-        zi01(nz01) = maxt1
-        zi01(nz01+1)=maxt1
-        zi01(nz01+2)=maxt1
-        zi01(nz01+3)=maxt1
-        
-        ti01 = zi01
-
-!       write(*,*)'zi01',zi01
-
-        min = 0.d0
-        max = maxt2
-
-        do k = 1,no
-                if(t2(k).ge.min)then 
-                        if(t2(k).lt.max)then
-                        max = t2(k)
-                        endif   
-                endif
-
-                if(t3(k).ge.min)then 
-                        if(t3(k).lt.max)then
-                        max = t3(k)
-                        endif   
-                endif
-        end do   
-! ajout
-        mint2=max
-! fin ajout
-!-------------------------------------------------------------------
-        allocate(zi12(-2:(nz12+3)))
-!       write(*,*)'taille de zi12',size(zi12)
-!-------------------------------------------------------------------    
-        zi12(-2) = mint2
-        zi12(-1)= mint2
-        zi12(0)= mint2
-        zi12(1)= mint2
-
-        do i=2,nz12-1
-                zi12(i) =zi12(i-1)+((maxt2)-mint2)/dble(nz12-1) 
-        end do 
-
-        zi12(nz12) = maxt2
-        zi12(nz12+1)=maxt2
-        zi12(nz12+2)=maxt2
-        zi12(nz12+3)=maxt2
-
-        ti12 = zi12
-!       write(*,*)'zi12',zi12
-
-        min = 0.d0
-        max = maxt3
-        
-        do k = 1,no
-                if((t1(k).ge.min))then
-                        if(t1(k).lt.max)then
-                                max = t1(k)
-                        endif
-                endif
-
-                if(truncated.eq.1) then
-                        if(t0(k).ge.min)then 
-                                if(t0(k).lt.max)then
-                                        max = t0(k)
-                                endif   
-                        endif
-                end if
-
-                if(t4(k).ge.min)then 
-                        if(t4(k).lt.max)then
-                                max = t4(k)
-                        endif   
-                endif
-        end do   
-! ajout
-        mint3=max
-! fin ajout     
-!-------------------------------------------------------------------
-        allocate(zi02(-2:(nz02+3)))
-!       write(*,*)'taille de zi02',size(zi02)
-!-------------------------------------------------------------------    
-        zi02(-2) = mint3
-        zi02(-1)= mint3
-        zi02(0)= mint3
-        zi02(1)= mint3
-
-        do i=2,nz02-1
-                zi02(i) =zi02(i-1)+((maxt3)-mint3)/dble(nz02-1)
-        end do  
-
-        zi02(nz02) = maxt3      
-        zi02(nz02+1)=maxt3
-        zi02(nz02+2)=maxt3
-        zi02(nz02+3)=maxt3
-
-        ti02 = zi02
-!       write(*,*)'zi02',zi02
-
 !---------- affectation des vecteurs de splines -----------------
         
         npar  = nz01+2+nz02+2+nz12+2
@@ -700,7 +597,7 @@
         end if
 
         deallocate(hessienne)
-        if(igraph.ne.1)then       
+        if(igraph.ne.1)then 
                 t=0.d0
                 a01=0.d0
                 a01_l=0.d0

@@ -1,22 +1,17 @@
 
-# fonction qui calcule lam la fonction de risque approchée par des M-splines
-# ainsi que gl la fonction de risque cumulée approchée par des I-splines
-# ainsi que la fonction de survie, fonction de gl
 
 susp <- function(x,zi,nz,the,bZ=0) {
 
-# On suppose que le x en entrée est un vecteur. Du coup les 3 éléments de la liste sortante sont aussi des vecteurs
-# C'est parce que quand on utilise integrate(f,lower,upper), f est appelé avec le vecteur de tous les x
 
- gl=rep(0,length(x))   # risque cumulé
+ gl=rep(0,length(x))   # risque cumule
  lam=rep(0,length(x))  # risque
  su=rep(0,length(x))   # survie
  TF=rep(0,length(x)) # T si z[i-1]<=x[.]<z[i], F sinon
  som=0
 	for (i in 5:(nz+3)) {
     TF = ( (zi[i-1]<=x) & (x<zi[i]) )
-    if (sum(TF) != 0) { # s'il existe des x[.] compris entre les 2 noeuds zi[i-1] et zi[i]
-      ind = which(TF) # récupération des indices de x pour lesquels on a zi[i-1]<=x[.]<zi[i]
+    if (sum(TF) != 0) { 
+      ind = which(TF) 
       mm3=rep(0,length(ind))
       mm2=rep(0,length(ind))
       mm1=rep(0,length(ind))
@@ -26,7 +21,7 @@ susp <- function(x,zi,nz,the,bZ=0) {
       im1=rep(0,length(ind))
       im=rep(0,length(ind))
 			j = i-1
-			if (j>4) { # si l'on est placé après le 1er noeud
+			if (j>4) { 
         			som = sum(the[1:(j-4)])
 			}
 			ht = x[ind]-zi[j] #
@@ -78,11 +73,6 @@ susp <- function(x,zi,nz,the,bZ=0) {
 	
 	return(list(intensity=lam,cumul.intensity=gl,survival=su))
 }
-
-
-### fonction de risque cumulé entre 2 temps :
-# A(s,t) = int_s^t { alpha(u) du }
-#        = A(t)-A(s)
 
 A <- function(s,t,zi,nz,the,bZ=0) {
 	res=rep(0,length(t))

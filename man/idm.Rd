@@ -17,34 +17,50 @@ hazard="Weib", print.iter=FALSE, subset=NULL, na.action=na.omit)
 
 \arguments{
   \item{formula01}{
-a formula object for transition '0 --> 1' (from the initial state to the transient state), with the response on the left of a \eqn{\texttildelow}
-operator, and the terms on the right. The response must be a
-survival object or Hist object as returned by the 'Surv' or 'Hist' function.
+A formula specifying a regression model for the \code{0 --> 1}
+transition from the initial state to the transient state of the
+illness-death model. 
+The right hand side of the formula specifies the covariate terms, and the left hand side  must be an event
+history object as returned by the function \code{Hist}. 
 }
-  \item{formula02}{
-a formula object for transition '0 --> 2' (from the initial state to the absorbant state), with the response on the left of a \eqn{\texttildelow}
-operator, and the terms on the right. The response must be a
-survival object or Hist object as returned by the 'Surv' or 'Hist' function.
+\item{formula02}{
+A formula specifying a regression model for the \code{0 --> 2} transition
+from the initial state to the absorbing state.
+The left hand side must be equal to the left hand side of
+  \code{formula01}. If missing it is set to \code{formula01}.
 }
-  \item{formula12}{
-a formula object for transition '1 --> 2' (from the transient state to the absorbant state). The response on the left of the \eqn{\texttildelow}
-operator is not required. If missing formula12, variables of transition '1--->2' are the same as the ones of transition '0--->1'.
+\item{formula12}{
+  A formula specifying a regression model for the \code{1 --> 2} transition
+  from the transient state to the absorbing state.
+  operator is not required. If missing it is set to \code{formula01}.
 }
   \item{data}{
-a data frame in which to interpret the variables named in \code{formula01}, \code{formula02} and \code{formula12}.
+A data frame in which to interpret the variables of \code{formula01}, \code{formula02} and \code{formula12}.
 }
   \item{maxiter}{
-maximum number of iterations. The default is 200. 
+Maximum number of iterations. The default is 200. 
 }
   \item{eps}{
-a vector of length 3 for the convergence criteria (criterion for parameters, criterion for likelihood, criterion for second derivatives). The default is 'c(5,5,3)' and corresponds to criteria equals to \eqn{10^{-5}}, \eqn{10^{-5}} and \eqn{10^{-3}}.
+ A vector of 3 integers >0 used to define the power of three convergence criteria: 1. for the
+  regression parameters, 2. for the likelihood, 3. for the second
+  derivatives. The default is \code{c(5,5,3)} which is translated into 
+  convergence if the respective values change less then
+  \eqn{10^{-5}} (for regression parameters and likelihood) and
+  \eqn{10^{-3}} for the second derivatives between two iterations.
 }
-  \item{n.knots}{
-a vector of length 3 for the number of knots for the splines to use to approximate the intensities for transitions 0 --> 1, 0 --> 2 and 1 --> 2 respectively. Argument for the penalized likelihood approach.
+\item{n.knots}{
+  For \code{hazard="Splines"} only, a vector of length 3
+  specifing the number of knots, one for each transition, for the M-splines estimate
+  of the baseline intensities in the order
+  \code{0 --> 1}, \code{0 --> 2}, \code{1 --> 2}.
   The default is c(7,7,7). 
 }
+\item{knots}{
+List of length 3 containing the placements (timepoints) of the knots for
+  the M-spline of the three transitions.  
+}
   \item{irec}{
-binary variable equals to 1 when search (by approximated cross validation) of the smoothing parameters kappa and 0 otherwise. Argument for the penalized likelihood approach. The default is 0.
+    Binary variable equals to 1 when search (by approximated cross validation) of the smoothing parameters kappa and 0 otherwise. Argument for the penalized likelihood approach. The default is 0.
 }
   \item{kappa0}{
 a vector of length 3.  If irec=0, smoothing parameters for the transition 0 --> 1, 0 --> 2 and 1 --> 2. If irec=1, initial values of the smoothing parameters for the cross validation search. Argument for the penalized likelihood approach.  
@@ -139,8 +155,6 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 \dontrun{
 # Weibull illness deaths model 
 data(Paq1000)
-d <- Paq1000
-names(d) <- c("dementia","death","entry","L","R","time","certif","gender")
 
 fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
 		formula01=Hist(time=list(L,R),event=dementia)~certif,
@@ -148,7 +162,13 @@ fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
 
 
 fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
-formula01=Hist(time=list(L,R),event=dementia)~certif,data=d) 
+		formula01=Hist(time=list(L,R),event=dementia)~certif,
+		data=Paq1000)
+
+fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
+		formula01=Hist(time=list(L,R),event=dementia)~certif,
+                igraph=FALSE,
+		data=Paq1000) 
 
 ## to print
 fit.weib

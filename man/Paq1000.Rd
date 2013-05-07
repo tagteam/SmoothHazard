@@ -13,12 +13,12 @@ Paquid data set composed of 1000 subjects selected randomly from the Paquid data
   \describe{
     \item{\code{dementia}}{dementia status, 0=non-demented, 1=demented}
     \item{\code{death}}{death status, 0=alive, 1=dead}
-    \item{\code{t0}}{age at entry in the study}
-    \item{\code{t1}}{for demented subjects: age at the visit before the diagnostic visit; for non-demented subjects: age at the last visit (censoring age)}
-    \item{\code{t2}}{for demented subjects: age at the diagnostic visit; for non-demented subjects: age at the last visit (censoring age)}
-    \item{\code{t3}}{for dead subjects: age at death; for alive subject: age at the latest news}
-    \item{\code{certif}}{primary school certificate}
-    \item{\code{gender}}{gender, 0=female, 1=male}
+    \item{\code{entry}}{age at entry in the study}
+    \item{\code{L}}{for demented subjects: age at the visit before the diagnostic visit; for non-demented subjects: age at the last visit (censoring age)}
+    \item{\code{R}}{for demented subjects: age at the diagnostic visit; for non-demented subjects: age at the last visit (censoring age)}
+    \item{\code{time}}{for dead subjects: age at death; for alive subject: age at the latest news}
+    \item{\code{certif}}{primary school certificate:\code{0=with certificate}, \code{1=without certificate}}
+    \item{\code{gender}}{gender: \code{0=female}, \code{1=male}}
   }
 }
 

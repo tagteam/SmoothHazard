@@ -37,7 +37,7 @@ data(test)
 fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test,hazard="Splines") 
 
 # no confidence bands
-plot(fit.su,conf.bands=FALSE)
+plot(fit.su,conf.int=FALSE)
 
 # confidence bands
 plot(fit.su)

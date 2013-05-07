@@ -1,4 +1,4 @@
-plot.idmWeib <- plot.idmPl <- plot.idm <- function(x,conf.bands=FALSE, 
+plot.idmWeib <- plot.idmPl <- plot.idm <- function(x,conf.int=FALSE, 
 #ylim=FALSE,type.plot="intensity", 
 ylim,pos.legend="topleft", main, transition, ...){ 
 
@@ -18,7 +18,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 					ylim <- c(min(x$hazard01,x$hazard02,x$hazard12),max(x$hazard01,x$hazard02,x$hazard12))
 				}
 					
-				if(conf.bands){
+				if(conf.int){
 					matplot(x$time, cbind(x$hazard01,x$lowerHazard01,x$upperHazard01),type="l",lty=c(1,1,1),col=c(1,1,1),lwd=c(2,1,1), xlab="Time",ylab="Weibull transition intensities",ylim=ylim, main=main)
 					matlines(x$time, cbind(x$hazard02,x$lowerHazard02,x$upperHazard02),ylim=ylim, type="l",lwd=c(2,1,1),lty=c(2,2,2),col=c(2,2,2))
 					matlines(x$time, cbind(x$hazard12,x$lowerHazard12,x$upperHazard12),ylim=ylim, type="l",lwd=c(2,1,1),lty=c(3,3,3),col=c(3,3,3))
@@ -34,7 +34,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 					        if (missing(ylim)){
 							ylim <- c(min(c(x$hazard01,x$lowerHazard01,x$upperHazard01)),max(c(x$hazard01,x$lowerHazard01,x$upperHazard01)))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time, x$hazard01,type="l",col=1,lwd=2, xlab="Time",ylab="Weibull transition intensity 01",main=main)
 						}else{
 							matplot(x$time, cbind(x$hazard01,x$lowerHazard01,x$upperHazard01), col=c(1,1,1),type="l",lty=c(1,1,1),lwd=c(2,1,1),ylim=ylim
@@ -47,7 +47,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(c(x$hazard02,x$lowerHazard02,x$upperHazard02)),max(c(x$hazard02,x$lowerHazard02,x$upperHazard02)))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time, x$hazard02, type="l",col=2,lwd=2,lty=2, xlab="Time",ylab="Weibull transition intensity 02",main=main)
 						}else{
 							matplot(x$time, cbind(x$hazard02,x$lowerHazard02,x$upperHazard02),type="l",col=c(2,2,2),lwd=c(2,1,1),lty=c(2,2,2),ylim=ylim
@@ -59,7 +59,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(c(x$hazard12,x$lowerHazard12,x$upperHazard12)),max(c(x$hazard12,x$lowerHazard12,x$upperHazard12)))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time, x$hazard12, type="l",col=3,lwd=2,lty=3, xlab="Time",ylab="Weibull transition intensity 12", main=main)
 						}else{
 							matplot(x$time, cbind(x$hazard12,x$lowerHazard12,x$upperHazard12),type="l",col=c(3,3,3),lwd=c(2,1,1),lty=c(3,3,3),ylim=ylim
@@ -75,7 +75,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 					        if (missing(ylim)){
 							ylim <- c(min(x$hazard01,x$lowerHazard01,x$upperHazard01),max(x$hazard01,x$lowerHazard01,x$upperHazard01))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time, x$hazard01,type="l",col=1,lwd=2, xlab="Time",ylab="Weibull transition intensity 01",main=main)
 						}else{
 							matplot(x$time, cbind(x$hazard01,x$lowerHazard01,x$upperHazard01), col=c(1,1,1),type="l",lty=c(1,1,1),lwd=c(2,1,1),ylim=ylim
@@ -88,7 +88,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(c(x$hazard02,x$lowerHazard02,x$upperHazard02)),max(c(x$hazard02,x$lowerHazard02,x$upperHazard02)))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time, x$hazard02, type="l",col=2,lwd=2,lty=2, xlab="Time",ylab="Weibull transition intensity 02",main=main)
 						}else{
 							matplot(x$time, cbind(x$hazard02,x$lowerHazard02,x$upperHazard02),type="l",col=c(2,2,2),lwd=c(2,1,1),lty=c(2,2,2),ylim=ylim
@@ -100,7 +100,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(c(x$hazard12,x$lowerHazard12,x$upperHazard12)),max(c(x$hazard12,x$lowerHazard12,x$upperHazard12)))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time, x$hazard12, type="l",col=3,lwd=2,lty=3, xlab="Time",ylab="Weibull transition intensity 12", main=main)
 						}else{
 							matplot(x$time, cbind(x$hazard12,x$lowerHazard12,x$upperHazard12),type="l",col=c(3,3,3),lwd=c(2,1,1),lty=c(3,3,3),ylim=ylim
@@ -113,7 +113,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(x$hazard01,x$lowerHazard01,x$upperHazard01),max(x$hazard01,x$lowerHazard01,x$upperHazard01))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time,x$hazard01,type="l",col=1,lwd=2,xlab="Time",ylab="Weibull transition intensity 01",main=main)
 						}else{
 							matplot(x$time, cbind(x$hazard01,x$lowerHazard01,x$upperHazard01),type="l",col=c(1,1,1),lty=c(1,1,1),lwd=c(2,1,1),ylim=ylim
@@ -125,7 +125,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(x$hazard02,x$lowerHazard02,x$upperHazard02),max(x$hazard02,x$lowerHazard02,x$upperHazard02))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time, x$hazard02,type="l",col=2,lwd=2,lty=2,xlab="Time",ylab="Weibull transition intensity 02",main=main)
 						}else{
 							matplot(x$time,cbind(x$hazard02,x$lowerHazard02,x$upperHazard02),type="l",col=c(2,2,2),lwd=c(2,1,1),lty=c(2,2,2),ylim=ylim
@@ -137,7 +137,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(x$hazard12,x$lowerHazard12,x$upperHazard12),max(x$hazard12,x$lowerHazard12,x$upperHazard12))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time, x$hazard12, type="l",col=3,lwd=2,lty=3, xlab="Time",ylab="Weibull transition intensity 12", main=main)
 						}else{
 							matplot(x$time, cbind(x$hazard12,x$lowerHazard12,x$upperHazard12),type="l",col=c(3,3,3),lwd=c(2,1,1),lty=c(3,3,3),ylim=ylim
@@ -167,7 +167,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 					ylim <- c(ymin,ymax)
                                 }
                                 
-				if(conf.bands){
+				if(conf.int){
 					matplot(x$time[,1], cbind(x$hazard01,x$lowerHazard01,x$upperHazard01),type="l",lwd=c(2,1,1),lty=c(1,1,1),col=c(1,1,1),
 					xlab="Time",ylab="Splines transition intensities",xlim=c(xmin,xmax),ylim=ylim, main=main)
 					matlines(x$time[,2], cbind(x$hazard02,x$lowerHazard02,x$upperHazard02),xlim=c(xmin,xmax),ylim=ylim,type="l",lty=c(2,2,2),lwd=c(2,1,1),col=c(2,2,2))
@@ -186,7 +186,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(x$hazard01,x$lowerHazard01,x$upperHazard01),max(x$hazard01,x$lowerHazard01,x$upperHazard01))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time[,1],x$hazard01,type="l",col=1,lwd=2, xlab="Time",ylab="Splines transition intensity 01", main=main)
 						}else{
 							matplot(x$time[,1],cbind(x$hazard01,x$lowerHazard01,x$upperHazard01),type="l",col=c(1,1,1),lwd=c(2,1,1),lty=c(1,1,1),ylim=ylim
@@ -198,7 +198,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(c(x$hazard02,x$lowerHazard02,x$upperHazard02)),max(c(x$hazard02,x$lowerHazard02,x$upperHazard02)))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time[,2],x$hazard02,type="l",col=2,lwd=2,lty=2, xlab="Time",ylab="Splines transition intensity 02", main=main)
 						}else{
 							matplot(x$time[,2],cbind(x$hazard02,x$lowerHazard02,x$upperHazard02),type="l",col=c(2,2,2),lty=c(2,2,2),lwd=c(2,1,1),ylim=ylim
@@ -210,7 +210,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(c(x$hazard12,x$lowerHazard12,x$upperHazard12)),max(c(x$hazard12,x$lowerHazard12,x$upperHazard12)))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time[,3],x$hazard12,type="l",col=3,lwd=2,lty=3, xlab="Time",ylab="Splines transition intensity 12", main=main)
 						}else{
 							matplot(x$time[,3],cbind(x$hazard12,x$lowerHazard12,x$upperHazard12),type="l",col=c(3,3,3),lty=c(3,3,3),lwd=c(2,1,1),ylim=ylim
@@ -225,7 +225,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(x$hazard01,x$lowerHazard01,x$upperHazard01),max(x$hazard01,x$lowerHazard01,x$upperHazard01))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time[,1],x$hazard01, type="l",col=1,lwd=2, xlab="Time",ylab="Splines transition intensity 01", main=main)
 						}else{
 							matplot(x$time[,1],cbind(x$hazard01,x$lowerHazard01,x$upperHazard01),type="l",col=c(1,1,1),lwd=c(2,1,1),lty=c(1,1,1),ylim=ylim
@@ -237,7 +237,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(x$hazard02,x$lowerHazard02,x$upperHazard02),max(x$hazard02,x$lowerHazard02,x$upperHazard02))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time[,2],x$hazard02, type="l",col=2,lwd=2,lty=2, xlab="Time",ylab="Splines transition intensity 02", main=main)
 						}else{
 							matplot(x$time[,2],cbind(x$hazard02,x$lowerHazard02,x$upperHazard02),type="l",col=c(2,2,2),lty=c(2,2,2),lwd=c(2,1,1),ylim=ylim
@@ -249,7 +249,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(x$hazard12,x$lowerHazard12,x$upperHazard12),max(x$hazard12,x$lowerHazard12,x$upperHazard12))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time[,3],x$hazard12, type="l",col=3,lwd=2,lty=3, xlab="Time",ylab="Splines transition intensity 12", main=main)
 						}else{
 							matplot(x$time[,3],cbind(x$hazard12,x$lowerHazard12,x$upperHazard12),type="l",col=c(3,3,3),lty=c(3,3,3),lwd=c(2,1,1),ylim=ylim
@@ -262,7 +262,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(x$hazard01,x$lowerHazard01,x$upperHazard01),max(x$hazard01,x$lowerHazard01,x$upperHazard01))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time[,1],x$hazard01,type="l",col=1,lwd=2,xlab="Time",ylab="Splines transition intensity 01",main=main)
 						}else{
 							matplot(x$time[,1],cbind(x$hazard01,x$lowerHazard01,x$upperHazard01),type="l",col=c(1,1,1),lwd=c(2,1,1),lty=c(1,1,1),ylim=ylim
@@ -274,7 +274,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(x$hazard02,x$lowerHazard02,x$upperHazard02),max(x$hazard02,x$lowerHazard02,x$upperHazard02))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time[,2],x$hazard02, type="l",col=2,lwd=2,lty=2, xlab="Time",ylab="Splines transition intensity 02", main=main)
 						}else{
 							matplot(x$time[,2],cbind(x$hazard02,x$lowerHazard02,x$upperHazard02),type="l",col=c(2,2,2),lty=c(2,2,2),lwd=c(2,1,1),ylim=ylim
@@ -286,7 +286,7 @@ ylim,pos.legend="topleft", main, transition, ...){
 						if (missing(ylim)){
 							ylim <- c(min(x$hazard02,x$lowerHazard02,x$upperHazard02),max(x$hazard02,x$lowerHazard02,x$upperHazard02))
 						}
-						if(!conf.bands){
+						if(!conf.int){
 							plot(x$time[,3],x$hazard12, type="l",col=3,lwd=2,lty=3, xlab="Time",ylab="Splines transition intensity 12", main=main)
 						}else{
 							matplot(x$time[,3],cbind(x$hazard12,x$lowerHazard12,x$upperHazard12),type="l",col=c(3,3,3),lty=c(3,3,3),lwd=c(2,1,1),ylim=ylim
