@@ -1,0 +1,15 @@
+The irreversible illness-death model allows subjects to move from an
+initial state (``health state'') to a terminal state (``death state'')
+either directly or through an intermediate state (``disease
+state''). Disease onset times may not be known exactly, for example if
+the disease status of a patient can only be assessed at regular
+visits. In this situation the disease onset times are usually
+interval-censored. This article presents the \pkg{SmoothHazard}
+package for \proglang{R}. It implements algorithms for simultaneously
+fitting regression models to the three transition intensities of an
+illness-death model where the times to the intermediate state may be
+interval-censored data. The three baseline hazard functions are either
+parametrized according to Weibull distributions or approximated by
+M-splines. For a given set of covariates, the intensities models can
+be combined into predictions of cumulative event probabilities and
+life expectancies.

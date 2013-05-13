@@ -1,0 +1,463 @@
+* Introduction
+
+The irreversible illness-death model is a special multi-state model
+which has many applications for example in medical research. The model
+allows subjects to make transitions from an initial state (health) to
+a terminal state (death) either directly or via an intermediate state
+(disease), see Figure \ref{fig:1}.
+#+source: idm1
+#+BEGIN_SRC R :results graphics  :file "fig0.pdf" :exports none :session *R* :cache yes 
+library(prodlim)
+plotIllnessDeathModel(stateLabels=c("Healthy","Diseased","Dead"),arrowLabelSymbol="alpha")
+#+END_SRC
+#+RESULTS[<2013-05-05 09:27:05> 38856dc9b3933d54da83656ebe4eb2f231a20b87]:
+[[file:fig0.pdf]]
+
+#+ATTR_LaTeX: :width 0.4\textwidth
+#+LABEL: fig:1
+#+CAPTION: The irreversible illness-death model has three transition intensities.
+#+results: idm1
+[[file:fig0.pdf]]
+If the exact transition times are observed, standard procedures can be
+used to estimate regression models for the three transitions
+\citep{deWreede_Fiocco_Putter_2010}. In particular, the regression
+coefficients can be estimated using Cox partial likelihood without the
+need to specify the baseline intensities. However, this possibility is
+lost when the transition times from the initial state to the transient
+state are interval censored. For example, it may not be possible to
+determine the exact onset time of dementia for a patient diagnosed at
+time $R$. Instead it is only known that the patient was last seen
+dementia-free at time $L$. Thus, the onset time is interval censored
+between $L$ and $R$. The algorithms of the \pkg{SmoothHazard} package
+implement methods for estimating regression models under this type of
+censoring if the transition times into the absorbing state (e.g. death
+of the patient) are either known exactly or right censored [REF: Joly
+et al.]. 
+
+Implemented are a parametric and a semi-parametric estimation
+approach. For the parametric approach, the Weibull distribution is
+used and parameters are estimated by maximising the likelihood.  For
+the semi-parametric approach, M-splines are used to approximate the
+baseline transition intensities and the model parameters (except for
+the regression coefficients) are estimated using a penalized
+likelihood approach. The methods allow delayed entry of the subjects,
+i.e. that the event times are left-truncated.
+
+Section 2 presents the models and the likelihood.
+Section 3 presents the estimation methods.
+Section 4 provides some examples illustrating \pkg{SmoothHazard} functions.
+
+
+** Data
+
+Paquid is a large cohort study on mental and physical aging. The
+population consists of subjects aged 65 years and older living in
+Southwestern France. In order to illustrate the functionality of the
+package we provide a random subset containing data from 1000 subjects
+that were enrolled in the Paquid study \cite{letenneur1999sex}. The
+event of interest is the incidence of dementia and death without
+dementia is a competing risk. Furthermore, the time to dementia onset
+is interval censored.
+
+In this subset SRC_R{n.demented} subjects are diagnosed as demented
+and SRC_R{n.died} died from whom SRC_R{n.died.notdiagnosed} without
+being diagnosed as demented before. There are two covariates in this
+subset: sex (SRC_R{n.women} women and SRC_R{n.men} men) and primary
+school diploma (SRC_R{n.with} with diploma and SRC_R{n.with} without
+diploma). Age is chosen as the basic time scale. Consequently, we need
+to deal with left-truncated event times.
+
+#+BEGIN_SRC R :exports none :results silent  :session *R* :cache yes 
+library(SmoothHazard)
+data(Paq1000)
+n.demented <- sum(Paq1000$dementia)
+n.died <- sum(Paq1000$death)
+n.died.notdiagnosed <- sum(Paq1000$death & !Paq1000$dementia)
+n.women <- sum(Paq1000$gender==0)
+n.men <- sum(Paq1000$gender==1)
+n.with <- sum(Paq1000$certif==0)
+n.without <- sum(Paq1000$certif==1)
+#+END_SRC
+
+#+BEGIN_SRC R :results graphics  :file "~/research/SoftWare/eventhistory/pkg/SmoothHazard/manuscript/paq-idm.pdf" :exports both :session *R* :cache yes 
+library(prodlim)
+plotIllnessDeathModel(stateLabels=c("Dementia free","Dementia","Death"),arrowLabelSymbol="alpha")
+#+END_SRC
+
+#+ATTR_LaTeX: :width 0.4\textwidth
+#+RESULTS[<2013-04-30 16:53:16> ba75f7433e9d7fc854a710dd837d90d7c76a26a1]:
+[[file:~/research/SoftWare/eventhistory/pkg/SmoothHazard/manuscript/paq-idm.pdf]]
+
+
+#+BEGIN_SRC R :exports both :results output  :session *R* :cache yes 
+head(Paq1000)
+#+END_SRC
+
+#+RESULTS[<2013-04-30 13:49:19> f6320ffa3c0dd5e062341b21b4486baef83212c3]:
+:   dementia death   entry        L        R     time certif gender
+: 1        1     1 72.3333 82.34014 84.73303 87.93155      0      0
+: 2        0     1 77.9167 78.93240 78.93240 79.60048      0      1
+: 3        0     1 79.9167 79.91670 79.91670 80.92423      0      0
+: 4        0     1 74.6667 78.64750 78.64750 82.93501      1      1
+: 5        0     1 76.6667 76.66670 76.66670 79.16636      0      1
+: 6        0     0 66.2500 71.38070 71.38070 84.16975      1      0
+
+** Questions
+ 
+TODO
+   
+* Fitting the illness-death model based on interval censored data
+
+The function idm computes the maximum likelihood estimate for the
+three transition intensities:
+# $$\alpha_{hl}(t|Z_i)=\alpha_{0hl}(t)\exp\{\beta_{hl}Z_i\}; \text{hl in \{01,02,12\}}.$$
+
+In the situation where both transition times are not interval censored
+the regression coefficients can be estimated by the partial likelihood
+method \cite{coxpartial} without the need to specify or estimate the
+baseline hazard functions $\alpha_{0hl}(t)$. For interval censored
+transition times to state 1 the situation is more complex. It turns
+out that we have to estimate all transition intensities simultaneously
+and that we need a model for the baseline hazard functions. This can
+be seen by inspecting the likelihood function.
+Denote the conditional event-free survival function by
+$$S(t|Z_{01i},Z_{02i})=\exp\{- A_{01}(t|Z_{01}) -A_{02}(t|Z_{02})\}$$
+where the conditional cumulative hazard
+$${A}_{hl}(t|Z_{hli})=\int_0^t {\alpha}_{hl}(u)du$$.
+
+Subject $i$, $\delta_{1i}$ indicator for event "ill", $\delta_{2i}$
+indicator for event "death", 
+cumulative intensity function. We can have $L_i=R_i$: no interval
+censoring, $L_i=R_i=T_i$ if we know that the subject is not becoming
+ill before dying, $R_i=T_i$ if we do not know that the subject is
+becoming ill before dying
+
+\begin{multline}
+{\cal L} = \displaystyle \prod_{i=1}^{n} 
+S(T_{0i}|Z_{01i},Z_{02i})^{-1}
+\left(
+\left( 
+S(T_i|Z_{01i},Z_{02i})
+\left(\alpha_{02}(T_i|Z_{02i})\right)^{\delta_{2i}}
+\right)^{1-\delta_{1i}} + \right.\\
+\left.
+\int_{L_i}
+^{R_i} S(u|Z_{01i},Z_{02i})
+\alpha_{01}(u|Z_{01i}) \frac{
+e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}\left(\alpha_{12}(T_i|Z_{12i})\right)^{\delta_{2i}}du
+\right)
+\end{multline}
+
+** The Weibull parametrization
+
+TODO: Describe the implemented parametrization of the three baseline functions.
+   
+#+BEGIN_SRC R :exports both :results output   :session *R* :cache yes 
+fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif+gender,
+                formula01=Hist(time=list(L,R),event=dementia)~certif+gender,
+                data=Paq1000,eps=c(5,5,3),maxiter=200,hazard="Weib")
+print(fit.weib)
+#+END_SRC
+
+#+RESULTS[<2013-04-30 13:49:56> c4a7cbcc4bb44796d4fcc1e6c405d63d54452162]:
+#+begin_example
+Call:
+idm(formula01 = Hist(time = list(L, R), event = dementia) ~ certif + 
+    gender, formula02 = Hist(time, event = death, entry = entry) ~ 
+    certif + gender, data = Paq1000, maxiter = 200, eps = c(5, 
+    5, 3), hazard = "Weib")
+
+Illness-death Model using a parametric approach with a Weibull distribution for the intensity functions.
+
+number of subjects:  1000 
+number of events '0-->1':  186 
+number of events '0-->2' or '0-->1-->2':  724 
+number of covariates:  2 2 2 
+
+             coef SE.coef     HR          CI       Wald  p.value
+certif_01 -0.5194  0.2016 0.5949 [0.40;0.88]  6.6399364 0.009972
+gender_01 -0.1221  0.1599 0.8851 [0.65;1.21]  0.5834324 0.444970
+certif_02  0.1268  0.1264 1.1352 [0.89;1.45]  1.0066517 0.315706
+gender_02  0.5363  0.1200 1.7096 [1.35;2.16] 19.9873828 < 0.0001
+certif_12 -0.2079  0.2323 0.8123 [0.52;1.28]  0.8014211 0.370669
+gender_12  0.5792  0.1865 1.7846 [1.24;2.57]  9.6469569 0.001897
+
+               Without cov  With cov
+Log likelihood   -3075.308 -3048.791
+
+Parameters of the Weibull distribution: 'S(t) = exp(-(b*t)^a)'
+      alpha01    alpha02    alpha12
+a 11.18802187 8.62750163 7.50200265
+b  0.01099806 0.01078284 0.01294115
+
+----
+Model converged.
+number of iterations:  8 
+convergence criteria: parameters= 0.00000012 
+                    : likelihood= 0.0000007 
+                    : second derivatives= 0.00000000047
+#+end_example
+
+
+** The penalized likelihood 
+
+Intensity functions are expected to be smooth.
+
+To introduce such a priori knowledge, we penalize the likelihood by a
+term which has large values for rough functions.
+
+The roughness penalty function chosen for the three-state model is the
+sum of the square norms of the second derivatives of the intensities.
+
+The penalized log-likelihood $(pl)$ is thus defined as
+
+\begin{equation}
+\label{eq:77}
+pl = l - \kappa_{01} \int {\alpha_{01} ^{''} }^2 (u) du - \kappa_{12}
+\int {\alpha_{12} ^{''} }^2 (u) du - \kappa_{02} \int {\alpha_{02}
+^{''} }^2 (u) du \ \ \ \
+\end{equation}
+
+where $l$ is the full log-likelihood (which is a function of
+$\alpha_{01} (.)$, $\alpha_{12}(.)$ and $\alpha_{02}(.)$) and
+$\kappa_{01}$, $\kappa_{12}$ and $\kappa_{02}$ are three positive
+smoothing parameters which control the trade-off between the data fit
+and the smoothness of the functions.
+
+Maximization of (\ref{eq:77}) defines the maximum penalized likelihood
+estimators (MPLE) ${\hat \alpha_{01}}(.)$, ${\hat \alpha_{12}}(.)$ and
+${\hat \alpha_{02}}(.)$.\\
+
+\underline{Approximation via splines:}\\
+
+The MPLE of (\ref{eq:77}) cannot be calculated explicitly. However, it
+can be approximated using splines.
+
+Splines are piecewise polynomial functions which are combined linearly
+to approximate a function on an interval.
+
+We use cubic M-splines and I-splines, which are variants of B-splines.
+
+The estimator ${\hat A} (.)$ for a given transition is approximated by
+a linear combination of $m$ I-splines:
+
+$ {\tilde A}(.) = \GTH I (.)$, where $\GTH = ({\tilde \theta}
+_1,...,{\tilde \theta}_m)$ and $I (.)= (I_1 (.),...,I_m (.))^T$. By
+differentiation we obtain: ${\tilde \alpha}(.) = \GTH M(.)$, where $M
+(.) =(M_1 (.),...,M_m (.))^T$. We use a distinct base of splines for
+each intensity function, possibly with a different number of splines
+in each basis. The monotonicity constraint for $ {\tilde A}(.)$ is
+fulfilled by constraining the coefficients $\GTH$ to be positive.
+
+The approximation ${\tilde \alpha}$ of ${\hat \alpha}$ is the function
+belonging to the space generated by the basis of splines, which
+maximizes $pl(\alpha_{01},\alpha_{12},\alpha_{02})$.
+
+We briefly present the M-splines and I-splines used here and give some
+computational aspects of this approach.
+
+For more details see Ramsay (1988).
+
+A M-spline of order $k$ is defined as:
+
+\begin{eqnarray*}
+M _{j} (x |k)& = & \left\{
+\begin{array}{ll}
+\frac { k \left[ (x-t _{j})M_{j} (x |k-1)+ (t_{j+k}-x)M_{j+1} (x |k-1)
+\right]}{(k-1)(t_{j+k}-t_{j})}, \ \ \ \ t_j \leq x < t _{j+k},\\
+0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{elsewhere,} \\
+\end{array}
+\right.\\
+\mbox{with} &&\\
+M _{j} (x |1)& = &\left\{
+\begin{array}{ll}
+\frac {1}{(t_{j+1}-t_{j})} \ \ \ \ \mbox{if} \ \ t_j \leq x < t
+_{j+1},\\
+0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{elsewhere.} \\
+\end{array}
+\right.
+\end{eqnarray*}
+
+where $t_1,...,t_m$ is a sequence of increasing knots.
+
+Each $M_j(x |k)$ is zero outside of the interval $[t_j,t_{j+k}]$,
+hence is non-zero over $k$ intervals and over each interval there are
+$k$ non-zero M-splines. For our approximation we use splines of order
+4 (cubic splines).\\
+
+To each M-spline we associate a I-spline:
+
+$$I _j (x|k) = \int _0 ^x M _{j} (u |k) du.$$
+
+Each $M_j$ is piecewise polynomial of degree $k-1$ and each associated
+$I_j$ is piecewise polynomial of degree $k$ defined as (if $t_j \leq x
+< t_{j+1}$):
+\begin{equation*}
+I _h (x|k) =
+\left\{
+\begin{array}{ll}
+& 0 \ \ \ \ \ \ \mbox{if} \ \ h>j \mbox{,} \\
+& \displaystyle\sum _{l=h} ^{j} (t_{l+k+1}-t_l) \frac {M_l (x | k +
+1)}{k+1} \ \ \ \ \mbox{if} \ \ j-k+1 \leq h \leq j\mbox{,} \\
+& 1, \ \ \ \ \mbox{if} \ \ h < j - k + 1 \mbox{.}
+\end{array}
+\right.
+\end{equation*}
+These splines are convenient to manipulate; among other things a
+linear combination of splines is easy to differentiate or integrate.
+
+Note that M-splines are nonnegative and I-splines are monotonically
+increasing; it results that the monotonicity constraint for a function
+represented on a basis of I-splines can be fulfilled by constraining
+the coefficients to be positive.
+
+Thus the estimator ${\hat A} (.)$ can be approximated by a linear
+combination of $m$ I-splines $ {\tilde A}(.) = \sum_{j=1} ^{m}
+g(\tilde \theta _j)I _j (.)$, where $g(\tilde \theta _j) \geq 0 \ \
+\forall j$ (for example $g(\tilde \theta _j) = e^{\tilde \theta _j}$
+or $g(\tilde \theta _j) = {\tilde \theta _j}^2$); in practice we use
+$g(\tilde \theta _j) = {\tilde \theta _j}^2$ to avoid convergence
+problems when $g(\tilde \theta _j)$ should be zero. For the transition
+intensity we have: ${\tilde \alpha}(.) = \sum _{j=1} ^m g(\tilde
+\theta _j) M _j(.) .$ So with the same vector of coefficients $\GTH =
+(\tilde \theta _1,...,\tilde \theta_m)^T$ we get the cumulative hazard
+function with I-splines and the hazard function with M-splines. In
+fact the set of functions generated by the basis of splines with
+positive coefficients is included in the set of positive functions
+generated by the basis of splines. However our numerical experience
+shows that this set is rich enough to provide a good approximation of
+the hazard function.\\
+
+\underline {The knots :}\\
+
+A spline function is completely defined by a sequence of knots and the
+coefficients of the splines.
+
+In the program, a knot is set on the first and last data points and
+the other knots are put equidistantly between them by default.
+
+Another way to have an automatic choice for the location of the knots
+is to locate the knots at every $p$ data points as described in
+O'Sullivan (1988). Otherwise the user can choose their location freely
+but by verifying that there are several time in the data set between
+every knots.
+
+Theoretically, the more knots, the better the approximation.
+
+Increasing the number of knots does not deteriorate the MPLE: this is
+because the degree of smoothing in the penalized likelihood method is
+tuned by the smoothing parameters $\kappa_{01}$, $\kappa_{12}$ and
+$\kappa_{02}$ and not by the number of splines.
+
+On the other hand, once a sufficient number of knots is established,
+there is no advantage in adding more.
+
+Moreover, the more knots, the longer the running time, especially if
+there is a search for the smoothing parameters; some numerical problem
+can arise, particularly for a large number of knots. That is why the
+maximum number of knots is limited to 25. So it is recommended to
+start with a small number of knots (e.g. 7) and increase the number of
+knots until the graph of the hazard function remains unchanged (rarely
+more than 12 knots). It is possible to have different number of knots
+for each transition intensity.
+
+In any case there must be a knot before or at the first data point and
+after or at the last data point.\\
+
+%%%%%%%%%%%%%%%% Penalized 
+
+The vectors of spline coefficients $\GTH_{01}$, $\GTH_{12}$ and
+$\GTH_{02}$ for fixed $\kappa_{01}$, $\kappa_{12}$ and $\kappa_{02}$
+are obtained simultaneously by maximizing the log-likelihood using a
+Marquardt's algorithm (1963)
+
+When the three vectors $\GTH _{01}$, $\GTH _{12}$ and $\GTH _{02}$ are
+obtained, with the knots sequence , all the functions of interest can
+be computed, as in a parametric method.\\
+
+\underline {Algorithm:}\\
+
+The vectors of parameter for the baseline transition intensities
+(either spline coefficients or weibull parameters) and the vector of
+regression parameter $\hat \beta _{01}$, $\hat \beta _{12}$ and $\hat
+\beta _{02}$ are obtained simultaneously by maximizing the
+log-likelihood using a combination of a Marquardt's algorithm (1963)
+and a steepest descent algorithm. Marquardt's algorithm is a robust
+Newton-like algorithm. The Marquardt's algorithm step involves a line
+search with a step reduction if the new point is not better. The
+steepest descent step involves a full line search and is attempted
+only if the Marquardt's algorithm step has failed, due generally to a
+difficulty to inverse the Hessian of the log-likelihood. Few
+iterations are needed if the initial value is judiciously chosen
+because the Marquardt's algorithm iteration is used. In other cases
+the steepest descent iteration is often used because the Hessian may
+be singular and the convergence is slower.
+
+We stop the iterations when the difference between two consecutive
+log-likelihoods is small, the coefficients are stable and the gradient
+is small enough. The variance of parameter estimates are estimated
+using the inverse of the matrix of the second derivatives at
+convergence.
+
+
+
+#+BEGIN_SRC R :results graphics  :file "~/research/SoftWare/eventhistory/pkg/SmoothHazard/manuscript/transition-intensities-paq-weib.pdf" :exports results :session *R* :cache yes 
+plot(fit.weib,conf.int=TRUE)
+#+END_SRC
+
+#+RESULTS[<2013-04-30 16:27:45> a85422472c3b7b3bb92da9751c2b751b59bb30fc]:
+[[file:~/research/SoftWare/eventhistory/pkg/SmoothHazard/manuscript/transition-intensities-paq-weib.pdf]]
+
+* Predicting parameters of life
+
+\bibliographystyle{apalike}
+\bibliography{smoothhazard}
+
+* COMMENT Latex header
+#+TITLE: Fitting regression models to interval censored observations of illness-death models
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc author:nil creator:nil
+#+LaTeX_CLASS: jss
+#+LATEX_HEADER: \usepackage{tikz}
+#+LATEX_HEADER: \usepackage{hyperref}
+#+LATEX_HEADER: \usepackage{amsmath}
+#+LATEX_HEADER: \usepackage{attrib}
+#+LATEX_HEADER: \Plainauthor{C\'elia Touraine, Thomas A. Gerds, Pierre Joly}
+#+LATEX_HEADER: \author{C\'elia Touraine\\University of Bordeaux \And Thomas A. Gerds\\University of Copenhagen \And Pierre Joly\\University of Bordeaux}
+#+LATEX_HEADER: \title{Illness-Death Model for Interval-Censored Data: The \pkg{SmoothHazard} Package for \proglang{R}}
+#+LATEX_HEADER: \Shorttitle{Illness-Death Model for Interval-Censored Data: The  \pkg{SmoothHazard} Package for \proglang{R}}
+#+LATEX_HEADER: \Keywords{illness-death model, interval-censored data, left-truncated data, survival model, proportional regression models, Smooth Transition intensities, Weibull}
+#+LATEX_HEADER: \Address{C\'elia Touraine\\Univ. Bordeaux\\ISPED\\Centre INSERM U-897-Epidemiologie-Biostatistique\\Bordeaux F-33000\\France\\E-mail: celia.touraine@isped.u-bordeaux2.fr\\URL: http://www.isped.u-bordeaux2.fr/}
+#+LATEX_HEADER: \Abstract{\input{jss-abstract.tex}}
+#+LATEX_HEADER: \lstset{
+#+LATEX_HEADER: keywordstyle=\color{blue},
+#+LATEX_HEADER: commentstyle=\color{red},
+#+LATEX_HEADER: stringstyle=\color[rgb]{0,.5,0},
+#+LATEX_HEADER: basicstyle=\ttfamily\small,
+#+LATEX_HEADER: columns=fullflexible,
+#+LATEX_HEADER: breaklines=true,        % sets automatic line breaking
+#+LATEX_HEADER: breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
+#+LATEX_HEADER: numbers=left,
+#+LATEX_HEADER: numberstyle=\ttfamily\tiny\color{gray},
+#+LATEX_HEADER: stepnumber=1,
+#+LATEX_HEADER: numbersep=10pt,
+#+LATEX_HEADER: backgroundcolor=\color{white},
+#+LATEX_HEADER: tabsize=4,
+#+LATEX_HEADER: showspaces=false,
+#+LATEX_HEADER: showstringspaces=false,
+#+LATEX_HEADER: xleftmargin=.23in,
+#+LATEX_HEADER: frame=single,
+#+LATEX_HEADER: basewidth={0.5em,0.4em}
+#+LATEX_HEADER: }
+#+latex_header:\def\GTH{ \mbox{ $\tilde{ \theta} $}}
+# # \newcommand{\GTH}{\ensuremath{\Theta}}
+#+LaTeX_HEADER:\usepackage{natbib}
+#+LaTeX_HEADER:\usepackage{graphicx}
+#+LaTeX_HEADER:\usepackage{array}
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+STARTUP: oddeven
+#+PROPERTY: session *R* 
+#+PROPERTY: cache yes
