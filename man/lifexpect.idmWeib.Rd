@@ -25,9 +25,9 @@ Predictions of life expectancies from an illness-death model using a penalized l
 
 \value{
   a list containing:
-   \item{life.in.0.expectancy}{life expectancy in state 0 and confidence interval.}
-   \item{life.expectancy.nondis}{life expectancy of a non-diseased subject and confidence interval.} 
-   \item{life.expectancy.dis}{life expectancy of a diseased subject and confidence interval.}
+   \item{HLE}{healthy life expectancy and confidence interval.}
+   \item{LE0}{life expectancy of a non-diseased subject and confidence interval.} 
+   \item{LE1}{life expectancy of a diseased subject and confidence interval.}
 }
 
 \seealso{
@@ -43,13 +43,10 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 \examples{
 \dontrun{
 data(Paq1000)
-d <- Paq1000
-names(d) <- c("dementia","mort","entry","L","R","time","certif","death")
-
 fit <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
-formula01=Hist(time=list(L,R),event=dementia)~certif,data=d,hazard="Splines") 
+formula01=Hist(time=list(L,R),event=dementia)~certif,data=Paq1000) 
 
-pred <- lifexpect.idmWeib(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
+LEs <- lifexpect.idmWeib(fit,s=95,Z01=c(1),Z02=c(1),Z12=c(1))
 
 }
 }

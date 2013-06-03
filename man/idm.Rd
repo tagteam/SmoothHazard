@@ -11,7 +11,7 @@ State 0 corresponds to the initial state, state 1 to the transient one, state 2 
 }
 \usage{
 idm(formula01, formula02, formula12, data, maxiter=200, eps=c(5,5,3), 
-n.knots=c(7,7,7), irec=0,kappa0 = c(1000000,500000,20000), igraph=1, 
+n.knots=c(7,7,7), knots, irec=0,kappa0 = c(1000000,500000,20000), igraph=1, 
 hazard="Weib", print.iter=FALSE, subset=NULL, na.action=na.omit)
 }
 

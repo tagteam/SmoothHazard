@@ -117,9 +117,9 @@ lifexpect.idmWeib <- function(object,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
 			isup <- ceiling(isup)*delta + floor(isup)*(1-delta)
 		}
 		Xres4 <- cbind(Xres3[,iinf],Xres3[,isup]) # 1ere colonne = bornes inf pour chaque valeur ; 2eme colonne = borne sup pour chaque valeur
-		return(list(life.in.0.expectancy=c(res$life.in.0.expectancy,Xres4[1,]),
-		life.expectancy.nondis=c(res$life.expectancy.nondis,Xres4[2,]),
-		life.expectancy.dis=c(res$life.expectancy.dis,Xres4[3,])))	
+		return(list(HLE=c(res$HLE,Xres4[1,]),
+		LE0=c(res$LE0,Xres4[2,]),
+		LE1=c(res$LE1,Xres4[3,])))	
 		}
 		else 
 			return(res)
@@ -143,7 +143,7 @@ lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
 		}
 		,lower=s,upper=x)$value})
                },s,Inf)
-return(list(life.in.0.expectancy=ET0.$value,life.expectancy.nondem=ET01$value+ET0.$value,life.expectancy.dem=ET12$value))
+return(list(HLE=ET0.$value,LE0=ET01$value+ET0.$value,LE1=ET12$value))
 
 }
 

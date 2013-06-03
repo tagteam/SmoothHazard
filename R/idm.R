@@ -25,7 +25,7 @@ idm <- function(formula01,
   if(class(formula01)!="formula")stop("The argument formula01 must be a class 'formula'.")	
   if(class(formula02)!="formula")stop("The argument formula02 must be a class 'formula'.")		
   if(missing(formula02)) formula02 <- formula01
-  if(missing(formula12)) formula12 <- formula01
+  if(missing(formula12)) formula12 <- formula02
   if(missing(data)) stop("Need a data frame.")
   if(class(data)!="data.frame")stop("The 'data' argument must be a data.frame")
   ### to remove missing data
