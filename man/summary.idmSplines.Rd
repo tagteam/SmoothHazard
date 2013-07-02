@@ -1,18 +1,18 @@
-\name{summary.idmPl}
-\alias{summary.idmPl}
+\name{summary.idmSplines}
+\alias{summary.idmSplines}
 
 \title{
 Summary of a fitted illness-death model using a penalized likelihood approach
 }
 
 \usage{
-\method{summary}{idmPl}(object, conf.int = 0.95, digits = 4,
+\method{summary}{idmSplines}(object, conf.int = 0.95, digits = 4,
  pvalDigits = 4, eps = 1e-04, ...)
 }
 \description{Print a short summary of a fitted illness-death model using the penalized likelihood approach.}
 \arguments{
   \item{object}{
-a \code{idmPl} object, i.e., the result of a call to the \code{\link{idm}} function with \code{hazard}="Splines".
+a \code{idmSplines} object, i.e., the result of a call to the \code{\link{idm}} function with \code{intensities}="Splines".
 }
   \item{conf.int}{
 confiance level.
@@ -33,9 +33,9 @@ other unusued arguments.
 
 \seealso{
  \code{\link{idm}}, 
- \code{\link{print.idmPl}}, 
+ \code{\link{print.idmSplines}}, 
  \code{\link{plot.idm}} 
- \code{\link{plot.idmPl}}
+ \code{\link{plot.idmSplines}}
 }
   
 \author{
@@ -47,13 +47,12 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 \examples{
 \dontrun{
 data(Paq1000)
-d <- Paq1000
-names(d) <- c("dementia","mort","entry","L","R","time","certif","death")
-
-fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
-formula01=Hist(time=list(L,R),event=dementia)~certif,data=d
-,irec=0,igraph=1,hazard="Splines",eps=c(1,1,1)) 
-summary(fit.weib) 
+fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+		formula01=Hist(time=list(l,r),event=dementia)~certif,
+                formula12=~1,
+                intensities="Splines",
+		data=Paq1000)
+summary(fit.splines) 
 }
 }
 

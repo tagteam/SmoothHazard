@@ -1,5 +1,5 @@
-print.shrPl <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
-	if (!inherits(x,"shrPl")) stop("Object must be of class 'shrPl'")
+print.shrSplines <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
+	if (!inherits(x,"shrSplines")) stop("Object must be of class 'shrSplines'")
 
 	cl <- x$call
 	cat("Call:\n")
@@ -34,7 +34,7 @@ print.shrPl <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 		if(length(x$na.action))cat("number of deleted observations due to missing: ",length(x$na.action),"\n")
 
 		cat("\n")
-		if(x$irec == 1){
+		if(x$CV){
 			cat("Smoothing parameters estimated by Cross validation: ",x$kappa,"\n")
 			cat("Cross validation criterion:",x$CVcrit,"\n")
 			cat("DoF: ", formatC(-x$DoF, format="f",digits=2),"\n")

@@ -1,6 +1,6 @@
-summary.idmPl <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...){
+summary.idmSplines <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...){
 
-	if (!inherits(object,"idmPl")) stop("Object must be of class 'idmPl'")
+	if (!inherits(object,"idmSplines")) stop("Object must be of class 'idmSplines'")
 	x <- object
 	if (x$converged == 1){
 		cat("illness using a Penalized Likelihood on the hazard function.\n")

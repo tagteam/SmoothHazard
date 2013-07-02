@@ -11,7 +11,7 @@ Predictions for an illness-death model using the Weibull approach.
  \method{predict}{idmWeib}(object, s, t, Z01, Z02, Z12, nsim=2000, CI=TRUE, ...)
 }
 \arguments{
-  \item{object}{an \code{idmWeib} class objects returned by a call to the \code{\link{idm}} function with \code{hazard}="Weib".}
+  \item{object}{an \code{idmWeib} class objects returned by a call to the \code{\link{idm}} function with \code{intensities}="Weib".}
   \item{s}{time at prediction.}
   \item{t}{time for prediction.}
   \item{Z01}{vector for the values of the covariates on the transition 0 --> 1 (in the same order as the covariates within the call. The default values are all 0.}  
@@ -49,13 +49,12 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 \examples{
 \dontrun{
 data(Paq1000)
-d <- Paq1000
-names(d) <- c("dementia","mort","entry","L","R","time","certif","death")
 
-fit <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
-formula01=Hist(time=list(L,R),event=dementia)~certif,data=d) 
+fit <- idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000) 
 
 pred <- predict(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
+pred
 }
 }
 

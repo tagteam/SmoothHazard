@@ -1,18 +1,18 @@
-\name{summary.shrPl}
-\alias{summary.shrPl}
+\name{print.shrSplines}
+\alias{print.shrSplines}
 
 \title{
-Summary of a fitted survival model using a penalized likelihood approach
+Print method for \code{shrSplines} objects 
 }
 
 \usage{
-\method{summary}{shrPl}(object, conf.int = 0.95, digits = 4,
+\method{print}{shrSplines}(x, conf.int = 0.95, digits = 4,
  pvalDigits = 4, eps = 1e-04, ...)
 }
-\description{Print a short summary of a fitted illness-death model using the penalized likelihood approach.}
+\description{Print a summary of a fitted illness-death model using the penalized likelihood approach.}
 \arguments{
-  \item{object}{
-a \code{shrPl} object, i.e., the result of a call to the \code{\link{shr}} function with \code{hazard}="Splines".
+  \item{x}{
+a \code{shrSplines} object, i.e., the result of a call to the \code{\link{shr}} function with \code{hazard}="Splines".
 }
   \item{conf.int}{
 confiance level.
@@ -32,9 +32,8 @@ other unusued arguments.
 }
 
 \seealso{
- \code{\link{shr}}, 
- \code{\link{print.shrPl}},  
- \code{\link{plot.shrPl}}
+ \code{\link{summary.shrSplines}},  
+ \code{\link{plot.shrSplines}}
 }
   
 \author{
@@ -48,7 +47,7 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 # a penalized survival model 
 data(test)
 fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test,hazard="Splines") 
-summary(fit.su) 
+print(fit.su) 
 }
 }
 

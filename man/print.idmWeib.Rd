@@ -12,7 +12,7 @@ Print method for \code{idmWeib} objects
 \description{Print a summary of a fitted illness-death model using the Weibull approach.}
 \arguments{
   \item{x}{
-a \code{idmWeib} object, i.e., the result of a call to the \code{\link{idm}} function with \code{hazard}="Weib".
+a \code{idmWeib} object, i.e., the result of a call to the \code{\link{idm}} function with \code{intensities}="Weib".
 }
   \item{conf.int}{
 confiance level.

@@ -6,10 +6,10 @@ idm <- function(formula01,
                 eps=c(5,5,3),
                 n.knots=c(7,7,7),
                 knots,
-                irec=0,
-                kappa0=c(1000000,500000,20000),
+                CV=FALSE,
+                kappa=c(1000000,500000,20000),
                 igraph=1,
-                hazard="Weib",
+                intensities="Weib",
                 print.iter=FALSE,
                 subset = NULL,
                 na.action = na.omit){
@@ -25,7 +25,7 @@ idm <- function(formula01,
   if(class(formula01)!="formula")stop("The argument formula01 must be a class 'formula'.")	
   if(class(formula02)!="formula")stop("The argument formula02 must be a class 'formula'.")		
   if(missing(formula02)) formula02 <- formula01
-  if(missing(formula12)) formula12 <- formula02
+  if(missing(formula12)) formula12 <- formula01
   if(missing(data)) stop("Need a data frame.")
   if(class(data)!="data.frame")stop("The 'data' argument must be a data.frame")
   ### to remove missing data
@@ -166,7 +166,7 @@ idm <- function(formula01,
   idm <- responseTrans[,"status"]==(as.integer(isIntervalCensored)+1)
   idd <- responseAbs[,"status"]==1
  
-  if(!(hazard %in% c("Weib","Splines"))) stop("The hazard argument must be 'Weib' or 'Splines'")
+  if(!(intensities %in% c("Weib","Splines"))) stop("The intensities argument must be 'Weib' or 'Splines'")
   # }}}
   # {{{ call Fortran function weib and collect results
   
@@ -191,7 +191,7 @@ idm <- function(formula01,
   ## eps|convergence criteria: 1:likelihood,2:parameter est,3:gradient parameter est |length 3|integer|example eps=c(7,4,5) then use 10^-7,10^-4,10^-5. Defaults to c(5,5,3)
   ## maxiter| maximum number of iteration | length 1 | integer | > 0 default to 200
   
-  if (hazard == "Weib"){
+  if (intensities == "Weib"){
     #	cat("------ Program Weibull ------ \n")
     size1 <- NC01 + NC02 + NC12
     size2 <- size1^2
@@ -323,8 +323,8 @@ idm <- function(formula01,
                      as.double(knots02),
                      as.integer(nknots12),
                      as.double(knots12),
-                     as.integer(irec),
-                     as.double(kappa0),
+                     as.integer(CV),
+                     as.double(kappa),
                      kappa=as.double(rep(0,3)),
                      as.integer(igraph),
                      CVcrit=as.double(0),
@@ -350,7 +350,7 @@ idm <- function(formula01,
   }
 
   fit <- NULL
-  if(hazard=="Weib"){
+  if(intensities=="Weib"){
     weibullParameter <- ffit$basepar
   }
 
@@ -361,7 +361,7 @@ idm <- function(formula01,
   fit$cv <- ffit$cv
   fit$niter <- ffit$niter
   fit$converged <- ffit$converged
-  if(hazard=="Weib"){
+  if(intensities=="Weib"){
     fit$modelPar <- weibullParameter
   }
   fit$N <- N
@@ -370,22 +370,22 @@ idm <- function(formula01,
   fit$NC <- NC
   fit$responseAbs <- responseAbs
   fit$responseTrans <- responseTrans
-  if(hazard=="Splines"){
+  if(intensities=="Splines"){
     fit$time <- matrix(ffit$t,ncol=3) 
   }else{
     fit$time <- ffit$t 
   }
-  fit$hazard01 <- ffit$a01
-  fit$lowerHazard01 <- ffit$a01_l
-  fit$upperHazard01 <- ffit$a01_u
+  fit$intensity01 <- ffit$a01
+  fit$lowerIntensity01 <- ffit$a01_l
+  fit$upperIntensity01 <- ffit$a01_u
   
-  fit$hazard02 <- ffit$a02
-  fit$lowerHazard02 <- ffit$a02_l
-  fit$upperHazard02 <- ffit$a02_u
+  fit$intensity02 <- ffit$a02
+  fit$lowerIntensity02 <- ffit$a02_l
+  fit$upperIntensity02 <- ffit$a02_u
   
-  fit$hazard12 <- ffit$a12
-  fit$lowerHazard12 <- ffit$a12_l
-  fit$upperHazard12 <- ffit$a12_u
+  fit$intensity12 <- ffit$a12
+  fit$lowerIntensity12 <- ffit$a12_l
+  fit$upperIntensity12 <- ffit$a12_u
  
   if (sum(NC)>0){                       # if at least one covariate
     betaCoef <- ffit$regpar
@@ -399,7 +399,7 @@ idm <- function(formula01,
     fit$se <- sqrt(diag(fit$V))
   }  	
   V <- matrix(ffit$V_tot,nrow=size_V,ncol=size_V,byrow=T)
-  if(hazard=="Weib"){
+  if(intensities=="Weib"){
     colnames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
     rownames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
   }else{
@@ -415,32 +415,32 @@ idm <- function(formula01,
   if(NC02>0) fit$Xnames02 <- Xnames02
   if(NC12>0) fit$Xnames12 <- Xnames12
 
-  if(hazard=="Splines"){
+  if(intensities=="Splines"){
     fit$knots01 <- knots01
     fit$knots02 <- knots02
     fit$knots12 <- knots12
     fit$theta01 <- ffit$theta01     
     fit$theta02 <- ffit$theta02    
     fit$theta12 <- ffit$theta12 
-    fit$irec <- irec
+    fit$CV <- CV
     fit$nknots01 <- n.knots[1]
     fit$nknots02 <- n.knots[2]
     fit$nknots12 <- n.knots[3]
     fit$igraph <- ffit$igraph
     fit$CVcrit <- ffit$CVcrit
     fit$DoF <- ffit$mdf
-    if(irec == 1){	
+    if(CV){	
       fit$kappa <- ffit$kappa	
     }else{
-      fit$kappa <- kappa0
+      fit$kappa <- kappa
     }
   }
   fit$na.action <- na.action	
   # }}}
-  if(hazard=="Weib"){
+  if(intensities=="Weib"){
     class(fit) <- "idmWeib"
   }else{
-    class(fit) <- "idmPl"
+    class(fit) <- "idmSplines"
   }  
 	
   cost<-proc.time()-ptm

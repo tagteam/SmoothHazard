@@ -10,7 +10,7 @@ Left-truncated, right-censored, and interval-censored data are allowed.
 }
 \usage{
 shr(formula, data, eps = c(5, 5, 3), nknots=7,
-irec = 0 , kappa0 = 10000, igraph = 1, maxiter = 200, hazard = "Weib",
+CV=FALSE , kappa = 10000, igraph = 1, maxiter = 200, hazard = "Weib",
 print.iter = FALSE, na.action = na.omit)
 }
 
@@ -30,12 +30,12 @@ a vector of length 3 for the convergence criteria (criterion for parameters, cri
 number of knots for the splines to use to approximate the hazard function. Argument for the penalized likelihood approach.
   The default is 7.
 }
-  \item{irec}{
+  \item{CV}{
 binary variable equals to 1 when search (by approximated cross validation) of the smoothing parameter kappa and 0 otherwise. Argument for the penalized likelihood approach. The default is 0.
 }
 
-  \item{kappa0}{
-if irec=0, smoothing parameter; if irec=1, initial value of the smoothing parameters for the cross validation search. Argument for the penalized likelihood approach.  
+  \item{kappa}{
+if CV=FALSE, smoothing parameter; if CV=TRUE, initial value of the smoothing parameters for the cross validation search. Argument for the penalized likelihood approach.  
 }
 
   \item{igraph}{
@@ -80,7 +80,7 @@ how NAs are  treated. The default is first, any na.action attribute of data, sec
   \item{se}{standart errors.}
   \item{knots}{knots to approximate by M-splines the hazard function.}
   \item{nknots}{number of knots.}
-  \item{irec}{a binary variable equals to 1 when search of the smoothing parameter \link{kappa} by approximated cross-validation, 1 otherwise. The default is 0.}  
+  \item{CV}{a binary variable equals to 1 when search of the smoothing parameter \link{kappa} by approximated cross-validation, 1 otherwise. The default is 0.}  
   \item{niter}{number of iterations.} 
   \item{cv}{vector containing the convergence criteria.}
   \item{na.action}{observations deleted if missing values.} 
@@ -89,8 +89,8 @@ how NAs are  treated. The default is first, any na.action attribute of data, sec
 \code{\link{shr}},
 \code{\link{print.shrWeib}},
 \code{\link{summary.shrWeib}},
-\code{\link{print.shrPl}},
-\code{\link{summary.shrPl}}
+\code{\link{print.shrSplines}},
+\code{\link{summary.shrSplines}}
 }
 \references{
 D. Marquardt (1963). An algorithm for least-squares estimation of nonlinear parameters. 
@@ -117,5 +117,5 @@ summary(fit.su)
 }
 
 \keyword{methods}
-\keyword{shrPl}
+\keyword{shrSplines}
 \keyword{shrWeib}

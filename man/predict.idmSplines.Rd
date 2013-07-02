@@ -1,17 +1,17 @@
-\name{predict.idmPl}
-\alias{predict.idmPl}
+\name{predict.idmSplines}
+\alias{predict.idmSplines}
 
 \title{
 Predictions for an illness-death model using the penalized likelihood approach.
 }
 \description{
-  Predict transition probabilities and cumulative probabilities from an object of class \code{idmPl}. Confidence intervals are calculated. 
+  Predict transition probabilities and cumulative probabilities from an object of class \code{idmSplines}. Confidence intervals are calculated. 
 }
 \usage{
- \method{predict}{idmPl}(object, s, t, Z01, Z02, Z12, nsim=2000, CI=TRUE, ...)
+ \method{predict}{idmSplines}(object, s, t, Z01, Z02, Z12, nsim=2000, CI=TRUE, ...)
 }
 \arguments{
-  \item{object}{an \code{idmPl} class objects returned by a call to the \code{\link{idm}} function with \code{hazard}="Splines".}
+  \item{object}{an \code{idmSplines} class objects returned by a call to the \code{\link{idm}} function with \code{intensities}="Splines".}
   \item{s}{time at prediction.}
   \item{t}{time for prediction.}
   \item{Z01}{vector for the values of the covariates on the transition 0 --> 1 (in the same order as the covariates within the call. The default values are all 0.}  
@@ -48,14 +48,14 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 
 \examples{
 \dontrun{
-data(Paq1000)
-d <- Paq1000
-names(d) <- c("dementia","mort","entry","L","R","time","certif","death")
+fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+		formula01=Hist(time=list(l,r),event=dementia)~certif,
+                formula12=~1,
+                intensities="Splines",
+		data=Paq1000)
 
-fit <- idm(formula02=Hist(time,event=mort,entry=entry)~certif,
-formula01=Hist(time=list(L,R),event=dementia)~certif,data=d,hazard="Splines") 
-
-pred <- predict(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
+pred <- predict(fit.splines,s=70,t=80,Z01=c(1),Z02=c(1))
+pred
 }
 }
 

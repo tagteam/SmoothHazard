@@ -1,18 +1,18 @@
-\name{print.idmPl}
-\alias{print.idmPl}
+\name{print.idmSplines}
+\alias{print.idmSplines}
 
 \title{
-Print method for \code{idmPl} objects 
+Print method for \code{idmSplines} objects 
 }
 
 \usage{
-\method{print}{idmPl}(x, conf.int = 0.95, digits = 4, 
+\method{print}{idmSplines}(x, conf.int = 0.95, digits = 4, 
 pvalDigits = 4, eps = 1e-04, ...)
 }
 \description{Print a summary of a fitted illness-death model using the penalized likelihood approach.}
 \arguments{
   \item{x}{
-a \code{idmPl} object, i.e., the result of a call to the \code{\link{idm}} function with \code{hazard}="Splines".
+a \code{idmSplines} object, i.e., the result of a call to the \code{\link{idm}} function with \code{intensities}="Splines".
 }
   \item{conf.int}{
 confiance level.
@@ -32,8 +32,8 @@ other unusued arguments.
 }
 
 \seealso{
- \code{\link{summary.idmPl}},  
- \code{\link{plot.idmPl}}
+ \code{\link{summary.idmSplines}},  
+ \code{\link{plot.idmSplines}}
 }
   
 \author{
@@ -45,13 +45,12 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 \examples{
 \dontrun{
 data(Paq1000)
-d <- Paq1000
-names(d) <- c("dementia","mort","entry","L","R","time","certif","death")
-
-fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
-formula01=Hist(time=list(L,R),event=dementia)~certif,data=d
-,irec=0,igraph=1,hazard="Splines",eps=c(1,1,1)) 
-print(fit.weib) 
+fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+		formula01=Hist(time=list(l,r),event=dementia)~certif,
+                formula12=~1,
+                intensities="Splines",
+		data=Paq1000)
+print(fit.splines)
 }
 }
 

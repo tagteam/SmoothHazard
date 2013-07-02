@@ -2,8 +2,8 @@ shr <- function(formula,
                  data,
                  eps=c(5,5,3),
                  nknots=7,
-                 irec=0,
-                 kappa0=10000,
+                 CV=FALSE,
+                 kappa=10000,
                  igraph=1,
                  maxiter=200,
                  hazard="Weib",
@@ -166,8 +166,8 @@ shr <- function(formula,
                      h_l=as.double(rep(0,99)),
                      h_u=as.double(rep(0,99)),
                      as.integer(nknots),
-                     as.integer(irec),
-                     as.double(kappa0),
+                     as.integer(CV),
+                     as.double(kappa),
                      kappa=as.double(0),
                      as.integer(igraph),
                      CVcrit=as.double(0),
@@ -262,14 +262,14 @@ shr <- function(formula,
     fit$nknots <- nknots
     fit$knots <- ffit$ti
     fit$theta <-  ffit$theta
-    fit$irec <- irec
+    fit$CV <- CV
     fit$igraph <- ffit$igraph
-    if(irec==1){
+    if(CV){
       fit$kappa <- ffit$kappa
       fit$CVcrit <- ffit$CVcrit
       fit$DoF <- ffit$mdf
     }else{
-      fit$kappa <- kappa0
+      fit$kappa <- kappa
     }
 
   }
@@ -278,7 +278,7 @@ shr <- function(formula,
   if(hazard=="Weib"){
     class(fit) <- "shrWeib"
   }else{
-    class(fit) <- "shrPl"
+    class(fit) <- "shrSplines"
   }  
 
 

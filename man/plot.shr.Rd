@@ -14,7 +14,7 @@ Plot method for a survival model.
 	axes=TRUE, percent=TRUE,...)
 }
 \arguments{
-  \item{x}{a \code{shrWeib} or a \code{shrPl} class object (output from calling \code{\link{shr}}
+  \item{x}{a \code{shrWeib} or a \code{shrSplines} class object (output from calling \code{\link{shr}}
     function).
 }
   \item{type}{type of function to plot. The default is "shr".

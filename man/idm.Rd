@@ -11,8 +11,8 @@ State 0 corresponds to the initial state, state 1 to the transient one, state 2 
 }
 \usage{
 idm(formula01, formula02, formula12, data, maxiter=200, eps=c(5,5,3), 
-n.knots=c(7,7,7), knots, irec=0,kappa0 = c(1000000,500000,20000), igraph=1, 
-hazard="Weib", print.iter=FALSE, subset=NULL, na.action=na.omit)
+n.knots=c(7,7,7), knots, CV=FALSE,kappa = c(1000000,500000,20000), igraph=1, 
+intensities="Weib", print.iter=FALSE, subset=NULL, na.action=na.omit)
 }
 
 \arguments{
@@ -49,7 +49,7 @@ Maximum number of iterations. The default is 200.
   \eqn{10^{-3}} for the second derivatives between two iterations.
 }
 \item{n.knots}{
-  For \code{hazard="Splines"} only, a vector of length 3
+  For \code{intensities="Splines"} only, a vector of length 3
   specifing the number of knots, one for each transition, for the M-splines estimate
   of the baseline intensities in the order
   \code{0 --> 1}, \code{0 --> 2}, \code{1 --> 2}.
@@ -59,16 +59,16 @@ Maximum number of iterations. The default is 200.
 List of length 3 containing the placements (timepoints) of the knots for
   the M-spline of the three transitions.  
 }
-  \item{irec}{
+  \item{CV}{
     Binary variable equals to 1 when search (by approximated cross validation) of the smoothing parameters kappa and 0 otherwise. Argument for the penalized likelihood approach. The default is 0.
 }
-  \item{kappa0}{
-a vector of length 3.  If irec=0, smoothing parameters for the transition 0 --> 1, 0 --> 2 and 1 --> 2. If irec=1, initial values of the smoothing parameters for the cross validation search. Argument for the penalized likelihood approach.  
+  \item{kappa}{
+a vector of length 3.  If CV=FALSE, smoothing parameters for the transition 0 --> 1, 0 --> 2 and 1 --> 2. If CV=TRUE, initial values of the smoothing parameters for the cross validation search. Argument for the penalized likelihood approach.  
 }
   \item{igraph}{
 a binary variable equals to 1 when you want to output graphs of the transition intensities, 0 otherwise. The default is 1.
 }
-  \item{hazard}{
+  \item{intensities}{
 type of estimation method: "Splines" for a penalized likelihood approach with approximation of the transition intensities by M-splines, "Weib" for a parametric approach with a Weibull distribution on the transition intensities. Default is "Weib".
 }
   \item{print.iter}{
@@ -101,15 +101,15 @@ how NAs are  treated. The default is first, any na.action attribute of data, sec
   \item{responseTrans}{model response for the 0 --> 1 transition. \code{Hist} or \code{Surv} object.}
   \item{responseAbs}{model response for the 0 --> 2 transition. \code{Hist} or \code{Surv} object.}
   \item{time}{times for which transition intensities have been evaluated for plotting. Vector in the Weibull approach. Matrix in the penalized likelihhod approach for which the colums corresponds to the transitions 0 --> 1, 1 --> 2, 0 --> 2.}
-  \item{hazard01}{matched values of the intensities for transition 0 --> 1.} 
-  \item{lowerHazard01}{lower confidence intervals for the values of the intensities for transition 0 --> 1.}
-  \item{upperHazard01}{upper confidence intervals for the values of the intensities for transition 0 --> 1.}
-  \item{hazard02}{matched values of the intensities for transition 0 --> 2.}
-  \item{lowerHazard02}{lower confidence intervals for the values of the intensities for transition 0 --> 2.} 
-  \item{upperHazard02}{upper confidence intervals for the values of the intensities for transition 0 --> 2.}
-  \item{hazard12}{matched values of the intensities for transition 1 --> 2.}
-  \item{lowerHazard12}{lower confidence intervals for the values of the intensities for transition 1 --> 2.}
-  \item{upperHazard12}{upper confidence intervals for the values of the intensities for transition 1 --> 2.} 
+  \item{intensity01}{matched values of the intensities for transition 0 --> 1.} 
+  \item{lowerIntensity01}{lower confidence intervals for the values of the intensities for transition 0 --> 1.}
+  \item{upperIntensity01}{upper confidence intervals for the values of the intensities for transition 0 --> 1.}
+  \item{intensity02}{matched values of the intensities for transition 0 --> 2.}
+  \item{lowerIntensity02}{lower confidence intervals for the values of the intensities for transition 0 --> 2.} 
+  \item{upperIntensity02}{upper confidence intervals for the values of the intensities for transition 0 --> 2.}
+  \item{intensity12}{matched values of the intensities for transition 1 --> 2.}
+  \item{lowerIntensity12}{lower confidence intervals for the values of the intensities for transition 1 --> 2.}
+  \item{upperIntensity12}{upper confidence intervals for the values of the intensities for transition 1 --> 2.} 
   \item{RR}{vector of relative risks.}
   \item{V}{variance-covariance matrix.}
   \item{se}{standart errors of the regression parameters.}
@@ -125,7 +125,7 @@ how NAs are  treated. The default is first, any na.action attribute of data, sec
   \item{theta01}{square root of splines coefficients for transition 0 --> 1.}
   \item{theta02}{square root of splines coefficients for transition 0 --> 2.} 
   \item{theta12}{square root of splines coefficients for transition 1 --> 2.}   
-  \item{irec}{a binary variable equals to 1 when search of the smoothing parameters \link{kappa} by approximated cross-validation, 1 otherwise. The default is 0.}    
+  \item{CV}{a binary variable equals to 1 when search of the smoothing parameters \link{kappa} by approximated cross-validation, 1 otherwise. The default is 0.}    
   \item{igraph}{a binary variable equals 1 when you need to output transition intensity to plot, 0 otherwise. The default is 1.} 
   \item{kappa}{vector containing the smoothing parameters for transition 0 --> 1, 0 --> 2, 1 --> 2 used to estimate the model by the penalized likelihood approach.} 
   \item{CVcrit}{cross validation criteria.}    
@@ -146,35 +146,38 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 
 \seealso{
 \code{\link{print.idmWeib}},
-\code{\link{print.idmPl}},
+\code{\link{print.idmSplines}},
 \code{\link{summary.idmWeib}},
-\code{\link{summary.idmPl}}
+\code{\link{summary.idmSplines}}
 }
 
 \examples{
 \dontrun{
-# Weibull illness deaths model 
+
 data(Paq1000)
 
-fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
-		formula01=Hist(time=list(L,R),event=dementia)~certif,
-		data=d)
+# Illness-death model with certif on the 3 transitions
+# Weibull parametrization and likelihood maximization
+fit.weib <- idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000) 
 
-
-fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
-		formula01=Hist(time=list(L,R),event=dementia)~certif,
+fit.weib <- idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+		formula01=Hist(time=list(l,r),event=dementia)~certif,
 		data=Paq1000)
 
-fit.weib <- idm(formula02=Hist(time,event=death,entry=entry)~certif,
-		formula01=Hist(time=list(L,R),event=dementia)~certif,
-                igraph=FALSE,
-		data=Paq1000) 
+# Illness-death model with certif on transitions 01 and 02
+# Splines parametrization and penalized likelihood maximization
+fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+		formula01=Hist(time=list(l,r),event=dementia)~certif,
+                formula12=~1,
+                intensities="Splines",
+		data=Paq1000)
 
 ## to print
 fit.weib
 
 ## to summary
-summary(fit.weib)
+summary(fit.splines)
 }
 }
 

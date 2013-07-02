@@ -1,4 +1,4 @@
-print.idmPl <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
+print.idmSplines <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 	cl <- x$call
 	cat("Call:\n")
 	dput(cl)
@@ -36,7 +36,7 @@ print.idmPl <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 		tmp2 <- data.frame("transition01"=c(x$nknots01,x$kappa[1]),"transition02"=c(x$nknots02,x$kappa[2]),"transition12"=c(x$nknots12,x$kappa[3]))
 		rownames(tmp2) <- c("knots","kappa")
 		cat("\n")
-		if(x$irec == 1){
+		if(x$CV){
 			cat("Smoothing parameters estimated by cross validation:\n")
 			print(tmp2,row.names=T)
 			cat("Cross validation criterion:",x$CVcrit,"\n")

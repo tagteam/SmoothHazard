@@ -1,6 +1,6 @@
-summary.shrPl <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...){
+summary.shrSplines <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...){
 
-	if (!inherits(object,"shrPl")) stop("Object must be of class 'shrPl'")
+	if (!inherits(object,"shrSplines")) stop("Object must be of class 'shrSplines'")
 	x <- object
 #	if (x$istop == 1){
 	if (x$converged == 1){

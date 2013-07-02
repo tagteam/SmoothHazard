@@ -12,7 +12,7 @@ Summary of a fitted illness-death model using a Weibull approach
 \description{Print a short summary of a fitted Weibull model using the penalized likelihood approach.}
 \arguments{
   \item{object}{
-a \code{idmWeib} object, i.e., the result of a call to the \code{\link{idm}} function with \code{hazard}="Weib".
+a \code{idmWeib} object, i.e., the result of a call to the \code{\link{idm}} function with \code{intensities}="Weib".
 }
   \item{conf.int}{
 confiance level.
@@ -45,10 +45,12 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 
 \examples{
 \dontrun{
-# Weibull survival model 
-data(test)
-fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test) 
-fit.su 
+# Weibull illness-death model 
+data(Paq1000)
+
+fit <- idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000) 
+
 }
 }
 

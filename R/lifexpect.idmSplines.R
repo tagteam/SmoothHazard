@@ -3,9 +3,7 @@
 # 2 : death state
 
 ##### Fonction qui calcule les esperances de vie avec leurs intervalles de confiance au temps s
-lifexpect.idmPl <- function(object,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
-	xx <- object
-	if (inherits(xx,"idmPl")) {
+lifexpect.idmSplines <- function(xx,s,Z01,Z02,Z12,nsim,CI,...) {
 		nvar01 <- xx$NC[1]
 		nvar02 <- xx$NC[2]
 		nvar12 <- xx$NC[3]
@@ -115,16 +113,15 @@ lifexpect.idmPl <- function(object,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
 			isup <- ceiling(isup)*delta + floor(isup)*(1-delta)
 		}
 		Xres4 <- cbind(Xres3[,iinf],Xres3[,isup]) # 1ere colonne = bornes inf pour chaque valeur ; 2eme colonne = borne sup pour chaque valeur
-		return(list(HLE=c(res$HLE,Xres4[1,]),
-		LE0=c(res$LE0,Xres4[2,]),
-		LE1=c(res$LE1,Xres4[3,])))	
+		return(list(life.in.0.expectancy=c(res$life.in.0.expectancy,Xres4[1,]),
+		life.expectancy.nondis=c(res$life.expectancy.nondem,Xres4[2,]),
+		life.expectancy.dis=c(res$life.expectancy.dem,Xres4[3,])))	
 		}
 		else 
-			return(res)
+                  return(res)
   		
-	}
 
-}
+              }
 
 lifexpect0 <- function(s,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01=0,bZ12=0,bZ02=0) {
 	ET12 = integrate(f=function(x) {
@@ -136,7 +133,7 @@ lifexpect0 <- function(s,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01=0,
 	ET01 = integrate(f=function(x) {
                Predict0.idmPl(s,x,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01,bZ12,bZ02)$p01
                },s,zi01[nz01+6])
-return(list(HLE=ET0.$value,LE0=ET01$value+ET0.$value,LE1=ET12$value))
+return(list(life.in.0.expectancy=ET0.$value,life.expectancy.nondis=ET01$value+ET0.$value,life.expectancy.dis=ET12$value))
 
 }
 

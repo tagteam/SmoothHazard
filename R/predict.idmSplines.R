@@ -3,13 +3,12 @@
 # 2 : death state
 
 ##### Fonction qui calcule les predictions avec leurs intervalles de confiance entre les temps s et t
-predict.idmPl <- function(object,s,t,Z01,Z02,Z12,nsim=2000,CI=TRUE,...) {
-#predict.idmPl <- function(object, ...) {
+predict.idmSplines <- function(object,s,t,Z01,Z02,Z12,nsim=2000,CI=TRUE,...) {
 
 # if covariates: cov=c(cov1,cov2,cov3,...)
 
 	x <- object
-	if (inherits(x,"idmPl")) {
+	if (inherits(x,"idmSplines")) {
 		nvar01 <- x$NC[1]
 		nvar02 <- x$NC[2]
 		nvar12 <- x$NC[3]

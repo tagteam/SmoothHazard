@@ -76,7 +76,7 @@
         maxiter = maxiter0
 
         som = 0.d0
-        ts =0.d0
+        ts = 0.d0
 
         min = l(1)
         max = l(1)
