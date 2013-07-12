@@ -11,142 +11,57 @@ idm <- function(formula01,
                 igraph=1,
                 intensities="Weib",
                 print.iter=FALSE,
-                subset = NULL,
-                na.action = na.omit){
+                subset,
+                na.action = na.fail){
 
-  # {{{ check formulae
+  # {{{ check formula
   call <- match.call()
-  ## cat("\n")
-  ## cat("Be patient. The program is computing... \n") 
-  flush.console()
-  ptm<-proc.time()
+  ptm <- proc.time()
   if(missing(formula01))stop("The argument formula01 needs a formula.")
   if(missing(formula02))stop("The argument formula02 needs a formula.")	
   if(class(formula01)!="formula")stop("The argument formula01 must be a class 'formula'.")	
   if(class(formula02)!="formula")stop("The argument formula02 must be a class 'formula'.")		
   if(missing(formula02)) formula02 <- formula01
-  if(missing(formula12)) formula12 <- formula01
+  if(missing(formula12)) formula12 <- formula02
+  # }}}
+  # {{{ evaluate formula in data 
   if(missing(data)) stop("Need a data frame.")
-  if(class(data)!="data.frame")stop("The 'data' argument must be a data.frame")
-  ### to remove missing data
+  if(class(data)!="data.frame")stop("Argument 'data' must be a data.frame")
   m <- match.call()
-  position <- match(c("","data","subset","na.action"),names(m),0)
-  m01 <- m02 <- m12 <- m[position]	
+  m01 <- m02 <- m12 <- m[match(c("","data","subset","na.action"),names(m),nomatch=0)]	
   m01$formula <- formula01
   m02$formula <- formula02
   m12$formula <- formula12
   m01[[1]] <- m02[[1]] <- m12[[1]] <- as.name("model.frame")
-  m01 <- eval(m01,sys.parent())
-  na.action01 <- attr(m01,"na.action")
-  m02 <- eval(m02,sys.parent())
-  na.action02 <- attr(m02,"na.action")	
-  m12 <- eval(m12,sys.parent())
-  na.action12 <- attr(m12,"na.action")
-  ## table without missing data: newdata
-  if(!is.null(na.action01)){
-    na.action <- na.action01
-    if(!is.null(na.action02)){
-      na.action <- unique(na.action,na.action02)
-      if(!is.null(na.action12)){
-        na.action <- unique(na.action,na.action12)
-      }
-    }else{
-      if(!is.null(na.action12)){
-        na.action <- unique(na.action,na.action12)
-      }
-    }
-  }else{
-    if(!is.null(na.action02)){
-      na.action <- na.action02
-      if(!is.null(na.action12)){
-        na.action <- unique(na.action,na.action12)
-      }
-    }else{
-      if(!is.null(na.action12)){
-        na.action <- na.action12
-      }else{
-        na.action <- NULL
-      }
-    }
-  }
-  #	na.action <- unique(na.action01,na.action02,na.action12)
-  if(!is.null(na.action)){
-    newdata <- data[-na.action,]
-  }else{
-    newdata <- data
-  }
-  ### response
-  responseTrans <- model.response(model.frame(formula01,data=newdata))
-  responseAbs <- model.response(model.frame(formula02,data=newdata))
-  ### covariates
-			
-  ######################
-  ######################	 formula01
-  ######################	
-  Xnames01 <- NULL
-  NC01 <- 0
-  Xnames02 <- NULL
-  NC02 <- 0
-  Xnames12 <- NULL
-  NC12 <- 0
+  m01 <- eval(m01,parent.frame())
+  m02 <- eval(m02,parent.frame())
+  m12 <- eval(m12,parent.frame())
+  # }}}
+  # {{{ extract response
+  responseTrans <- model.response(m01)
+  responseAbs <- model.response(m02)
+  # {{{ extract covariates
 
-  if(!missing(formula01)){
-    x01 <- model.matrix(formula01,data=newdata)
-    if (ncol(x01) == 1){ 
-      x01 <- x01-1
-      NC01 <- 0
-    }else{
-      #covariates
-      x01 <- x01[, -1, drop = FALSE]
-      NC01 <- NCOL(x01)
-      Xnames01 <- colnames(x01)		
-    } 		
-  }
+  ## formula01
+  x01 <- model.matrix(formula01,data=m01)[, -1, drop = FALSE]
+  NC01 <- NCOL(x01)
+  Xnames01 <- colnames(x01) 
 
-  ######################
-  ######################	 formula02
-  ######################	
+  ## formula02
+  x02 <- model.matrix(formula02,data=m02)[, -1, drop = FALSE]
+  NC02 <- NCOL(x02)
+  Xnames02 <- colnames(x02)
 
-  if(!missing(formula02)){
-    x02 <- model.matrix(formula02,data=newdata)
-    if (ncol(x02) == 1){ 
-      x02 <- x02-1
-      NC02 <- 0
-    }else{
-      #covariates
-      x02 <- x02[, -1, drop = FALSE]
-      NC02 <- NCOL(x02)
-      Xnames02 <- colnames(x02)
-    } 
-  }
-
-  ######################
-  ######################	 formula12
-  ######################	
-
-	
-  if(!missing(formula12)){
-    x12 <- model.matrix(formula12,data=newdata)
-    if (ncol(x12) == 1){ 
-      #no covariates
-      x12 <- x12-1
-      NC12 <- 0
-    }else{
-      #covariates
-      x12 <- x12[, -1, drop = FALSE]
-      NC12 <- NCOL(x12)
-      Xnames12 <- colnames(x12)	
-    } 
-  }
-
+  ## formula12
+  x12 <- model.matrix(formula12,data=m12)[, -1, drop = FALSE]
+  NC12 <- NCOL(x12)
+  Xnames12 <- colnames(x12)	
   # }}}
   # {{{ prepare censored event times 
-
   N <- length(responseAbs[,"time"])
 
   isIntervalCensored <- attr(responseTrans,"cens.type")=="intervalCensored"
-
-  truncated <- nchar(attr(responseAbs,"entry.type"))>1
+  truncated <- length(attr(responseAbs,"entry.type"))>1
   
   if (truncated==0){
     entrytime <- as.double(NULL)
@@ -160,9 +75,9 @@ idm <- function(formula01,
   }else{
     Ltime <- as.double(responseTrans[,"time",drop=TRUE])
     Rtime <- as.double(responseTrans[,"time",drop=TRUE])
-    #		Rtime <- rep(0,N)
+    # Rtime <- rep(0,N)
   }
-	
+  
   idm <- responseTrans[,"status"]==(as.integer(isIntervalCensored)+1)
   idd <- responseAbs[,"status"]==1
  
