@@ -1,25 +1,25 @@
 useDynLib(SmoothHazard)
-export(idm,shr,lifexpect.idmPl,lifexpect.idmWeib) 
+export(idm,shr,lifexpect.idmWeib) 
 import(mvtnorm)
 
 S3method(plot,shr)
 S3method(plot,idm)
 
 S3method(plot,shrWeib)
-S3method(plot,shrPl)
+## S3method(plot,shrPl)
 S3method(plot,idmWeib)
-S3method(plot,idmPl)
+## S3method(plot,idmPl)
 
-S3method(print,idmPl) 
+## S3method(print,idmPl) 
 S3method(print,idmWeib) 
 S3method(print,shrWeib) 
-S3method(print,shrPl) 
+## S3method(print,shrPl) 
 
-S3method(summary,idmPl) 
+## S3method(summary,idmPl) 
 S3method(summary,idmWeib) 
 S3method(summary,shrWeib) 
-S3method(summary,shrPl) 
+## S3method(summary,shrPl) 
 
-S3method(predict,idmPl)
+## S3method(predict,idmPl)
 S3method(predict,idmWeib)
 
