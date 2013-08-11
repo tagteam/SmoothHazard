@@ -61,7 +61,7 @@ idm <- function(formula01,
   N <- length(responseAbs[,"time"])
 
   isIntervalCensored <- attr(responseTrans,"cens.type")=="intervalCensored"
-  truncated <- length(attr(responseAbs,"entry.type"))>1
+  truncated <- nchar(attr(responseAbs,"entry.type"))>1
   
   if (truncated==0){
     entrytime <- as.double(NULL)
