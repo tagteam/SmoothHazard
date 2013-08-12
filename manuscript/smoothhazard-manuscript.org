@@ -1,15 +1,3 @@
-* Load R libraries and set 
-#+BEGIN_SRC R  :results silent  :exports results  :session *R* :cache no
-user <- system("whoami",intern=TRUE)
-if (user %in% c("grb615","tag")){
-setwd("~/research/SoftWare/eventhistory/pkg/SmoothHazard/manuscript/")
-}else{
-setwd("~/Dropbox/JSS2013/manuscript_50/")
-}
-library(SmoothHazard)
-data(Paq1000)
-#+END_SRC
-
 * Introduction
 
 The irreversible illness-death model is a special multi-state model
@@ -92,7 +80,7 @@ less than SRC_R{n.died.notdiagnosed} should have been dead with dementia
 There are two covariates in this
 subset: gender (SRC_R{n.women} women and SRC_R{n.men} men) and primary
 school diploma (SRC_R{n.with} with diploma and SRC_R{n.without} without
-diploma). Age is chosen as the basic time scale and subjects are non demented at entry into stydy. 
+diploma). Age is chosen as the basic time scale and subjects are non demented at entry into study. 
 Consequently, we need to deal with left-truncated event times.
 
 #+BEGIN_SRC R :exports both :results output :cache yes
@@ -151,6 +139,7 @@ For interval-censored data, the \code{time} argument of \code{Hist} must contain
 \caption{The exact number of transitions in the illness-death model with interval-censored time to disease is unknown.}
 \end{figure}
 \end{center}
+
 #+end_latex
 
  # #+ATTR_LaTeX: :width 0.4\textwidth
@@ -167,29 +156,25 @@ fit <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=t0)~certif,
 #+END_SRC
 where the \code{data} argument contains the data frame in which to interpret the variables of \code{formula01}, \code{formula02} and \code{formula12}.
 
-Note that the left side of \code{formula12} does not need to be filled
-because all the data informations are already contained in
-\code{formula01} and \code{formula02}.  In fact, the \code{formula12}
-argument is required only if we want the covariates impacting
+Note that the left side of \code{formula12} does not need to be filled because all the data 
+informations are already contained in \code{formula01} and \code{formula02}.
+In fact, the \code{formula12} argument is required only if we want the covariates impacting 
 transition 12 different from those impacting transition 02.
 
 Questions ?
 TODO
    
 * Fitting the illness-death model based on interval-censored data
-  
-The \code{idm} function computes estimates for the three transition
-intensities:
-$$\alpha_{hl}(t|Z_{hli})=\alpha_{0hl}(t)\exp\{\beta_{hl}^T Z_{hli}\};
-~~~ hl \in \{01,02,12\}$$ In the situation where time to disease and
-time to death are not interval censored the regression coefficients
-can be estimated by the partial likelihood method \citep{coxpartial}
-without the need to specify or estimate the baseline hazard functions
-$\alpha_{0hl}(t)$. For interval-censored transition times to state 1
-the situation is more complex. It turns out that we have to estimate
-all parameters simultaneously and that we need a model for the
-baseline transition intensity functions. This can be seen by
-inspecting the likelihood function.
+The \code{idm} function computes estimates for the three transition intensities:
+$$\alpha_{hl}(t|Z_{hli})=\alpha_{0hl}(t)\exp\{\beta_{hl}^T Z_{hli}\}; ~~~ hl \in \{01,02,12\}$$
+In the situation where time to disease and time to death are not interval censored
+the regression coefficients can be estimated by the partial likelihood
+method \citep{coxpartial} without the need to specify or estimate the
+baseline hazard functions $\alpha_{0hl}(t)$. For interval-censored
+transition times to state 1 the situation is more complex. It turns
+out that we have to estimate all parameters simultaneously
+and that we need a model for the baseline transition intensity functions. This can
+be seen by inspecting the likelihood function.
 
 For subject $i$, let us denote the conditional event-free survival function by
 $$S(t|Z_{01i},Z_{02i})=e^{- A_{01}(t|Z_{01i}) -A_{02}(t|Z_{02i})}$$
@@ -230,10 +215,8 @@ S(T_i|Z_{01i},Z_{02i})
 e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}\big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}du
 \Bigg)
 \end{multline}
+If time to disease and time to death are both right-censored at the same time, we have $L_i=R_i=T_i$ and the integral value in (\ref{eq:likelihood2}) is zero.
 
-If time to disease and time to death are both right-censored at the
-same time, we have $L_i=R_i=T_i$ and the integral value in
-(\ref{eq:likelihood2}) is zero.
 
 
 ** The Weibull parametrization
@@ -244,8 +227,8 @@ using a Weibull parametrization for the baseline transition intensities:
 where $a_{hl}$ and $b_{hl}$ are shape and scale parameters.
 
 #+BEGIN_SRC R :exports both :results output :cache yes 
-fit.weib <- idm(formula02=Hist(time=time,event=death,entry=entry)~certif+gender,
-                formula01=Hist(time=list(L,R),event=dementia,entry=entry)~certif+gender,
+fit.weib <- idm(formula02=Hist(time=t,event=death,entry=t0)~certif+gender,
+                formula01=Hist(time=list(l,r),event=dementia,entry=t0)~certif+gender,
                 data=Paq1000,intensities="Weib")
 print(fit.weib)
 #+END_SRC
@@ -477,12 +460,12 @@ with the \code{plot} function.
 For the curves that seem over-smooth, the associated smoothing parameter must be reduced.
 For the curves that seem under-smooth, the associated smoothing parameter must be increased.
 
-#+BEGIN_SRC R :results graphics :file "transition-intensities-paq-weib.pdf" :exports results
+
+#+BEGIN_SRC R :results graphics :file "~/Dropbox/JSS2013/manuscript_50/transition-intensities-paq-weib.pdf" :exports results
 plot(fit.weib,conf.int=TRUE)
 #+END_SRC
 
-#+RESULTS[<2013-07-11 12:30:52> 1ed5cd369451e2bd39cf1b75fa4dec34ec6a43fa]:
-[[file:transition-intensities-paq-weib.pdf]]
+ # #+RESULTS[<2013-04-30 16:27:45> a85422472c3b7b3bb92da9751c2b751b59bb30fc]:[[file:~/Dropbox/JSS2013/manuscript_50/transition-intensities-paq-weib.pdf]]
 
 * Predicting parameters of life
 
@@ -497,18 +480,31 @@ may provide additional information and have a more natural interpretation.
 The fonction \code{idm} returns an ``idmWeib'' or ``idmSplines'' class object
 depending on the parametrization of the transition intensities (Weibull or splines).
 These objects can be used in argument of the \code{predict.idmWeib} and \code{predict.idmSplines} 
-functions in order to obtain transition probabilities and cumulative probabilities:
+functions in order to obtain transition probabilities between ages 70 and 80 (and cumulative probabilities).
+For example, for a female subject who is healthy at age 70 and has primary school certificate: 
 #+BEGIN_SRC R :exports both :results output :cache yes 
-TP_fit.weib <- predict(fit.weib,s=70,t=80,Z01=c(1,0),Z02=c(1,0),Z12=c(1,0))
-TP_fit.weib
+TP <- predict(fit.weib,s=70,t=80,Z01=c(1,0),Z02=c(1,0),Z12=c(1,0))
+TP
 #+END_SRC
 
-They can also be used in argument of the \code{lifexpect}
-function to obtain life expectancies:
-#+BEGIN_SRC R :exports both :results output :cache yes 
+where \code{TP$p00}, \code{TP$p01}, \code{TP$p11}, \code{TP$p02} are the transition probabilities; 
+\code{TP$p02_1} and \code{TP$p02_0} are the probabilities of transition from state 0 to state 2 coming through state 1 or not;
+\code{F01} is the probability for of becoming diseased between ages 70 and 80;
+\code{F0.} is the probability of exit from state 0 between ages 70 and 80.
+
+If the \code{predict} function is used with an \code{idmSplines} object, the \code{s} input must be greater than the first knot and the \code{t} input must be lower than the last knot.
+
+The ``idmWeib'' or ``idmSplines'' objects can also be used in argument of the \code{lifexpect}
+function to obtain life expectancies. For example, for a female subjects who has primary school certificate, the following code:
+#+BEGIN_SRC R :exports both :results output :cache yes
 LE_fit.weib <- lifexpect(fit.weib,s=90,Z01=c(1,0),Z02=c(1,0),Z12=c(1,0),CI=FALSE)
 LE_fit.weib
 #+END_SRC
+produces healthy life expectancy, life expectancy for a non diseased subject and life expectancy for a diseased subject.
+Again, if this function is used with an \code{idmSplines} object, the \code{s} input must be greater than the first knot. 
+Moreover, life expectancies are calculated integrating up to infinity using an ``idmWeib'' object but up to the last knot using an ``idmSplines'' object.
+Consequently using an ``idmSplines'' object, it must be acceptable to assume that any subject should be in state 2 (dead) at the age corresponding to the last knot. 
+Otherwise, the life expectancies would be underestimated.
 
   # \bibliographystyle{apalike}
 \bibliography{smoothhazard}
