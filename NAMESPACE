@@ -1,5 +1,5 @@
 useDynLib(SmoothHazard)
-export(idm,shr,lifexpect.idmWeib) 
+export(idm,shr,lifexpect) 
 import(mvtnorm)
 
 S3method(plot,shr)
