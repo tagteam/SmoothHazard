@@ -18,21 +18,32 @@ plotIllnessDeathModel(stateLabels=c("0: Healthy","1: Diseased","2: Dead"),arrowL
 #+CAPTION: The irreversible illness-death model
 #+results: idm1
 [[file:fig0.pdf]]
-If the exact transition times are observed, standard procedures can be
+If the exact transition times are observed, standard procedures like those implemented in the \pkg{mstate} package can be
 used to estimate regression models for the three transitions
 \citep{deWreede_Fiocco_Putter_2010}. In particular, the regression
 coefficients can be estimated using Cox partial likelihood without the
 need to specify the baseline intensities. However, this possibility is
 lost when the transition times from the initial state to the transient
 state are interval censored. For example, it may not be possible to
-determine the exact onset time of dementia for a patient diagnosed at
-time $R$. Instead it is only known that the patient was last seen
+determine the exact onset time of dementia for a subject diagnosed at
+time $R$. Instead it is only known that the subject was last seen
 dementia-free at time $L$. Thus, the onset time is interval censored
-between $L$ and $R$. The algorithms of the \pkg{SmoothHazard} package
+between $L$ and $R$. 
+Furthermore, for a subject who died without being diagnosed as demented before,
+it may not be possible to determine if the subject developed dementia between
+the last time he was seen and the time of death.
+The algorithms of the \pkg{SmoothHazard} package
 implement methods for estimating regression models under this type of
 censoring if the transition times into the absorbing state (e.g. death
-of the patient) are either known exactly or right censored 
+of the subject) are either known exactly or right censored 
 \citep{Joly_Commenges_Helmer_Letenneur_2002}. 
+The \pkg{msm} package \citep{Jackson_2010} allows to fit more general multi-state models to panel data 
+(where states of each subjects are only known at a finite series of times). 
+We focuse on a particular multi-state model, the illness-death model, 
+where only one state is known at a finite series of times 
+leading to data which are only interval censored. 
+Even if the \pkg{msm} could be used, the direct expression of the likelihood can be derived
+making possible to estimate more flexible transition intensities with less assumptions.
 
 Implemented are a parametric and a semi-parametric estimation
 approach. For the parametric approach, the Weibull distribution is
@@ -73,9 +84,9 @@ n.without <- sum(Paq1000$certif==1)
 In this subset SRC_R{n.demented} subjects are diagnosed as demented
 and SRC_R{n.died} died from whom SRC_R{n.died.notdiagnosed} without
 being diagnosed as demented before. Because of interval censoring 
-more than SRC_R{n.demented} should have been demented, more than (respectively more than 
+more than SRC_R{n.demented} should have been demented, more than
 SRC_R{n.died-n.died.notdiagnosed} should have been dead with dementia and
-less than SRC_R{n.died.notdiagnosed} should have been dead with dementia
+less than SRC_R{n.died.notdiagnosed} should have been dead without dementia
 (see Figure \ref{fig:idm_nb_transitions}).
 There are two covariates in this
 subset: gender (SRC_R{n.women} women and SRC_R{n.men} men) and primary
@@ -97,8 +108,8 @@ head(Paq1000)
 : 6        0     0 66.2500 71.38070 71.38070 84.16975      1      0
 
 Each row in the data corresponds to one subject. 
-The variables \code{dementia} and \code{death} are the status variables (1 for an event, 0 for right censoring) for events dementia and death, respectively.
-The variable \code{t0} contains ages of subjects at entry. The variables \code{l} and \code{r} contain the left and right endpoints of the censoring intervals.
+The variables \code{dementia} and \code{death} are the status variables (1 if an event occured, 0 otherwise) for dementia and death, respectively.
+The variable \code{t0} contains ages of subjects at entry into study. The variables \code{l} and \code{r} contain the left and right endpoints of the censoring intervals.
 For demented subjects, \code{r} is the age at the diagnostic visit and \code{l} is the age at the previous one.
 For non demented subjects, \code{l} and \code{r} are the age at the latest visit without dementia (\code{l}=\code{r}).
 The variable \code{t} is the age at death or at latest news. \code{certif} and \code{gender} are binary covariates.
@@ -109,12 +120,12 @@ The variable \code{t} is the age at death or at latest news. \code{certif} and \
  # #+END_SRC
 
 The function \code{idm} computes estimates for the
-three transition intensities $\alpha_{01}$, $\alpha_{02}$, $\alpha_{12}$ which are
-age-specific incidence of dementia, age-specific mortality rate of dementia-free subjects and age-specific mortality rate of demented sujects, respectively.
-Proportional transition intensities regression models allow for covariates :
-$$\alpha_{hl}(t|Z_{hli})=\alpha_{0hl}(t)\exp\{\beta_{hl}^T Z_{hli}\}; ~~~ hl \in \{01,02,12\}$$
-where $\alpha_{0hl}$ are baseline transition intensities, $Z_{hli}$ are covariates vectors and 
-$\beta_{hl}$ are vectors of associated regression parameters.
+three transition intensities $\alpha_{01}(.)$, $\alpha_{02}(.)$, $\alpha_{12}(.)$ which are
+age-specific incidence rate of dementia, age-specific mortality rate of dementia-free subjects and age-specific mortality rate of demented sujects, respectively.
+Proportional transition intensities regression models allow for covariates on each transition:
+$$\alpha_{hl}(t|Z_{hli})=\alpha_{0,hl}(t)\exp\{\beta_{hl}^T Z_{hli}\}; ~~~ hl \in \{01,02,12\}$$
+where $\alpha_{0,hl}$ are baseline transition intensities, $Z_{hli}$ are covariates vectors for subject $i$ and 
+$\beta_{hl}$ are vectors of regression parameters.
 
 Covariates must be specified at the right side of the \code{formula01}, \code{formula02} and 
 \code{formula12} arguments of the \code{idm} function (\code{~1} for no covariates).
@@ -166,11 +177,11 @@ TODO
    
 * Fitting the illness-death model based on interval-censored data
 The \code{idm} function computes estimates for the three transition intensities:
-$$\alpha_{hl}(t|Z_{hli})=\alpha_{0hl}(t)\exp\{\beta_{hl}^T Z_{hli}\}; ~~~ hl \in \{01,02,12\}$$
+$$\alpha_{hl}(t|Z_{hli})=\alpha_{0,hl}(t)\exp\{\beta_{hl}^T Z_{hli}\}; ~~~ hl \in \{01,02,12\}$$
 In the situation where time to disease and time to death are not interval censored
 the regression coefficients can be estimated by the partial likelihood
 method \citep{coxpartial} without the need to specify or estimate the
-baseline hazard functions $\alpha_{0hl}(t)$. For interval-censored
+baseline hazard functions $\alpha_{0,hl}(t)$. For interval-censored
 transition times to state 1 the situation is more complex. It turns
 out that we have to estimate all parameters simultaneously
 and that we need a model for the baseline transition intensity functions. This can
@@ -223,7 +234,7 @@ If time to disease and time to death are both right-censored at the same time, w
 
 The default estimation method in function \code{idm} computes the maximum likelihood estimate for the three transition intensities 
 using a Weibull parametrization for the baseline transition intensities: 
- $$ \alpha_{0hl}(t)= a_{hl} ~ b_{hl}^{a_{hl}} ~ t^{a_{hl}-1}; ~~~ hl \in \{01,02,12\}.$$
+ $$ \alpha_{0,hl}(t)= a_{hl} ~ b_{hl}^{a_{hl}} ~ t^{a_{hl}-1}; ~~~ hl \in \{01,02,12\}.$$
 where $a_{hl}$ and $b_{hl}$ are shape and scale parameters.
 
 #+BEGIN_SRC R :exports both :results output :cache yes 
@@ -274,7 +285,7 @@ convergence criteria: parameters= 0.00000012
 
 \textit{Maximization algorithm}
 
-The vectors of parameters for the baseline transition intensities
+The Weibull parameters
 $a_{hl}$ and $b_{hl}$ and the vectors of
 regression parameter $\hat \beta_{hl}$ are obtained simultaneously by maximizing the
 log-likelihood using a combination of a Marquardt's algorithm \citep{Marquardt_1963} 
@@ -300,7 +311,7 @@ convergence.
 Another estimation method in \code{idm} permits to get smooth transition intensities 
 without parametric specification.
 Using the option \code{intensities="Splines"}, a maximum penalized likelihood estimate is computed
-using a spline approximation for the three transition intensities $\alpha_{01}$, $\alpha_{02}$, $\alpha_{12}$.
+using a spline approximation for the three baseline transition intensities $\alpha_{0,01}(.)$, $\alpha_{0,02}(.)$, $\alpha_{0,12}(.)$.
 
 To force smoothness of intensity functions, we penalize the likelihood by a
 term relating to the curvature of the intensity functions that is the quare of the 
@@ -310,9 +321,9 @@ The penalized log-likelihood $(pl)$ is defined as:
 
 \begin{equation}
 \label{eq:77}
-pl = l - \kappa_{01} \int {\alpha_{01} ^{''} }^2 (u) du - \kappa_{12}
-\int {\alpha_{12} ^{''} }^2 (u) du - \kappa_{02} \int {\alpha_{02}
-^{''} }^2 (u) du \ \ \ \
+pl = l - \kappa_{01} \int {\alpha_{01} ^{''} }^2 (u|Z_{01}) du  - \kappa_{02} \int {\alpha_{02} ^{''} }^2 (u|Z_{02}) du
+- \kappa_{12} \int {\alpha_{12} 
+^{''} }^2 (u|Z_{12}) du \ \ \ \
 \end{equation}
 
 where $l$ is the log-likelihood and
@@ -332,12 +343,12 @@ A spline of order $k$ is a piecewise polynomial functions of degree $k-1$.
 The places where the polynomial pieces connect are the knots.
 Associated with a knot sequence $t$, basis splines can be combined linearly to yield 
 any other spline associated with $t$.
-${\hat \alpha_{01}}$, ${\hat \alpha_{02}}$ and ${\hat \alpha_{12}}$ 
+${\hat \alpha_{0,01}}$, ${\hat \alpha_{0,02}}$ and ${\hat \alpha_{0,12}}$ 
 are approximated using linear combination of $M$-splines \citep{Ramsay_1988}. 
 For $hl \in \{01,02,12\}$:
-$$ \tilde \alpha_{hl}(x)=\sum_{i=1}^n a_i M_i(x)  $$ 
+$$ \tilde \alpha_{0,hl}(x)=\sum_{i=1}^n a_i M_i(x)  $$ 
 where $n$ is the number of free parameters.\\
-The non-negativity of $\tilde \alpha_{hl}$ is assured by constraining 
+The non-negativity of $\tilde \alpha_{0,hl}$ is assured by constraining 
 the coefficients $a_i$ to be positive.
 In practice, we estimate parameters $\theta_i$ such that $a_i=\theta_i^2$
 which maximize the penalized likelihood.
@@ -376,10 +387,10 @@ Among them, we have $\int M_i(x) dx = 1$
 One can associate to each $M$-spline, the integrated splines or $I$-splines 
 $I_i$, $i=1,\ldots,n$ such that $I_i(x|k,t)=\int_{t_k}^x M_i(u|k,t) du$.
 Given the coefficients $a_i$, we can approximate estimators of the 
-cumulative transition intensities $\hat A_{hl}$ using a linear combination of $I$-splines:
-$$ \tilde A_{hl}(x)=\sum_{i=1}^n a_i I_i(x) $$
+cumulative baseline transition intensities $\hat A_{hl}$ using a linear combination of $I$-splines:
+$$ \tilde A_{0,hl}(x)=\sum_{i=1}^n a_i I_i(x) $$
 Because $M$-splines are non-negative, the positivity constraint on $a_i$ ensures that 
-the $\tilde A_{hl}$ are monotically increasing.
+the $\tilde A_{0,hl}$ are monotically increasing.
 Each $M_j$ is piecewise polynomial of degree $k-1$ and each associated
 $I_j$ is piecewise polynomial of degree $k$. 
 In the package we use cubic $M$-splines \textit{i.e.} $k=4$.
@@ -404,7 +415,7 @@ The number of knots can be specified in the \code{n.knots} argument. It must be
 understood as the number of different knots \textit{i.e.} 
 the number of knots from $t_k$ to $t_{n+1}$. 
 The default is 7 on the three transitions which leads to 
-a number of free parameters one one transition $n=3+5=9$.
+a number of free parameters on each transition $n=3+5=9$.
 Increasing the number of knots in a region leads to 
 a greater flexibility of the function in that region.
 The number of knots and their location can be chosen differently for each transition.
@@ -470,9 +481,6 @@ plot(fit.weib,conf.int=TRUE)
 * Predicting parameters of life
 
 Most often in illness-death models, the functions of interest are the transition intensities. 
-In our application, $\alpha_{01}(.)$, $\alpha_{02}(.)$ and $\alpha_{12}(.)$ corresponds to
-age-specific incidence of dementia, age-specific mortality rate of non demented subjects 
-and age-specific mortality rate of demented subjects.
 However, other functions/quantities which can be expressed in terms of the 
 transition intensities \citep{Touraine_2013} and
 may provide additional information and have a more natural interpretation.
