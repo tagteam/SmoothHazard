@@ -171,25 +171,28 @@ idm <- function(formula01,
     ## a12|transition intensity function for 1--->2|length 100|double|
     ## a12_l|lower confidence band for a12|length 100|double|
     ## a12_u|upper confidence band for a12|length 100|double|
-  }else{
+}else{
     #  	cat("------ Program Splines ------ \n")
-    nknots01 <- n.knots[1]
-    nknots02 <- n.knots[2]
-    nknots12 <- n.knots[3]
     alltimes <- sort(unique(Ltime,Rtime,entrytime,responseAbs[,"time"]))
     amax <- max(alltimes)
     amin <- min(alltimes)
     if (missing(knots)){
-      knots01 <- seq(amin,amax,(amax-amin)/(nknots01-1))
-      knots02 <- seq(amin,amax,(amax-amin)/(nknots02-1))
-      knots12 <- seq(amin,amax,(amax-amin)/(nknots12-1))
+        nknots01 <- n.knots[1]
+        nknots02 <- n.knots[2]
+        nknots12 <- n.knots[3]
+        knots01 <- seq(amin,amax,(amax-amin)/(nknots01-1))
+        knots02 <- seq(amin,amax,(amax-amin)/(nknots02-1))
+        knots12 <- seq(amin,amax,(amax-amin)/(nknots12-1))
     }
     else{
-      knots01 <- knots[[1]]
-      knots02 <- knots[[2]]
-      knots12 <- knots[[3]]
+        knots01 <- knots[[1]]
+        knots02 <- knots[[2]]
+        knots12 <- knots[[3]]
+        nknots01 <- length(knots01)
+        nknots02 <- length(knots02)
+        nknots12 <- length(knots12)
     }
-    ## make fake knots
+    ## make fake knots needed for M-splines
     knots01 <- c(rep(knots01[1],3),knots01,rep(knots01[length(knots01)],3))
     knots02 <- c(rep(knots02[1],3),knots02,rep(knots02[length(knots02)],3))
     knots12 <- c(rep(knots12[1],3),knots12,rep(knots12[length(knots12)],3))
@@ -250,7 +253,7 @@ idm <- function(formula01,
                      as.integer(print.iter),
                      V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                      package="SmoothHazard")
-  }
+}
 
   if (ffit$converged == 4){
     warning("Problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
@@ -329,7 +332,7 @@ idm <- function(formula01,
   if(NC01>0) fit$Xnames01 <- Xnames01
   if(NC02>0) fit$Xnames02 <- Xnames02
   if(NC12>0) fit$Xnames12 <- Xnames12
-
+  
   if(intensities=="Splines"){
     fit$knots01 <- knots01
     fit$knots02 <- knots02

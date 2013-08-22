@@ -22,7 +22,7 @@ print.idmWeib <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 		tmp1 <- matrix(x$loglik,nrow=1)
 		dimnames(tmp1) <- list("Log likelihood", c("Without cov", "With cov"))		
 		
-		cat("Illness-death Model using a parametric approach with a Weibull distribution for the intensity functions.\n")
+		cat("Illness-death model: Results of Weibull regression for the intensity functions.\n")
 		cat("\n")
 		cat("number of subjects: ", x$N,"\n")
 		cat("number of events '0-->1': ", x$events1,"\n")

@@ -2,6 +2,9 @@ useDynLib(SmoothHazard)
 export(idm,shr,lifexpect) 
 import(mvtnorm)
 
+S3method(lifexpect,idmSplines)
+S3method(plot,idmWeib)
+
 S3method(plot,shr)
 S3method(plot,idm)
 

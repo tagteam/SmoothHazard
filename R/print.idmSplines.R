@@ -3,8 +3,7 @@ print.idmSplines <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...
 	cat("Call:\n")
 	dput(cl)
 	cat("\n")
-
-#	if (x$istop == 1){
+        # if (x$istop == 1){
 	if (x$converged == 1){
 		if(sum(x$NC)>0){
 			wald <- (x$coef/x$se)**2
@@ -23,8 +22,7 @@ print.idmSplines <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...
 		}
 		tmp1 <- matrix(x$loglik,nrow=1)
 		dimnames(tmp1) <- list("Penalized log likelihood", c("Without cov", "With cov"))		
-		
-		cat("Illness-death model using a penalized likelihood approach with splines approximation for the intensity functions.\n")
+		cat("Illness-death regression model using M-spline approximations\n of the baseline transition intensities.\n")
 		cat("\n")
 		cat("number of subjects: ", x$N,"\n")
 		cat("number of events '0-->1': ", x$events1,"\n")
