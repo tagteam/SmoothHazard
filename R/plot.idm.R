@@ -15,7 +15,7 @@ plot.idmWeib <- plot.idmPl <- plot.idm <- function(x,
                                                    ...){ 
 
     # {{{ collecting the (X, Y)-values of the lines
-    if (!is.null(NCOL(x$time))){
+    if ((NCOL(x$time))>1){
         X01 <- x$time[,1]
         X02 <- x$time[,2]
         X12 <- x$time[,3]
@@ -112,10 +112,11 @@ plot.idmWeib <- plot.idmPl <- plot.idm <- function(x,
         time <- switch(s, "1"= X01,"2"=X02,"3"=X12)
         lines(x = time,y = Y[[s]],type = lines.type,col = col[s],lty = lty[s],lwd = lwd[s])
     })
+
     # {{{  legend
     if(legend==TRUE && !add && !is.null(names(Y))){
         if (is.null(control$legend$title)){
-                if (x$call$intensities=="Splines")
+                if (class(x)=="idmSplines")
             control$legend$title <- "M-spline intensity model"
             else
             control$legend$title <- "Weibull model"

@@ -7,7 +7,7 @@ idm <- function(formula01,
                 n.knots=c(7,7,7),
                 knots,
                 CV=FALSE,
-                kappa=c(1000000,500000,20000),
+                kappa=c(800000,200000,50000),
                 igraph=1,
                 intensities="Weib",
                 print.iter=FALSE,
@@ -197,7 +197,7 @@ idm <- function(formula01,
     knots02 <- c(rep(knots02[1],3),knots02,rep(knots02[length(knots02)],3))
     knots12 <- c(rep(knots12[1],3),knots12,rep(knots12[length(knots12)],3))
     size1 <- NC01 + NC02 + NC12
-    size_V <- size1 + sum(n.knots) + 6
+    size_V <- size1 + nknots01+nknots02+nknots12 + 6
     size2 <- size1**2
     ffit <- .Fortran("idmPl",
                      ## input
@@ -341,9 +341,9 @@ idm <- function(formula01,
     fit$theta02 <- ffit$theta02    
     fit$theta12 <- ffit$theta12 
     fit$CV <- CV
-    fit$nknots01 <- n.knots[1]
-    fit$nknots02 <- n.knots[2]
-    fit$nknots12 <- n.knots[3]
+    fit$nknots01 <- nknots01
+    fit$nknots02 <- nknots02
+    fit$nknots12 <- nknots12
     fit$igraph <- ffit$igraph
     fit$CVcrit <- ffit$CVcrit
     fit$DoF <- ffit$mdf
