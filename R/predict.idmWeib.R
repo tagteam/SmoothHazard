@@ -63,7 +63,7 @@ predict.idmWeib <- function(object,s,t,Z01,Z02,Z12,nsim=2000,CI=TRUE,...) {
 			bZ12 <- 0
 		}
 
-		res <- Predict0.idmWeib(s,t,a01,1/b01,a02,1/b02,a12,1/b12,bZ01,bZ12,bZ02)
+		res <- Predict0.idmWeib(s,t,a01,1/b01,a02,1/b02,a12,1/b12,bZ01,bZ02,bZ12)
 
 		if (CI!=FALSE) {
 		### CI prediction by Monte-Carlo
