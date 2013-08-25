@@ -153,7 +153,7 @@ Predict0.idmWeib <- function(s,t,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
 		p02_1 = 1-p00-p02_0-p01
 		p02 = p02_0+p02_1
  	}
-return(list(p00=round(p00,digits=2),p01=round(p01,digits=2),p11=round(p11,digits=2),p12=round(p12,digits=2),p02_0=round(p02_0,digits=2),p02_1=round(p02_1,digits=2),p02=round(p02,digits=2),F01=round(p01+p02_1,digits=2),F0.=round(p02_0+p01+p02_1,digits=2)))
+return(list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1))
 }
 
 
