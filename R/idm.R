@@ -41,11 +41,10 @@ idm <- function(formula01,
   responseTrans <- model.response(m01)
   responseAbs <- model.response(m02)
   # {{{ extract covariates
-
   ## formula01
   x01 <- model.matrix(formula01,data=m01)[, -1, drop = FALSE]
   NC01 <- NCOL(x01)
-  Xnames01 <- colnames(x01) 
+  Xnames01 <- colnames(x01)
 
   ## formula02
   x02 <- model.matrix(formula02,data=m02)[, -1, drop = FALSE]
@@ -256,7 +255,7 @@ idm <- function(formula01,
 }
 
   if (ffit$converged == 4){
-    warning("Problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
+      warning("Problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
   }
 
   if (ffit$converged == 2){
