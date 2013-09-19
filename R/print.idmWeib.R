@@ -28,8 +28,8 @@ print.idmWeib <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 		cat("number of events '0-->1': ", x$events1,"\n")
 		cat("number of events '0-->2' or '0-->1-->2': ", x$events2,"\n")
 		cat("number of covariates: ", x$NC,"\n")
-		if(length(x$na.action))cat("number of deleted observations due to missing: ",length(x$na.action),"\n")
-
+		## if(length(x$na.action))cat("number of deleted observations due to missing: ",length(x$na.action),"\n")
+                
 		cat("\n")
 		if(sum(x$NC)>0){
 			print(tmp,row.names=T)

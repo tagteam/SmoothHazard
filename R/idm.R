@@ -13,7 +13,7 @@ idm <- function(formula01,
                 print.iter=FALSE,
                 subset,
                 na.action = na.fail){
-
+    
   # {{{ check formula
   call <- match.call()
   ptm <- proc.time()
@@ -33,28 +33,32 @@ idm <- function(formula01,
   m02$formula <- formula02
   m12$formula <- formula12
   m01[[1]] <- m02[[1]] <- m12[[1]] <- as.name("model.frame")
+
   m01 <- eval(m01,parent.frame())
   m02 <- eval(m02,parent.frame())
   m12 <- eval(m12,parent.frame())
   # }}}
   # {{{ extract response
   responseTrans <- model.response(m01)
+  
   responseAbs <- model.response(m02)
   # {{{ extract covariates
   ## formula01
   x01 <- model.matrix(formula01,data=m01)[, -1, drop = FALSE]
   NC01 <- NCOL(x01)
-  Xnames01 <- colnames(x01)
+  Xnames01 <- paste(colnames(x01),"01",sep="_")
 
   ## formula02
   x02 <- model.matrix(formula02,data=m02)[, -1, drop = FALSE]
   NC02 <- NCOL(x02)
-  Xnames02 <- colnames(x02)
+  ## Xnames02 <- colnames(x02)
+  Xnames02 <- paste(colnames(x02),"02",sep="_")
 
   ## formula12
   x12 <- model.matrix(formula12,data=m12)[, -1, drop = FALSE]
   NC12 <- NCOL(x12)
-  Xnames12 <- colnames(x12)	
+  ## Xnames12 <- colnames(x12)
+  Xnames12 <- paste(colnames(x12),"12",sep="_")
   # }}}
   # {{{ prepare censored event times 
   N <- length(responseAbs[,"time"])
@@ -172,7 +176,10 @@ idm <- function(formula01,
     ## a12_u|upper confidence band for a12|length 100|double|
 }else{
     #  	cat("------ Program Splines ------ \n")
-    alltimes <- sort(unique(Ltime,Rtime,entrytime,responseAbs[,"time"]))
+    if (length(entrytime)>0)
+        alltimes <- sort(unique(Ltime, Rtime,entrytime,responseAbs[,"time"]))
+    else
+        alltimes <- sort(unique(Ltime, Rtime,responseAbs[,"time"]))
     amax <- max(alltimes)
     amin <- min(alltimes)
     if (missing(knots)){

@@ -64,6 +64,7 @@ sim.idmModel <- function(x,n=100,compliance=1,p=NULL,normal=FALSE,cond=FALSE,sig
         dat <- cbind(dat[,-c(ipos,match(c("time","waittime"),names(dat)))],interval)
     }
     ## right censored?
+    dat$censtime <- pmax(dat$censtime,dat$R)
     dat$status <- 1*(dat$lifetime<dat$censtime)
     dat$lifetime <- pmin(dat$lifetime,dat$censtime)
     ## dat <- dat[,-match(c("censtime","illtime"),names(dat))]

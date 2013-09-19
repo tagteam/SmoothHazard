@@ -343,6 +343,26 @@ plot(fit.weib,conf.int=TRUE,lwd=3,citype="shadow",xlim=c(65,100), axis2.las=2,ax
 #+results: paq-fit-weib
 [[file:transition-intensities-paq-weib.pdf]]
 
+Data were simulated to illustrate the effect of the length between
+visit times on the properties of the estimtated regression parameters
+in the Weibull model.
+
+#+BEGIN_SRC R  :results output raw  :exports results  :session *R* :cache yes 
+scenario <- expand.grid(N=c(50,250,500),b01=c(log(2)),b02=c(0,log(2)),K=10,schedule=c(5,35),punctuality=1)
+setwd("~/research/SoftWare/SmoothHazard/manuscript/avakas/run/")
+files <- list.files(pattern="results.*rda")
+res.list <- foreach (i=1:NROW(scenario)) %dopar% {
+ ff <- grep(paste("results-",i,"-seed1735-NS-1000-",sep=""),files,value=TRUE)
+ rr <- get(load(ff))
+ truth <- unlist(rep(scenario[i,c("b01","b02")],c(1,2)))
+ bias <- colMeans(rr-truth)
+ abs.bias <- colMeans(abs(rr-truth))
+ mse <- colMeans((rr-truth)^2)
+out <- rbind(bias,abs.bias,mse)
+colnames(out) <- c("trans 0 -> 1","trans 0 -> 2","trans 1 -> 2")
+out
+}
+#+END_SRC
 
 *** Maximization algorithm
 
@@ -632,8 +652,6 @@ transition intensities can be plotted. This is done with the
 \code{plot} function. If the curves seem too smooth it may be useful
 to reduce the associated smoothing parameter. Similarly, if the curves
 are to wiggly, the associated smoothing parameter may be increased.
-
-
 
 * Predicting parameters of life
 

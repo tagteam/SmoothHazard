@@ -29,7 +29,7 @@ print.idmSplines <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...
 		cat("number of events '0-->2' or '0-->1-->2': ", x$events2,"\n")
 		cat("number of subjects: ", x$N,"\n")
 		cat("number of covariates: ", x$NC,"\n")
-		if(length(x$na.action))cat("number of deleted observations due to missing: ",length(x$na.action),"\n")
+		## if(length(x$na.action))cat("number of deleted observations due to missing: ",length(x$na.action),"\n")
 
 		tmp2 <- data.frame("transition01"=c(x$nknots01,x$kappa[1]),"transition02"=c(x$nknots02,x$kappa[2]),"transition12"=c(x$nknots12,x$kappa[3]))
 		rownames(tmp2) <- c("knots","kappa")
