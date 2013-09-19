@@ -36,8 +36,8 @@ sim.idmModel <- function(x,n=100,compliance=1,p=NULL,normal=FALSE,cond=FALSE,sig
     # construct lifetime for ill subjects
     ill <- dat$event==1
     dat$lifetime[ill] <- dat$illtime[ill]+dat$waittime[ill]
-    # remove illtime for never ill subjects
-    dat$illtime[!ill] <- NA
+    # reset illtime for subjects that were never ill 
+    dat$illtime[!ill] <- dat$lifetime[!ill]
     cens <- attr(x,"cens")
     ## if (cens=="right"){
     # right censoring
@@ -65,7 +65,7 @@ sim.idmModel <- function(x,n=100,compliance=1,p=NULL,normal=FALSE,cond=FALSE,sig
     }
     ## right censored?
     dat$censtime <- pmax(dat$censtime,dat$R)
-    dat$status <- 1*(dat$lifetime<dat$censtime)
+    dat$status <- 1*(dat$lifetime<dat$censtime) 
     dat$lifetime <- pmin(dat$lifetime,dat$censtime)
     ## dat <- dat[,-match(c("censtime","illtime"),names(dat))]
     dat

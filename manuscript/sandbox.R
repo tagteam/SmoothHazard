@@ -15,31 +15,45 @@ regression(u,from="X",to="waittime") <- log(2)
 testdat1 <- sim(u,500)
 plot(prodlim(Hist(lifetime,event)~1,data=testdat1),col=2,add=TRUE)
 
-
-
 tmp <- idm(formula02=Hist(time=lifetime,event=event!=0)~X,
            formula01=Hist(time=list(L,R),event=ill)~X,
            data=testdat1,
+           igraph=0,
            intensities="Weib")
 
+set.seed(17)
+u <- idmModel(K=10,schedule=15,punctuality=1/20)
+distribution(u,"lifetime") <- coxWeibull.lvm(scale=1/120000,shape=2.5)
+distribution(u,"waittime") <- coxWeibull.lvm(scale=1/120000,shape=2.5)
+regression(u,from="X",to="lifetime") <- log(2)
+regression(u,from="X",to="waittime") <- log(2)
+testdat1 <- sim(u,50)
 
-stmp <- idm(formula02=Hist(time=lifetime,event=event!=0)~X,
-           formula01=Hist(time=list(L,R),event=ill)~X,
-           data=testdat1,
-           intensities="Splines")
+system.time(stmp1 <- idm(formula02=Hist(time=lifetime,event=status)~X,
+                         formula01=Hist(time=illtime,event=ill)~X,
+                         data=testdat1,
+                         n.knots=c(2,2,2),
+                         intensities="Splines"))
+
+system.time(stmp2 <- idm(formula02=Hist(time=lifetime,event=status)~X,
+                         formula01=Hist(time=illtime,event=ill)~X,
+                         data=testdat1,
+                         knots="quantiles",
+                         n.knots=c(2,2,2),
+                         intensities="Splines"))
 
 Rprof()
 testdat1 <- sim(u,50)
 
-testdat1$ill[!is.na(testdat1$illtime)]
-testdat1$illtime[testdat1$ill==0] <- 200
+## testdat1$ill[!is.na(testdat1$illtime)]
+## testdat1$illtime[testdat1$ill==0] <- 200
 system.time(tmp <- idm(formula02=Hist(time=lifetime,event=event!=0)~X,
                        formula01=Hist(time=illtime,event=ill)~X,
                        data=testdat1,
                        igraph=0,
            intensities="Weib"))
 
-testdat1$illtime[is.na(testdat1$illtime)] <- NA
+## testdat1$illtime[is.na(testdat1$illtime)] <- NA
 system.time(tmp <- idm(formula02=Hist(time=lifetime,event=event!=0)~X,
            formula01=Hist(time=illtime,event=ill)~X,
            data=testdat1,
@@ -82,3 +96,13 @@ do.call("rbind",lapply(1:NROW(scenario),function(i){
 
 
 
+f <- function(x,N){
+    tic()
+    inner <- foreach(s = 1:N) %dopar% {
+        setwd("~/research/SoftWare/SmoothHazard/manuscript/avakas/")
+        source("R/tictoc.R")
+        toc()
+    }
+    inner
+}
+f(1,3)

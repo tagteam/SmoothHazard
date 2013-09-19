@@ -5,7 +5,7 @@ idm <- function(formula01,
                 maxiter=200,
                 eps=c(5,5,3),
                 n.knots=c(7,7,7),
-                knots,
+                knots="equidistant",
                 CV=FALSE,
                 kappa=c(800000,200000,50000),
                 igraph=1,
@@ -182,7 +182,7 @@ idm <- function(formula01,
         alltimes <- sort(unique(Ltime, Rtime,responseAbs[,"time"]))
     amax <- max(alltimes)
     amin <- min(alltimes)
-    if (missing(knots)){
+    if (knots=="equidistant"){
         nknots01 <- n.knots[1]
         nknots02 <- n.knots[2]
         nknots12 <- n.knots[3]
@@ -191,13 +191,26 @@ idm <- function(formula01,
         knots12 <- seq(amin,amax,(amax-amin)/(nknots12-1))
     }
     else{
-        knots01 <- knots[[1]]
-        knots02 <- knots[[2]]
-        knots12 <- knots[[3]]
-        nknots01 <- length(knots01)
-        nknots02 <- length(knots02)
-        nknots12 <- length(knots12)
+        if (knots=="quantiles"){
+            nknots01 <- n.knots[1]
+            nknots02 <- n.knots[2]
+            nknots12 <- n.knots[3]
+            knots01 <- quantile(alltimes,seq(0,1,1/(nknots01-1)))
+            knots02 <- quantile(alltimes,seq(0,1,1/(nknots02-1)))
+            knots12 <- quantile(alltimes,seq(0,1,1/(nknots12-1)))
+        }
+        else{## user specified knots
+            knots01 <- knots[[1]]
+            knots02 <- knots[[2]]
+            knots12 <- knots[[3]]
+            nknots01 <- length(knots01)
+            nknots02 <- length(knots02)
+            nknots12 <- length(knots12)
+        }
     }
+    ## print(knots01)
+    ## print(knots02)
+    ## print(knots12)
     ## make fake knots needed for M-splines
     knots01 <- c(rep(knots01[1],3),knots01,rep(knots01[length(knots01)],3))
     knots02 <- c(rep(knots02[1],3),knots02,rep(knots02[length(knots02)],3))
