@@ -6,6 +6,7 @@ distribution(u,"waittime") <- coxWeibull.lvm(scale=1/120000,shape=2.5)
 regression(u,from="X",to="lifetime") <- log(2)
 regression(u,from="X",to="waittime") <- log(2)
 testdat1 <- sim(u,50)
+
 ## does not converge
 system.time(stmp1 <- idm(formula02=Hist(time=lifetime,event=status)~X,
                          formula01=Hist(time=illtime,event=ill)~X,
@@ -16,10 +17,13 @@ system.time(stmp1 <- idm(formula02=Hist(time=lifetime,event=status)~X,
 system.time(stmp1 <- idm(formula02=Hist(time=lifetime,event=status)~X,
                          formula01=Hist(time=illtime,event=ill)~X,
                          data=testdat1,
-                         n.knots=c(2,2,2),
+                         n.knots=c(5,5,5),
+                         maxit=2000,
                          intensities="Splines"))
-system.time(stmp1 <- idm(formula02=Hist(time=lifetime,event=status)~X,
+system.time(stmp2 <- idm(formula02=Hist(time=lifetime,event=status)~X,
                          formula01=Hist(time=illtime,event=ill)~X,
                          data=testdat1,
-                         n.knots=c(2,2,2),
+                         n.knots=c(5,5,5),
+                         maxit=2000,
+                         knots="quantiles",
                          intensities="Splines"))
