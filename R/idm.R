@@ -46,26 +46,34 @@ idm <- function(formula01,
   ## formula01
   x01 <- model.matrix(formula01,data=m01)[, -1, drop = FALSE]
   NC01 <- NCOL(x01)
-  Xnames01 <- paste(colnames(x01),"01",sep="_")
-
+  if (NC01>0)
+      Xnames01 <- paste(colnames(x01),"01",sep="_")
+  else 
+      Xnames01 <- NULL
   ## formula02
   x02 <- model.matrix(formula02,data=m02)[, -1, drop = FALSE]
   NC02 <- NCOL(x02)
   ## Xnames02 <- colnames(x02)
-  Xnames02 <- paste(colnames(x02),"02",sep="_")
-
+  if (NC01>0)
+      Xnames02 <- paste(colnames(x02),"02",sep="_")
+  else
+      Xnames02 <- NULL
   ## formula12
   x12 <- model.matrix(formula12,data=m12)[, -1, drop = FALSE]
   NC12 <- NCOL(x12)
   ## Xnames12 <- colnames(x12)
-  Xnames12 <- paste(colnames(x12),"12",sep="_")
+  if (NC12>0)
+      Xnames12 <- paste(colnames(x12),"12",sep="_")
+  else
+      Xnames12 <- NULL
   # }}}
-  # {{{ prepare censored event times 
-  N <- length(responseAbs[,"time"])
-
+  # {{{ prepare censored event times
   isIntervalCensored <- attr(responseTrans,"cens.type")=="intervalCensored"
   truncated <- nchar(attr(responseAbs,"entry.type"))>1
-  
+  abstime <- as.double(responseAbs[,"time"])
+  idm <- responseTrans[,"status"]==(as.integer(isIntervalCensored)+1)
+  idd <- responseAbs[,"status"]==1
+  N <- length(abstime)
   if (truncated==0){
     entrytime <- as.double(NULL)
   }else{
@@ -73,18 +81,19 @@ idm <- function(formula01,
   }
 	
   if (isIntervalCensored){
-    Ltime <- as.double(responseTrans[,"L",drop=TRUE])
-    Rtime <- as.double(responseTrans[,"R",drop=TRUE])
-  }else{
-    Ltime <- as.double(responseTrans[,"time",drop=TRUE])
-    Rtime <- as.double(responseTrans[,"time",drop=TRUE])
-    # Rtime <- rep(0,N)
+      Ltime <- as.double(responseTrans[,"L",drop=TRUE])
+      Rtime <- as.double(responseTrans[,"R",drop=TRUE])
+  }else{# exactly observed transition times
+      Ltime <- as.double(responseTrans[,"time",drop=TRUE])
+      Rtime <- as.double(responseTrans[,"time",drop=TRUE])
+      Ltime[idm==0] <- abstime[idm==0]
+      Rtime[idm==0] <- abstime[idm==0]
   }
-  
-  idm <- responseTrans[,"status"]==(as.integer(isIntervalCensored)+1)
-  idd <- responseAbs[,"status"]==1
- 
   if(!(intensities %in% c("Weib","Splines"))) stop("The intensities argument must be 'Weib' or 'Splines'")
+  # }}}
+  # {{{ check data for integrity
+  if (attr(responseAbs,"cens.type")=="intervalCensored") stop("No method available when the transtion to the absorbing state is interval censored.")
+  if (isIntervalCensored && any(Rtime<Ltime)) stop("Misspecified transitition times:\nSome left interval limits are greater than the corresponding right limits.")
   # }}}
   # {{{ call Fortran function weib and collect results
   
@@ -119,7 +128,7 @@ idm <- function(formula01,
                      as.double(entrytime),               #
                      as.double(Ltime),                   #l=
                      as.double(Rtime),                   #r=
-                     as.double(responseAbs[,"time"]),    #d=
+                     as.double(abstime),                 #d=
                      as.integer(idm),                    #idm=}
                      as.integer(idd),                    #idd=
                      as.double(x01),                     #x01=
@@ -177,9 +186,9 @@ idm <- function(formula01,
 }else{
     #  	cat("------ Program Splines ------ \n")
     if (length(entrytime)>0)
-        alltimes <- sort(unique(Ltime, Rtime,entrytime,responseAbs[,"time"]))
+        alltimes <- sort(unique(Ltime, Rtime,entrytime,abstime))
     else
-        alltimes <- sort(unique(Ltime, Rtime,responseAbs[,"time"]))
+        alltimes <- sort(unique(Ltime, Rtime,abstime))
     amax <- max(alltimes)
     amin <- min(alltimes)
     if (knots=="equidistant"){
@@ -195,9 +204,10 @@ idm <- function(formula01,
             nknots01 <- n.knots[1]
             nknots02 <- n.knots[2]
             nknots12 <- n.knots[3]
-            knots01 <- quantile(alltimes,seq(0,1,1/(nknots01-1)))
-            knots02 <- quantile(alltimes,seq(0,1,1/(nknots02-1)))
-            knots12 <- quantile(alltimes,seq(0,1,1/(nknots12-1)))
+            approx.illtimes <- (Rtime[idm==1] + Ltime[idm==1])/2
+            knots01 <- quantile(approx.illtimes,seq(0,1,1/(nknots01-1)))
+            knots02 <- quantile(abstime,seq(0,1,1/(nknots02-1)))
+            knots12 <- quantile(abstime,seq(0,1,1/(nknots12-1)))
         }
         else{## user specified knots
             knots01 <- knots[[1]]
@@ -223,7 +233,7 @@ idm <- function(formula01,
                      as.double(entrytime),               #entrytime=
                      as.double(Ltime),                   #l=
                      as.double(Rtime),                   #r=
-                     as.double(responseAbs[,"time"]),    #d=
+                     as.double(abstime),                 #d=
                      as.integer(idm),                    #idm=
                      as.integer(idd),                    #idd=
                      as.double(x01),                     #x01=
