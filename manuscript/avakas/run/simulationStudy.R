@@ -45,10 +45,11 @@ runOne <- function(i,NS,seed){
         }
         ## Spline model with quantile knots 
         try.splines.quantiles <- try(suppressWarnings(splines.quantiles <- idm(formula02=Hist(time=lifetime,status)~X,
-                                                                             formula01=form.ill,
-                                                                             data=dat,
-                                                                             maxiter=2000,
-                                                                             knots="quantiles")),silent=TRUE)
+                                                                               formula01=form.ill,
+                                                                               data=dat,
+                                                                               maxiter=2000,
+                                                                               knots="quantiles",
+                                                                               intensities="Splines")),silent=TRUE)
         if (inherits(try.splines.quantiles,"try-error")==TRUE) {
             innerout <- c(innerout,list(splines.quantiles=list(coef=NA,conv=NA,maxiter=NA)))
         }
@@ -57,11 +58,11 @@ runOne <- function(i,NS,seed){
         }
         ## Spline model with equidistant knots 
         try.splines.equi <- try(suppressWarnings(splines.equi <- idm(formula02=Hist(time=lifetime,status)~X,
-                                                                   formula01=form.ill,
-                                                                   data=dat,
-                                                                   maxiter=2000,
-                                                                   knots="equidistant",
-                                                                   intensities="Splines")),silent=TRUE)
+                                                                     formula01=form.ill,
+                                                                     data=dat,
+                                                                     maxiter=2000,
+                                                                     knots="equidistant",
+                                                                     intensities="Splines")),silent=TRUE)
         if (inherits(try.splines.equi,"try-error")==TRUE) {
             innerout <- c(innerout,list(splines.equi=list(coef=NA,conv=NA,maxiter=NA)))
         }
@@ -73,7 +74,7 @@ runOne <- function(i,NS,seed){
     }
     inner
 }
-b <- runOne(i=1,NS=1,seed=1)
+## b <- runOne(i=5,NS=1,seed=1)
 
 
 ## run simulation
