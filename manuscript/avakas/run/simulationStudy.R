@@ -18,7 +18,7 @@ runOne <- function(i,NS,seed){
     ## setwd("~/research/SoftWare/SmoothHazard/manuscript/avakas/")
     ## source("R/tictoc.R")
     tic()
-    inner <- foreach(s = 1:NS,.packages=c("SmoothHazard","lava"),.export=c("p","iseed","tic","toc")) %dopar% {
+    inner <- foreach(s = 1:NS,.packages=c("SmoothHazard","lava"),.export=c("p","iseed","tic","toc",".time.temp","timer")) %dopar% {
         set.seed(iseed[s])
         mod <- idmModel(K=p$K,schedule=p$schedule,punctuality=p$punctuality)
         regression(mod,from="X",to="lifetime") <- p$b02
@@ -36,17 +36,19 @@ runOne <- function(i,NS,seed){
         try.weib <- try(weib <- idm(formula02=Hist(time=lifetime,event=status)~X,
                                     formula01=form.ill,
                                     data=dat,
+                                    maxiter=2000,
                                     intensities="Weib"),silent=TRUE)
         if (inherits(try.weib,"try-error")==TRUE) {
             innerout <- list(weib=list(coef=NA,conv=NA))
         }
         else{
-            innerout <- list(weib=list(coef=weib$coef,modelpar=weib$modelPar,conv=weib$converged))
+            innerout <- list(weib=list(coef=weib$coef,modelpar=weib$modelPar,conv=weib$converged,maxiter=weib$maxiter))
         }
         ## Spline model with quantile knots 
         try.splines.quantiles <- try(suppressWarnings(splines.quantiles <- idm(formula02=Hist(time=lifetime,status)~X,
                                                                                formula01=form.ill,
                                                                                data=dat,
+                                                                               CV=TRUE,
                                                                                maxiter=2000,
                                                                                knots="quantiles",
                                                                                intensities="Splines")),silent=TRUE)
@@ -60,6 +62,7 @@ runOne <- function(i,NS,seed){
         try.splines.equi <- try(suppressWarnings(splines.equi <- idm(formula02=Hist(time=lifetime,status)~X,
                                                                      formula01=form.ill,
                                                                      data=dat,
+                                                                     CV=TRUE,
                                                                      maxiter=2000,
                                                                      knots="equidistant",
                                                                      intensities="Splines")),silent=TRUE)

@@ -348,18 +348,68 @@ visit times on the properties of the estimtated regression parameters
 in the Weibull model.
 
 #+BEGIN_SRC R  :results output raw  :exports results  :session *R* :cache yes 
+library(Publish)
+library(foreach)
 scenario <- expand.grid(N=c(50,250,500),b01=c(log(2)),b02=c(0,log(2)),K=10,schedule=c(5,35),punctuality=1)
 setwd("~/research/SoftWare/SmoothHazard/manuscript/avakas/run/")
 files <- list.files(pattern="results.*rda")
 res.list <- foreach (i=1:NROW(scenario)) %dopar% {
- ff <- grep(paste("results-",i,"-seed1735-NS-1000-",sep=""),files,value=TRUE)
- rr <- get(load(ff))
- truth <- unlist(rep(scenario[i,c("b01","b02")],c(1,2)))
- bias <- colMeans(rr-truth)
- abs.bias <- colMeans(abs(rr-truth))
- mse <- colMeans((rr-truth)^2)
-out <- rbind(bias,abs.bias,mse)
-colnames(out) <- c("trans 0 -> 1","trans 0 -> 2","trans 1 -> 2")
+    ff <- grep(paste("results-",i,"-seed1735-NS-1000-",sep=""),files,value=TRUE)
+    rr <- get(load(ff))
+    truth <- unlist(rep(scenario[i,c("b01","b02")],c(1,2)))
+    bias <- colMeans(rr-truth)
+    #abs.bias <- colMeans(abs(rr-truth))
+    mse <- colMeans((rr-truth)^2)
+    #out <- rbind(bias,abs.bias,mse)
+    out <- paste(format(bias,digits=2,nsmall=1)," (",format(mse,digits=1,nsmall=1),")",sep="")
+    names(out) <- c("trans 0 -> 1","trans 0 -> 2","trans 1 -> 2")
+    out
+ }
+publish(cbind(round(scenario[,c(1,2,3,5)],2),do.call("rbind",res.list)),org=TRUE)
+#+END_SRC
+
+#+RESULTS[<2013-09-20 15:17:27> 8a47b0bc99e4df8f5d50e673da68c4c0ee19bfa9]:
+|   N |  b01 |  b02 | schedule | trans 0 -> 1  | trans 0 -> 2  | trans 1 -> 2   |
+|-----+------+------+----------+---------------+---------------+----------------|
+|  50 | 0.69 | 0.00 |        5 | 0.51 (0.4)    | -0.26 (0.2)   | -0.22 (0.3)    |
+| 250 | 0.69 | 0.00 |        5 | 0.47 (0.3)    | -0.25 (0.2)   | -0.23 (0.2)    |
+| 500 | 0.69 | 0.00 |        5 | 0.47 (0.3)    | -0.24 (0.2)   | -0.23 (0.2)    |
+|  50 | 0.69 | 0.69 |        5 | 0.062 (0.09)  | 0.025 (0.08)  | -0.249 (0.23)  |
+| 250 | 0.69 | 0.69 |        5 | 0.051 (0.02)  | 0.019 (0.01)  | -0.279 (0.10)  |
+| 500 | 0.69 | 0.69 |        5 | 0.047 (0.008) | 0.015 (0.006) | -0.285 (0.090) |
+|  50 | 0.69 | 0.00 |       35 | 0.54 (0.5)    | -0.25 (0.2)   | -0.28 (0.3)    |
+| 250 | 0.69 | 0.00 |       35 | 0.48 (0.3)    | -0.24 (0.2)   | -0.29 (0.2)    |
+| 500 | 0.69 | 0.00 |       35 | 0.48 (0.3)    | -0.24 (0.2)   | -0.29 (0.2)    |
+|  50 | 0.69 | 0.69 |       35 | 0.068 (0.09)  | 0.034 (0.07)  | -0.404 (0.31)  |
+| 250 | 0.69 | 0.69 |       35 | 0.041 (0.01)  | 0.020 (0.01)  | -0.423 (0.20)  |
+| 500 | 0.69 | 0.69 |       35 | 0.039 (0.008) | 0.015 (0.006) | -0.433 (0.198) |
+
+
+#+BEGIN_SRC R  :results output raw  :exports results  :session *R* :cache yes 
+library(foreach)
+library(Publish)
+scenario <- expand.grid(schedule=c(0,5,20,35),N=c(50,250,500),b01=log(2),b02=log(2),K=10,punctuality=1)
+setwd("~/research/SoftWare/SmoothHazard/manuscript/avakas/results/")
+files <- list.files(pattern="results.*rda")
+tablerow <- function(x,what,truth){
+    rr <- do.call("rbind",lapply(x,function(b){b[[what]]$coef}))
+    converged <- paste(100*mean(sapply(x,function(b){b[[what]]$conv})==1),"%")
+    #maxiter <- round(mean(sapply(x,function(b){b[[what]]$maxiter})))
+    bias <- colMeans(rr-truth)
+    mse <- colMeans((rr-truth)^2)
+    out <- paste(format(bias,digits=2,nsmall=1)," (",format(mse,digits=1,nsmall=1),")",sep="")
+    names(out) <- c("trans 0 -> 1","trans 0 -> 2","trans 1 -> 2")
+    out <- c(out,converged=converged)
+    out
+}
+#res.list <- foreach (i=1:NROW(scenario)) %dopar% {
+res.list <- foreach (i=1:length(files)) %dopar% {
+    ff <- grep(paste("results-",i,"-seed1735-NS-1000-",sep=""),files,value=TRUE)
+    x <- get(load(ff))
+    truth <- unlist(rep(scenario[i,c("b01","b02")],c(1,2)))
+    out <- rbind(quantiles=tablerow(x,"splines.quantiles",truth),
+                 equidistant=tablerow(x,"splines.equi",truth),
+                 weibull=tablerow(x,"weib",truth))
 out
 }
 #+END_SRC

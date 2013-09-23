@@ -32,7 +32,9 @@ testdat1 <- sim(u,50)
 system.time(stmp1 <- idm(formula02=Hist(time=lifetime,event=status)~X,
                          formula01=Hist(time=illtime,event=ill)~X,
                          data=testdat1,
-                         n.knots=c(2,2,2),
+                         CV=TRUE,
+                         maxiter=200,
+                         n.knots=c(7,7,7),
                          intensities="Splines"))
 
 system.time(stmp2 <- idm(formula02=Hist(time=lifetime,event=status)~X,

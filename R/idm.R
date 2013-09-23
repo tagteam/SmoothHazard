@@ -363,34 +363,34 @@ idm <- function(formula01,
   if(NC12>0) fit$Xnames12 <- Xnames12
   
   if(intensities=="Splines"){
-    fit$knots01 <- knots01
-    fit$knots02 <- knots02
-    fit$knots12 <- knots12
-    fit$theta01 <- ffit$theta01     
-    fit$theta02 <- ffit$theta02    
-    fit$theta12 <- ffit$theta12 
-    fit$CV <- CV
-    fit$nknots01 <- nknots01
-    fit$nknots02 <- nknots02
-    fit$nknots12 <- nknots12
-    fit$igraph <- ffit$igraph
-    fit$CVcrit <- ffit$CVcrit
-    fit$DoF <- ffit$mdf
-    if(CV){	
-      fit$kappa <- ffit$kappa	
-    }else{
-      fit$kappa <- kappa
-    }
+      fit$knots01 <- knots01
+      fit$knots02 <- knots02
+      fit$knots12 <- knots12
+      fit$theta01 <- ffit$theta01     
+      fit$theta02 <- ffit$theta02    
+      fit$theta12 <- ffit$theta12 
+      fit$CV <- CV
+      fit$nknots01 <- nknots01
+      fit$nknots02 <- nknots02
+      fit$nknots12 <- nknots12
+      fit$igraph <- ffit$igraph
+      fit$CVcrit <- ffit$CVcrit
+      fit$DoF <- ffit$mdf
+      if(CV){	
+          fit$kappa <- ffit$kappa	
+      }else{
+          fit$kappa <- kappa
+      }
   }
   fit$na.action <- na.action	
   # }}}
   if(intensities=="Weib"){
-    class(fit) <- "idmWeib"
+      class(fit) <- "idmWeib"
   }else{
-    class(fit) <- "idmSplines"
+      class(fit) <- "idmSplines"
   }  
 	
-  cost<-proc.time()-ptm
   ## cat("The program took", round(cost[3],2), "seconds \n")
+  fit$runtime <- proc.time()-ptm
   fit
 }
