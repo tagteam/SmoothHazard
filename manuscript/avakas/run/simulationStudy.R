@@ -8,7 +8,7 @@ library("Rmpi")
 cl <- makeCluster(nclust, type = "MPI") 
 registerDoSNOW(cl)
 ## scenario <- expand.grid(N=c(50,250,500),b01=c(0,log(2)),b02=c(0,log(2)),K=5,schedule=c(5,35),punctuality=1/20)
-scenario <- expand.grid(schedule=c(0,5,20,35),N=c(50,250,500),b01=log(2),b02=log(2),K=10,punctuality=1)
+scenario <- expand.grid(schedule=c(0,5,20,35),N=c(100,250,500),b01=log(2),b02=log(2),K=10,punctuality=1)
 runOne <- function(i,NS,seed){
     message(i)
     p <- scenario[i,,drop=FALSE]
@@ -38,47 +38,50 @@ runOne <- function(i,NS,seed){
                                     data=dat,
                                     maxiter=2000,
                                     intensities="Weib"),silent=TRUE)
+        ## if (weib$converged==2) browser()
         if (inherits(try.weib,"try-error")==TRUE) {
             innerout <- list(weib=list(coef=NA,conv=NA))
         }
         else{
-            innerout <- list(weib=list(coef=weib$coef,modelpar=weib$modelPar,conv=weib$converged,maxiter=weib$maxiter))
+            innerout <- list(weib=list(coef=weib$coef,modelpar=weib$modelPar,conv=weib$converged,maxiter=weib$niter))
         }
-        ## Spline model with quantile knots 
-        try.splines.quantiles <- try(suppressWarnings(splines.quantiles <- idm(formula02=Hist(time=lifetime,status)~X,
-                                                                               formula01=form.ill,
-                                                                               data=dat,
-                                                                               CV=TRUE,
-                                                                               maxiter=2000,
-                                                                               knots="quantiles",
-                                                                               intensities="Splines")),silent=TRUE)
-        if (inherits(try.splines.quantiles,"try-error")==TRUE) {
-            innerout <- c(innerout,list(splines.quantiles=list(coef=NA,conv=NA,maxiter=NA)))
-        }
-        else{
-            innerout <- c(innerout,list(splines.quantiles=list(coef=splines.quantiles$coef,conv=splines.quantiles$converged,maxiter=splines.quantiles$niter)))
-        }
-        ## Spline model with equidistant knots 
-        try.splines.equi <- try(suppressWarnings(splines.equi <- idm(formula02=Hist(time=lifetime,status)~X,
-                                                                     formula01=form.ill,
-                                                                     data=dat,
-                                                                     CV=TRUE,
-                                                                     maxiter=2000,
-                                                                     knots="equidistant",
-                                                                     intensities="Splines")),silent=TRUE)
-        if (inherits(try.splines.equi,"try-error")==TRUE) {
-            innerout <- c(innerout,list(splines.equi=list(coef=NA,conv=NA,maxiter=NA)))
-        }
-        else{
-            innerout <- c(innerout,list(splines.equi=list(coef=splines.equi$coef,conv=splines.equi$converged,maxiter=splines.equi$niter)))
+        ## Spline model with quantile knots
+        if (FALSE){
+            try.splines.quantiles <- try(suppressWarnings(splines.quantiles <- idm(formula02=Hist(time=lifetime,status)~X,
+                                                                                   formula01=form.ill,
+                                                                                   data=dat,
+                                                                                   CV=TRUE,
+                                                                                   maxiter=2000,
+                                                                                   knots="quantiles",
+                                                                                   intensities="Splines")),silent=TRUE)
+            if (inherits(try.splines.quantiles,"try-error")==TRUE) {
+                innerout <- c(innerout,list(splines.quantiles=list(coef=NA,conv=NA,maxiter=NA)))
+            }
+            else{
+                innerout <- c(innerout,list(splines.quantiles=list(coef=splines.quantiles$coef,conv=splines.quantiles$converged,maxiter=splines.quantiles$niter)))
+            }
+            ## Spline model with equidistant knots 
+            try.splines.equi <- try(suppressWarnings(splines.equi <- idm(formula02=Hist(time=lifetime,status)~X,
+                                                                         formula01=form.ill,
+                                                                         data=dat,
+                                                                         CV=TRUE,
+                                                                         maxiter=2000,
+                                                                         knots="equidistant",
+                                                                         intensities="Splines")),silent=TRUE)
+            if (inherits(try.splines.equi,"try-error")==TRUE) {
+                innerout <- c(innerout,list(splines.equi=list(coef=NA,conv=NA,maxiter=NA)))
+            }
+            else{
+                innerout <- c(innerout,list(splines.equi=list(coef=splines.equi$coef,conv=splines.equi$converged,maxiter=splines.equi$niter)))
+            }
         }
         if (s %in% c(1,10,50,seq(100,1000,100))) message(paste("Simulations: ",s,", Minutes: ",round(toc()/60,2),sep=""))
         innerout
     }
     inner
 }
-## b <- runOne(i=5,NS=1,seed=1)
 
+## b <- runOne(i=5,NS=1,seed=1)
 
 ## run simulation
 seed <- 1735

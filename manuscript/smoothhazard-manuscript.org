@@ -388,9 +388,9 @@ publish(cbind(round(scenario[,c(1,2,3,5)],2),do.call("rbind",res.list)),org=TRUE
 #+BEGIN_SRC R  :results output raw  :exports results  :session *R* :cache yes 
 library(foreach)
 library(Publish)
-scenario <- expand.grid(schedule=c(0,5,20,35),N=c(50,250,500),b01=log(2),b02=log(2),K=10,punctuality=1)
+scenario <- expand.grid(schedule=c(0,5,20,35),N=c(100,250,500),b01=log(2),b02=log(2),K=10,punctuality=1)
 setwd("~/research/SoftWare/SmoothHazard/manuscript/avakas/results/")
-files <- list.files(pattern="results.*rda")
+files <- list.files(pattern="results.*2013-09-24-.*rda")
 tablerow <- function(x,what,truth){
     rr <- do.call("rbind",lapply(x,function(b){b[[what]]$coef}))
     converged <- paste(100*mean(sapply(x,function(b){b[[what]]$conv})==1),"%")
@@ -407,12 +407,32 @@ res.list <- foreach (i=1:length(files)) %dopar% {
     ff <- grep(paste("results-",i,"-seed1735-NS-1000-",sep=""),files,value=TRUE)
     x <- get(load(ff))
     truth <- unlist(rep(scenario[i,c("b01","b02")],c(1,2)))
-    out <- rbind(quantiles=tablerow(x,"splines.quantiles",truth),
-                 equidistant=tablerow(x,"splines.equi",truth),
-                 weibull=tablerow(x,"weib",truth))
-out
+    tablerow(x,"weib",truth)
+    #out <- rbind(quantiles=tablerow(x,"splines.quantiles",truth),
+                 #equidistant=tablerow(x,"splines.equi",truth),
+                 #weibull=tablerow(x,"weib",truth))
+#out
 }
+simtab <- do.call("rbind",res.list)
+publish(cbind(scenario[,c(1,2)],simtab),org=TRUE)
 #+END_SRC
+
+#+RESULTS[<2013-09-24 10:34:48> c7ccb5091ff2c52e543bcafc061e5b884655ffb9]:
+| schedule |   N | trans 0 -> 1   | trans 0 -> 2   | trans 1 -> 2   | converged |
+|----------+-----+----------------+----------------+----------------+-----------|
+|        0 | 100 | -0.27 (0.2)    | -0.23 (0.2)    | -0.16 (0.3)    | 59.8 %    |
+|        5 | 100 | -0.207 (0.2)   | -0.159 (0.2)   | -0.019 (0.3)   | 69.5 %    |
+|       20 | 100 | 0.0089 (0.04)  | 0.0694 (0.07)  | 0.1855 (0.18)  | 97.3 %    |
+|       35 | 100 | 0.020 (0.04)   | 0.077 (0.06)   | 0.151 (0.16)   | 98.6 %    |
+|        0 | 250 | -0.26 (0.2)    | -0.21 (0.2)    | -0.19 (0.2)    | 62.1 %    |
+|        5 | 250 | -0.132 (0.1)   | -0.063 (0.1)   | 0.022 (0.2)    | 81.3 %    |
+|       20 | 250 | 0.011 (0.01)   | 0.081 (0.02)   | 0.142 (0.06)   | 100 %     |
+|       35 | 250 | 0.012 (0.01)   | 0.082 (0.02)   | 0.101 (0.05)   | 100 %     |
+|        0 | 500 | -0.20 (0.1)    | -0.15 (0.1)    | -0.12 (0.2)    | 71 %      |
+|        5 | 500 | -0.0749 (0.06) | -0.0087 (0.06) | 0.0788 (0.09)  | 89.3 %    |
+|       20 | 500 | 0.009 (0.006)  | 0.072 (0.013)  | 0.120 (0.032)  | 100 %     |
+|       35 | 500 | 0.0096 (0.006) | 0.0723 (0.013) | 0.0814 (0.025) | 100 %     |
+
 
 *** Maximization algorithm
 
