@@ -316,6 +316,8 @@
 !==========================  COSP  ====================================
         subroutine cosp(x,the,n,y,zi,binf,su,bsup,lbinf,lam,lbsup)
        
+	use commun,only:iconf
+
         implicit none
       
         integer::k,j,n,i
@@ -392,17 +394,21 @@
                         gl = som
             endif
 
-         
-   
-         call conf(x,j,n,y,pm,zi)
+        su  = dexp(-gl)
 
-         binf = dexp(-gl + 1.96d0*pm)
-         su  = dexp(-gl)
-         bsup = dexp(-gl - 1.96d0*pm)
-
-         call conf1(x,j,n,y,pm,zi)
-         lbinf = lam - 1.96d0*pm
-         lbsup = lam + 1.96d0*pm
+   	if (iconf.eq.1) then
+         	call conf(x,j,n,y,pm,zi)
+         	binf = dexp(-gl + 1.96d0*pm)
+         	bsup = dexp(-gl - 1.96d0*pm)
+         	call conf1(x,j,n,y,pm,zi)
+         	lbinf = lam - 1.96d0*pm
+         	lbsup = lam + 1.96d0*pm
+	else
+		binf=0
+		bsup=0
+		lbinf=0
+		lbsup=0
+	end if
 	
          return
 

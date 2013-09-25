@@ -3,18 +3,18 @@
 !                                 Weibull
 !                              20/05/10
 !            last              08/04/11
-        subroutine survWeib(entrytime,l,r,status,x,n,p,truncated,interval,eps,&
-        maxiter0,loglik,basepar,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,prt,hess_tot)
+        subroutine survWeib(entrytime,l,r,status,x,n,p,truncated,interval,eps,maxiter0,&
+        loglik,basepar,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,conf_bands,prt,hess_tot)
 !noVar
         use survCommun  
         use parameters
         use optim
-        use commun,only:pl
+        use commun,only:pl,iconf
         
         implicit none
 
 !  variables entrants
-        integer,intent(in)::n,p,prt
+        integer,intent(in)::n,p,prt,conf_bands
         double precision,dimension(n),intent(in)::l,r,entrytime
         integer,dimension(n),intent(in)::status
         double precision,dimension(n,p),intent(in)::x
@@ -58,6 +58,7 @@
 !---------------------------------
         pl=0
         print_iter = prt
+	iconf = conf_bands
         no=N
         
         if(noVar.ne.1) then
@@ -306,6 +307,7 @@
 
 !---------------- bootstrap ------------------------------
 
+		if (iconf.eq.1)then
                 do jj=1,2000
                         do i=1,np
                                 call bgos(1.d0,0,x1,x2,0.d0)
@@ -425,6 +427,12 @@
                         h_u(k) = tab_ri_s(1)
 
                 end do  
+	else 
+		S_l=0
+		S_u=0
+		h_l=0
+		h_u=0
+	end if
 
 1000    continue
         converged = istop

@@ -19,7 +19,7 @@
 !add prt,noVar
         subroutine survPl(entrytime,l,r,id,x,N,nva,truncated,interval,eps &
         ,maxiter0,loglik,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,&
-        nknots,irec,kappa0,kappa,igraph,CVcrit,mdf,ti,theta,prt,hess_tot)
+        nknots,irec,kappa0,kappa,conf_bands,CVcrit,mdf,ti,theta,prt,hess_tot)
 !!! CT 26sept2012
 ! noVar    
 !!! fin CT 26sept2012
@@ -36,7 +36,7 @@
         double precision::min,max,estimvSurv,ca,cb,dd,res
         double precision::mdf_int
 !!      double precision,dimension(:),allocatable::b2
-        integer,intent(in)::igraph,N,nknots,irec
+        integer,intent(in)::conf_bands,N,nknots,irec
         integer,dimension(N)::id
         double precision,dimension(N)::entrytime,l,r
         double precision,intent(in)::kappa0
@@ -71,6 +71,7 @@
         pl=1
         ind_hess=0
         print_iter = prt
+	iconf = conf_bands
 !end add
         npar = 0
         verSurv = 0
@@ -354,11 +355,11 @@
         cv(2) = cb
         cv(3) = dd
 
-        irep = igraph
+!        irep = igraph
 
-        if(irep.eq.1)then
+!        if(irep.eq.1)then
                 call distanceSurv(v1,b,t,S,S_l,S_u,h,h_l,h_u)
-        endif   
+!        endif   
         kappa=k0Surv
 
 1000    continue  

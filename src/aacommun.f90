@@ -34,7 +34,7 @@ module commun
 !-------------------  dace1new -------------------------------------------
         double precision,dimension(:),allocatable,save::opt2
         double precision,dimension(3),save::k0
-        integer,save::rec,troncature,ind_hess,pl
+        integer,save::rec,troncature,ind_hess,pl,iconf
         double precision,dimension(:,:),allocatable,save::hessienne     
 
 !add for survPl

@@ -33,8 +33,8 @@
 
         subroutine idmPl(entrytime,l,r,d,idm,idd,x01,x02,x12,N,P01,P02,P12,truncated,eps &
         ,maxiter0,loglik,regpar,v,converged,cv,niter,t,a01,a01_l,a01_u,a02,a02_l,a02_u,a12, &
-        a12_l,a12_u,nknots01,knots01,nknots02,knots02,nknots12,knots12,irec,kappa0,kappa,igraph,CVcrit,mdf, &
-        theta01,theta02,theta12,prt,hess_tot)
+        a12_l,a12_u,nknots01,knots01,nknots02,knots02,nknots12,knots12,irec,kappa0,kappa,&
+	conf_bands,CVcrit,mdf,theta01,theta02,theta12,prt,hess_tot)
         
         use tailles
         use propre
@@ -50,7 +50,7 @@
         double precision::min,max,maxt1,estimv,maxt2,maxt3,mint1,mint2,mint3,ca,cb,dd,res
         double precision::mdf_int
         double precision,dimension(:),allocatable::b2
-        integer,intent(in)::P01,P12,P02,igraph,N,nknots01,nknots02,nknots12,irec,prt
+        integer,intent(in)::P01,P12,P02,N,nknots01,nknots02,nknots12,irec,prt,conf_bands
         integer,dimension(N)::idm,idd
         double precision,dimension(N)::entrytime,l,r,d
         double precision,dimension(3),intent(in)::kappa0
@@ -109,6 +109,7 @@
         !------------  entre parametres -----
         
         print_iter = prt
+	iconf = conf_bands
         npar = 0
         ver = 0
         pl=1
@@ -592,23 +593,23 @@
 !               write(*,*)nomfichregr,' fichier variables explicatives'
 !               write(*,*)' '
 
-        if(igraph.eq.1)then
+!!        if(igraph.eq.1)then
                 call distance(nz01,nz02,nz12,b,t,a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u)
-        end if
+!!       end if
 
         deallocate(hessienne)
-        if(igraph.ne.1)then 
-                t=0.d0
-                a01=0.d0
-                a01_l=0.d0
-                a01_u=0.d0
-                a02=0.d0
-                a02_l=0.d0
-                a02_u=0.d0
-                a12=0.d0
-                a12_l=0.d0
-                a12_u=0.d0
-        end if  
+!        if(igraph.ne.1)then 
+!                t=0.d0
+!                a01=0.d0
+!                a01_l=0.d0
+!                a01_u=0.d0
+!                a02=0.d0
+!                a02_l=0.d0
+!                a02_u=0.d0
+!                a12=0.d0
+!                a12_l=0.d0
+!                a12_u=0.d0
+!        end if  
 
 !        converged = istop
         cv(1) = ca
