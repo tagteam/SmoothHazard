@@ -11,8 +11,8 @@ State 0 corresponds to the initial state, state 1 to the transient one, state 2 
 }
 \usage{
 idm(formula01, formula02, formula12, data, maxiter=200, eps=c(5,5,3), 
-n.knots=c(7,7,7), knots, CV=FALSE,kappa = c(1000000,500000,20000), igraph=1, 
-intensities="Weib", print.iter=FALSE, subset=NULL, na.action=na.omit)
+n.knots=c(7,7,7), knots, CV=FALSE,kappa = c(1000000,500000,20000),
+intensities="Weib", conf_bands=TRUE, print.iter=FALSE, subset=NULL, na.action=na.omit)
 }
 
 \arguments{
@@ -65,11 +65,11 @@ List of length 3 containing the placements (timepoints) of the knots for
   \item{kappa}{
 a vector of length 3.  If CV=FALSE, smoothing parameters for the transition 0 --> 1, 0 --> 2 and 1 --> 2. If CV=TRUE, initial values of the smoothing parameters for the cross validation search. Argument for the penalized likelihood approach.  
 }
-  \item{igraph}{
-a binary variable equals to 1 when you want to output graphs of the transition intensities, 0 otherwise. The default is 1.
-}
   \item{intensities}{
 type of estimation method: "Splines" for a penalized likelihood approach with approximation of the transition intensities by M-splines, "Weib" for a parametric approach with a Weibull distribution on the transition intensities. Default is "Weib".
+}
+  \item{conf.bands}{
+Boolean parameter. Equals to \code{TRUE} to calculate confidence bands for the transition intensities curves, \code{FALSE} otherwise. Default is \code{TRUE}.
 }
   \item{print.iter}{
 boolean parameter. Equals to \code{TRUE} to print the likelihood during the iteration process, \code{FALSE} otherwise. Default is \code{FALSE}. This option is not running on Windows.
@@ -126,7 +126,6 @@ how NAs are  treated. The default is first, any na.action attribute of data, sec
   \item{theta02}{square root of splines coefficients for transition 0 --> 2.} 
   \item{theta12}{square root of splines coefficients for transition 1 --> 2.}   
   \item{CV}{a binary variable equals to 1 when search of the smoothing parameters \link{kappa} by approximated cross-validation, 1 otherwise. The default is 0.}    
-  \item{igraph}{a binary variable equals 1 when you need to output transition intensity to plot, 0 otherwise. The default is 1.} 
   \item{kappa}{vector containing the smoothing parameters for transition 0 --> 1, 0 --> 2, 1 --> 2 used to estimate the model by the penalized likelihood approach.} 
   \item{CVcrit}{cross validation criteria.}    
   \item{DoF}{degrees of freedom of the model.} 

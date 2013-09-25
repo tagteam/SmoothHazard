@@ -10,8 +10,8 @@ Left-truncated, right-censored, and interval-censored data are allowed.
 }
 \usage{
 shr(formula, data, eps = c(5, 5, 3), nknots=7,
-CV=FALSE , kappa = 10000, igraph = 1, maxiter = 200, hazard = "Weib",
-print.iter = FALSE, na.action = na.omit)
+CV=FALSE , kappa = 10000, maxiter = 200, hazard = "Weib",
+conf_bands=TRUE, print.iter = FALSE, na.action = na.omit)
 }
 
 \arguments{
@@ -38,15 +38,15 @@ binary variable equals to 1 when search (by approximated cross validation) of th
 if CV=FALSE, smoothing parameter; if CV=TRUE, initial value of the smoothing parameters for the cross validation search. Argument for the penalized likelihood approach.  
 }
 
-  \item{igraph}{
-a binary variable equals to 1 when you want to output graph of the survival function, 0 otherwise. The default is 1.
-}
   \item{maxiter}{
 maximum number of iterations. The default is 200. 
 }
   \item{hazard}{
 type of estimation method: "Splines" for a penalized likelihood approach with approximation of the hazard function by M-splines, "Weib" for a parametric approach with a Weibull distribution on the hazard function. Default is "Weib".
 }
+  \item{conf.bands}{
+Boolean parameter. Equals to \code{TRUE} to calculate confidence bands for the survival or hazard curves, \code{FALSE} otherwise. Default is \code{TRUE}.
+  }
   \item{print.iter}{
 boolean parameter. Equals to \code{TRUE} to print the likelihood during the iteration process, \code{FALSE} otherwise. Default is \code{FALSE}. This option is not running on Windows.
 }
