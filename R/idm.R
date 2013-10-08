@@ -13,7 +13,7 @@ idm <- function(formula01,
                 print.iter=FALSE,
                 subset,
                 na.action = na.fail){
-    
+
   # {{{ check formula
   call <- match.call()
   ptm <- proc.time()
@@ -192,33 +192,37 @@ idm <- function(formula01,
         alltimes <- sort(unique(Ltime, Rtime,abstime))
     amax <- max(alltimes)
     amin <- min(alltimes)
-    if (knots=="equidistant"){
+    
+    if (length(knots)==1){
+      if (knots=="equidistant"){
         nknots01 <- n.knots[1]
         nknots02 <- n.knots[2]
         nknots12 <- n.knots[3]
         knots01 <- seq(amin,amax,(amax-amin)/(nknots01-1))
         knots02 <- seq(amin,amax,(amax-amin)/(nknots02-1))
         knots12 <- seq(amin,amax,(amax-amin)/(nknots12-1))
-    }
-    else{
+      }
+      else{
         if (knots=="quantiles"){
-            nknots01 <- n.knots[1]
-            nknots02 <- n.knots[2]
-            nknots12 <- n.knots[3]
-            approx.illtimes <- (Rtime[idm==1] + Ltime[idm==1])/2
-            knots01 <- quantile(approx.illtimes,seq(0,1,1/(nknots01-1)))
-            knots02 <- quantile(abstime,seq(0,1,1/(nknots02-1)))
-            knots12 <- quantile(abstime,seq(0,1,1/(nknots12-1)))
+          nknots01 <- n.knots[1]
+          nknots02 <- n.knots[2]
+          nknots12 <- n.knots[3]
+          approx.illtimes <- (Rtime[idm==1] + Ltime[idm==1])/2
+          knots01 <- quantile(approx.illtimes,seq(0,1,1/(nknots01-1)))
+          knots02 <- quantile(abstime,seq(0,1,1/(nknots02-1)))
+          knots12 <- quantile(abstime,seq(0,1,1/(nknots12-1)))
         }
-        else{## user specified knots
-            knots01 <- knots[[1]]
-            knots02 <- knots[[2]]
-            knots12 <- knots[[3]]
-            nknots01 <- length(knots01)
-            nknots02 <- length(knots02)
-            nknots12 <- length(knots12)
-        }
+      }
     }
+    else{## user specified knots
+      knots01 <- knots[[1]]
+      knots02 <- knots[[2]]
+      knots12 <- knots[[3]]
+      nknots01 <- length(knots01)
+      nknots02 <- length(knots02)
+      nknots12 <- length(knots12)
+    }
+  
     ## print(knots01)
     ## print(knots02)
     ## print(knots12)
