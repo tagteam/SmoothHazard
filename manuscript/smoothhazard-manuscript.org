@@ -34,30 +34,43 @@ If the exact transition times are observed, standard procedures like
 those implemented in the \pkg{mstate} package can be used to estimate
 regression models for the three transitions
 \citep{deWreede_Fiocco_Putter_2010}. In particular, the regression
-coefficients can be estimated using Cox partial likelihood without the
+coefficients can be estimated using Cox partial likelihood  \citep{coxpartial} without the
 need to specify the baseline intensities. However, this possibility is
-lost when the transition times from the initial state to the transient
+lost when the transition times from the initial state to the intermediate
 state are interval censored. For example, it may not be possible to
-determine the exact onset time of dementia for a subject diagnosed at
+determine the exact onset time of disease for a subject diagnosed at
 time $R$. Instead it is only known that the subject was last seen
-dementia-free at time $L$. Thus, the onset time is interval censored
-between $L$ and $R$.  Furthermore, for a subject who died without
-being diagnosed as demented before, it may not be possible to
-determine if the subject developed dementia between the last time he
-was seen and the time of death.  The algorithms of the
-\pkg{SmoothHazard} package implement methods for estimating regression
-models under this type of censoring if the transition times into the
-absorbing state (e.g. death of the subject) are either known exactly
-or right censored \citep{Joly_Commenges_Helmer_Letenneur_2002}.  The
-\pkg{msm} package \citep{Jackson_2010} allows to fit more general
+disease-free at time $L$. Thus, the onset time is interval censored
+between $L$ and $R$. Furthermore, for a subject who died without
+being diagnosed as diseased before, it may not be possible to
+determine if the subject developed disease between the last time he
+was seen and the time of death. 
+Even if time-to-disease only is of interest, 
+the risk of death should not be ignored using classical survival models,
+especially if risk of death for diseased subjects 
+is higher than risk of death for disease-free subjects. 
+A usual circumvention technique to handle subjects who died without
+being diagnosed as diseased before, consists in 
+right-censoring dead subjects without disease diagnostic 
+at the last time they were seen without disease. 
+But this approach can lead to an underestimation of the transition intensity of disease 
+(corresponding to the hazard function in survival models settings) \citep{Joly_Commenges_Helmer_Letenneur_2002} 
+and biases in the regression coefficients estimates \citep{Leffondre_2013}.
+
+The \pkg{msm} package \citep{Jackson_2010} allows to fit
 multi-state models to panel data (where states of each subjects are
-only known at a finite series of times).  We focuse on a particular
-multi-state model, the illness-death model, where only one state is
-known at a finite series of times leading to data which are only
-interval censored.  Even if the \pkg{msm} could be used, the direct
-expression of the likelihood can be derived making possible to
+only known at a finite series of times) and could be used
+to fit illness-death models to interval-censored data.
+However, the illness-death model for interval-censored data is very simple
+compared to more general multi-state models for panel data. 
+Consequently, the direct expression of the likelihood can be derived making possible to
 estimate more flexible transition intensities with less assumptions.
 
+The algorithms of the
+\pkg{SmoothHazard} package implement methods for estimating regression
+models under interval censoring if the transition times into the
+absorbing state (e.g. death of the subject) are either known exactly
+or right censored \citep{Joly_Commenges_Helmer_Letenneur_2002}. 
 Implemented are a parametric and a semi-parametric estimation
 approach. For the parametric approach, the Weibull distribution is
 used for the baseline transition intensities and the parameters are
@@ -86,7 +99,9 @@ The population consists of subjects aged 65 years and older living in
 Southwestern France. 
 The event of interest is dementia and death without
 dementia is a competing risk. Furthermore, the time to dementia onset
-is interval censored.
+is interval censored between the diagnostic visit and the previous one 
+and demented subjects are at risk of death.
+Thus, subjects who died without being diagnosed as demented at their last visit may have become demented between last visit and death.
 
 #+BEGIN_SRC R :exports none :results silent :cache yes 
 n.demented <- sum(Paq1000$dementia)
@@ -108,7 +123,7 @@ less than SRC_R{n.died.notdiagnosed} should have been dead without dementia
 There are two covariates in this
 subset: gender (SRC_R{n.women} women and SRC_R{n.men} men) and primary
 school diploma (SRC_R{n.with} with diploma and SRC_R{n.without} without
-diploma). Age is chosen as the basic time scale and subjects are non demented at entry into study. 
+diploma). Age is chosen as the basic time scale and subjects are dementia-free (and alive) at entry into study. 
 Consequently, we need to deal with left-truncated event times.
 
 #+BEGIN_SRC R :exports both :results output :cache yes
@@ -143,16 +158,11 @@ intensities $\alpha_{01}(.)$, $\alpha_{02}(.)$, $\alpha_{12}(.)$ which
 are age-specific incidence rate of dementia, age-specific mortality
 rate of dementia-free subjects and age-specific mortality rate of
 demented sujects, respectively.  Proportional transition intensities
-regression models allow for covariates on each transition:
-$$\alpha_{hl}(t|Z_{hli})=\alpha_{0,hl}(t)\exp\{\beta_{hl}^T Z_{hli}\};
-~~~ hl \in \{01,02,12\}$$ where $\alpha_{0,hl}$ are baseline
-transition intensities, $Z_{hli}$ are covariates vectors for subject
-$i$ and $\beta_{hl}$ are vectors of regression parameters.
-
+regression models allow for covariates on each transition.
 Covariates are specified independently for the regression models of
 the three transition intensities by the right hand side of the
 respective formula \code{formula01}, \code{formula02} and
-\code{formula12}. Set the formula (\code{~1} for no covariates.
+\code{formula12}.
 
 Interval censoring and left truncation must be specified at the left
 side of the formula arguments using the \code{Hist} function.  For
@@ -201,14 +211,29 @@ TODO
    
 * Fitting the illness-death model based on interval-censored data
 
-The \code{idm} function computes estimates for the three transition
-intensities:
+We consider an illness-death process $X=(X(t),t \geq 0)$. $X(t)$ has values in $\{0,1,2\}$.
+Subjects are initially dementia-free (state 0) and may become demented (transition $0 \rightarrow 1$) 
+and die (transition $1 \rightarrow 2$) or, die directly (transition $0 \rightarrow 2$.)
+$X$ is assumed to be a non-homogeneous Markov process which means that the future evolution of the process
+$\{X(t),t>s\}$ depends on the current time $s$ and only on the current state $X(s)$. 
+X is fully characterized by the transition probabilities :
+$$ p_{hl}(s,t)=\mathbb{P}(X(t)=l|X(s)=h) $$
+or the transition intensities which are instantaneous transition probabilities :
+$$ \alpha_{hl}(t)=\frac{p_{hl}(t,t+\Delta t)}{\Delta t} $$
+The transition intensities in multi-state models are similar to hazard functions in survival models.
+
+We introduce covariates through proportional transition intensity models which are a natural extension of the Cox proportional hazard model :
+
 \begin{equation}
 \alpha_{hl}(t|Z_{hli})=\alpha_{0,hl}(t)\exp\{\beta_{hl}^T Z_{hli}\};\qquad hl \in \{01,02,12\}
 \end{equation}
+where $\alpha_{0,hl}$ are baseline
+transition intensities, $Z_{hli}$ are covariates vectors for subject
+$i$ and $\beta_{hl}$ are vectors of regression parameters.
+
 In the situation where time to disease and time to death are not
-interval censored the regression coefficients can be estimated by the
-partial likelihood method \citep{coxpartial} without the need to
+interval censored the regression coefficients could be estimated by the
+partial likelihood method without the need to
 specify or estimate the baseline hazard functions
 $\alpha_{0,hl}(t)$. For interval-censored transition times to state 1
 the situation is more complex. It turns out that we have to estimate
@@ -219,7 +244,11 @@ inspecting the likelihood function.
 For subject $i$, let us denote the conditional event-free survival function by
 $$S(t|Z_{01i},Z_{02i})=e^{- A_{01}(t|Z_{01i}) -A_{02}(t|Z_{02i})}$$
 where ${A}_{hl}(.|Z_{hli})$ are the conditional cumulative intensity functions:
-$${A}_{hl}(t|Z_{hli})=\int_0^t {\alpha}_{hl}(u|Z_{hli})du$$.
+$${A}_{hl}(t|Z_{hli})=\int_0^t {\alpha}_{hl}(u|Z_{hli})du$$
+Age is chosen as the basic time scale and the model assumes that subjects are dementia-free at entry into the cohort.
+Let us denote $T_{0i}$ the age of subject $i$ at entry into the cohort. 
+The left truncation condition $X(T_{0i})=0$ is taken into account into the likelihood by the term $\frac{1}{S(T_{0i}|Z_{01i},Z_{02i})}$.
+Note that without left truncation data, $T_{0i}=0$ and this term would disappear.
 
 We set $\delta_{1i}=1$ ($\delta_{1i}=0$) if subject $i$ has (has not)
 been observed diseased, and $\delta_{2i}=1$ ($\delta_{2i}=0$) if
@@ -264,6 +293,24 @@ If time to disease and time to death are both right-censored at the
 same time, we have $L_i=R_i=T_i$ and the integral value in
 (\ref{eq:likelihood2}) is zero.
 
+\bigskip
+
+The \code{idm} function computes estimates for the three baseline transition
+intensities and for the regression parameters using likelihood-based estimation methods.
+In the parametric method and in the semi-parametric method, respectively the likelihood and
+the penalized likelihood are maximized
+using the Levenberg-Marquardt's
+algorithm \citep{Levenberg_1944,Marquardt_1963} which is a combination of a Newton-Raphson
+algorithm and a gradient descent algorithm (also known as the steepest descent algorithm). 
+This algorithm has the avantage of being more robust than the Newton-Raphson algorithm
+while preserving its fast convergence property.
+ We stop the iterations when the differences between two consecutive
+parameters values, log-likelihood values, and gradient values is small
+enough.  The default convergence criteria are $10^{-5}$, $10^{-5}$ and
+$10^{-3}$ and can be changed by means of the \code{eps} argument.  The
+variances of parameter estimates are estimated using the inverse of
+the matrix of the second derivatives at convergence.
+
 ** The Weibull parametrization
 
 The default estimation method in function \code{idm} computes the
@@ -272,6 +319,9 @@ a Weibull parametrization for the baseline transition intensities: $$
 \alpha_{0,hl}(t)= a_{hl} ~ b_{hl}^{a_{hl}} ~ t^{a_{hl}-1}; ~~~ hl \in
 \{01,02,12\}.$$ where $a_{hl}$ and $b_{hl}$ are shape and scale
 parameters.
+The Weibull parameters $a_{hl}$ and $b_{hl}$ and the vectors of
+regression parameter $\hat \beta_{hl}$ are obtained simultaneously by
+maximizing the log-likelihood. 
 
 #+BEGIN_SRC R :exports both :results output :cache yes 
 fit.weib <- idm(formula02=Hist(time=t,event=death,entry=t0)~certif+gender,
@@ -434,33 +484,11 @@ publish(cbind(scenario[,c(1,2)],simtab),org=TRUE)
 |       35 | 500 | 0.0096 (0.006) | 0.0723 (0.013) | 0.0814 (0.025) | 100 %     |
 
 
-*** Maximization algorithm
-
-The Weibull parameters $a_{hl}$ and $b_{hl}$ and the vectors of
-regression parameter $\hat \beta_{hl}$ are obtained simultaneously by
-maximizing the log-likelihood using a combination of a Marquardt's
-algorithm \citep{Marquardt_1963} which is a robust Newton-like
-algorithm and a steepest descent algorithm.  Using the Marquardt's
-algorithm, few iterations are needed if the initial value is
-judiciously chosen.  The Marquardt's algorithm step involves a line
-search with a step reduction if the new point is not better.  Using
-the steepest descent algorithm, the convergence is slower.  The
-steepest descent step involves a full line search and is attempted
-only if the Marquardt's algorithm step has failed, due generally to a
-difficulty to inverse the Hessian matrix of the log-likelihood.  We
-stop the iterations when the differences between two consecutive
-parameters values, log-likelihood values, and gradient values is small
-enough.  The default convergence criteria are $10^{-5}$, $10^{-5}$ and
-$10^{-3}$ and can be changed by means of the \code{eps} argument.  The
-variances of parameter estimates are estimated using the inverse of
-the matrix of the second derivatives at convergence.
-
-
-** The penalized likelihood 
+** The penalized likelihood approach
 
 The other estimation option in the function \code{idm} permits to
 relax the strict parametric assumptions of the Weibull regression
-models. With the option \code{intensities="Splines"}, M-splines are
+models. With the option \code{intensities="Splines"}, linear combinations of M-splines are
 used to approximate the three baseline transition
 intensities. Although this option implies a considerable amount of
 extra computations (see below), the call and the printed output are
@@ -535,10 +563,11 @@ par(mgp=c(4,1,0),mar=c(5,5,5,5))
 [[file:transition-intensities-paq-splines.pdf]]
 
 
-** Penalized likelihood and M-splines 
+** Penalized likelihood
 
+Let us denote the log-likelihood by $l$.
 To control the smoothness of the estimated intensity functions, we
-penalize the likelihood by a term which specificies the curvature of
+penalize the log-likelihood by a term which specificies the curvature of
 the intensity functions that is the square of the second
 derivates. The penalized log-likelihood $(pl)$ is defined as:
 \begin{equation}
@@ -551,121 +580,124 @@ where $l$ is the log-likelihood and $\kappa_{01}$, $\kappa_{02}$ and
 $\kappa_{12}$ are three positive smoothing parameters which control
 the trade-off between the data fit and the smoothness of the
 functions.
+The smoothing parameters can be chosen either arbitrarily or 
+by maximizing a cross-validation score.
+The leave-one-out cross-validation involves using a single observation 
+as the validation data and the remaining observations as the training data.
+This is repeated such that each observation in the sample is used once as validation data.
+To avoid maximizing the likelihood as many times as there are observations in the data set
+(and for each different values of $\kappa_{01}$, $\kappa_{02}$, $\kappa_{12}$),
+we use an approximate leave-one-out cross-validation score 
+proposed by \citet{O'Sullivan_1988} for survival models
+and extended by \citet{Commenges_Joly_Gegout-Petit_Liquet_2007} to multi-state models.
+It requires maximizing the likelihood one time only 
+by tested values of the smoothing parameters.
+To find the values of $\kappa_{01}$, $\kappa_{02}$, $\kappa_{12}$ which maximize 
+this score we use a golden section search.
 
-Maximization of (\ref{eq:77}) defines the maximum penalized likelihood
-estimators (MPLE) ${\hat \alpha_{01}}$, ${\hat \alpha_{02}}$ and
-${\hat \alpha_{12}}$. The parameters being maximized are the
-regression coefficients and further parameters defined by a linear
-combination of M-splines \citep{Ramsay_1988}. The latter are described
-in the remaining of this section.
+For given smoothing parameters, maximization of (\ref{eq:77}) defines 
+the maximum penalized likelihood
+estimators of the baseline transition intensities ${\hat \alpha_{0,01}}$, ${\hat \alpha_{0,02}}$ and
+${\hat \alpha_{0,12}}$ which are approximated using a basis of M-splines.
+The parameters being maximized are the regression coefficients 
+and the coefficients of the linear combination of M-splines.
 
-A spline of order $k$ is a piecewise polynomial functions of degree
-$k-1$. The places where the polynomial pieces connect are the knots.
-We denote by $t^{01}=(t^{01}_1,\dots,t^{01}_{J_{01}})$ a sequence of
-$J_{01}$ knots used to define the M-spline approximation of
-$\alpha_{0,01}$ and by $t^{02}=(t^{02}_1,\dots,t^{02}_{J_{02}})$ and
-$t^{12}=(t^{02}_1,\dots,t^{02}_{J_{12}})$ similar sequences for
-$\alpha_{0,02}$ and $\alpha_{0,12}$, respectively.
+ # further parameters defined by a linear
+ # combination of M-splines . The latter are described
+ # in the remaining of this section.
 
-(CELIA, PIERRE: please explain here that we define the estimate as a
-linear combination of several M-splines $M_i$, i=1,...,?  and what you
-mean by free parameters...)
+** Splines approximation 
 
-For $hl \in \{01,02,12\}$: $$ \tilde \alpha_{0,hl}(x)=\sum_{i=1}^n a_i
-M_i(x) $$ where $n$ is the number of free parameters.
+ # A spline of order $k$ is a piecewise polynomial functions of degree
+ # $k-1$. The places where the polynomial pieces connect are the knots.
+
+A M-spline (see \citep{Ramsay_1988}) is a non negative spline.
+A family of M-spline functions of order $k$, $M_1,\ldots,M_n$ is defined
+by a set of $m$ knots $t=(t_1 \leq t_2 \leq \ldots \leq t_{m})$ 
+where $n=m+k-2$. We use cubic M-splines, i.e. M-splines of order $k=4$.
+
+We denote by $t_{01}=(t_{01,1},\dots,t_{01,m_{01}})$ the sequence of
+$m_{01}$ knots used to define the cubic M-splines approximation of
+$\hat{\alpha}_{0,01}$, and by $t_{02}=(t_{02,1},\dots,t_{02,m_{02}})$ and
+$t_{12}=(t_{12,1,\dots,t_{12,m_{12}})$ similar sequences for
+$\hat{\alpha}_{0,02}$ and $\hat{\alpha}_{0,12}$, respectively.
+We denote by $M_{01,1},\ldots,M_{01,n_{hl}}$ the matching family 
+of $n_{hl}$ cubic M-splines, 
+with $n_{hl}=m_{hl}+2$.
+
+For $hl \in \{01,02,12\}$, the estimator $\hat{\alpha}_{hl}$ is approximated
+using the linear combination: 
+$$ \tilde \alpha_{0,hl}(x)=\sum_{i=1}^{n_{hl}} a_{hl,i} M_{hl,i}(x) $$ 
+where $a_{hl,i}$ are the coefficients to estimate.
 
 Non-negativity of $\tilde \alpha_{0,hl}$ is obtained by constraining
-the coefficients $a_i$ to be positive. In practice, we estimate
-parameters $\theta_i$ such that $a_i=\theta_i^2$ maximize the
-penalized likelihood. Each $M$-spline has an order $k$. For simplicity
-we suppress in the notation that the $M$-splines are specific to the
-transition and also write $t=(t_1,\dots,t_J)$ for a generic sequence
-of knots.
+the coefficients $a_{hl,i}$ to be positive. In practice, we estimate
+parameters $\theta_{hl,i}$ such that $a_{hl,i}=\theta_{hl,i}^2$. 
 
-An $M$-spline of order $k$ is computed using the following recursion:
-(CELIA, PIERRE: I dont understand the notation M(x|1,t).)
-For $k=1$,
-\begin{eqnarray*}
-M_{j} (x |1,t)& = &\left\{
-  \begin{array}{ll}
-  \frac {1}{(t_{j+1}-t_{j})} \ \ \ \ \mbox{if} \ \ t_j \leq x < t_{j+1}\\
-  0 \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{elsewhere} \\
-  \end{array}
-\right.\\
-\end{eqnarray*}
+ # An $M$-spline of order $k$ is computed using the following recursion:
+ # (CELIA, PIERRE: I dont understand the notation M(x|1,t).)
+ # For $k=1$,
+ # \begin{eqnarray*}
+ # M_{j} (x |1,t)& = &\left\{
+ # \begin{array}{ll}
+ # \frac {1}{(t_{j+1}-t_{j})} \ \ \ \ \mbox{if} \ \ t_j \leq x < t_{j+1}\\
+ # 0 \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{elsewhere} \\
+ # \end{array}
+ # \right.\\
+ # \end{eqnarray*}
 
-For $k>1$,
-\begin{eqnarray*}
-M_{j} (x |k,t)& = & \left\{
-  \begin{array}{ll}
-  \frac { k \left[ (x-t _{j})M_{j} (x |k-1,t)+ (t_{j+k}-x)M_{j+1} (x |k-1,t)
-  \right]}{(k-1)(t_{j+k}-t_{j})} \ \ \ \mbox{if} \ \ t_j \leq x < t _{j+k}\\
-  0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
-\ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \mbox{elsewhere} \\
-\end{array}
-\right.
-\end{eqnarray*}
+ # For $k>1$,
+ # \begin{eqnarray*}
+ # M_{j} (x |k,t)& = & \left\{
+ # \begin{array}{ll}
+ # \frac { k \left[ (x-t _{j})M_{j} (x |k-1,t)+ (t_{j+k}-x)M_{j+1} (x |k-1,t)
+ # \right]}{(k-1)(t_{j+k}-t_{j})} \ \ \ \mbox{if} \ \ t_j \leq x < t _{j+k}\\
+ # 0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
+ # \ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \mbox{elsewhere} \\
+ # \end{array}
+ # \right.
+ # \end{eqnarray*}
 
-(CELIA, PIERRE: I dont understand the role of the knot sequence in the previous display.
-where $t={t_1,...,t_{n+k}}$ is a knot sequence.)
-
-(CELIA, PIERRE: the following sentence is not clear (why are density
- properties appealing? maybe you can elaborate (or delete?) and move
- it to the introduction or discussion?
-
-The $M$-spline family is particularly appealing to statisticians
-because each $M_i$ has the properties of a probability density
-function over the interval $[t_i,t_{i+k}]$. One such property is $\int
-M_i(x) dx = 1$.
-)
-
-With each $M$-spline we associate an integrated spline or $I$-splines
-$I_i$, $i=1,\ldots,n$. It is defined as $I_i(x|k,t)=\int_{t_k}^x
-M_i(u|k,t) du$.  Given the coefficients $a_i$, we can approximate the
+The $n_{hl}$ M-splines can be integrated to produce a family of 
+monotone splines, called I-splines.
+With each M-spline $M_{hl,i}$ we associate an I-splines $I_{hl,i}$:
+$$I_{hl,i}(x)=\int_{t_{hl,1}}^x M_{hl,i}(u) du$$
+Given the coefficients $a_{hl,i}$, we can approximate the estimators of the
 cumulative baseline transition intensities $\hat A_{hl}$ by a linear
-combination of $I$-splines: $$ \tilde A_{0,hl}(x)=\sum_{i=1}^n a_i
-I_i(x).$$ Because $M$-splines are non-negative, the positivity
-constraint on $a_i$ ensures that $\tilde A_{0,hl}$ is monotone
-increasing. Each $M_j$ is a piecewise polynomial of degree $k-1$ and
-each $I_j$ is a piecewise polynomial of degree $k$. In the package we
-have implemented cubic $M$-splines, that is we set $k=4$.
+combination of I-splines: 
+$$ \tilde A_{0,hl}(x)=\sum_{i=1}^{n_{hl}} a_{hl,i}
+I_{hl,i}(x).$$ Because M-splines are non-negative, the positivity
+constraint on $a_{hl,i}$ ensures that $\tilde A_{0,hl}$ is monotone
+increasing. 
+ # Each $M_j$ is a piecewise polynomial of degree $k-1$ and
+ # each $I_j$ is a piecewise polynomial of degree $k$.
 
 *** Choice of the knots
-
-(CELIA, PIERRE: I dont understand the following paragraph:
-
-The knots sequences have some properties to ensure continuity
-conditions. Among them, we have: $t_1=\ldots=t_k$ and
-$t_{n+1}=\ldots=t_{n+k}$.  The number of free parameters $n$
-corresponds to $k+$ the number of knots interior to $[t_k,t_{n+1}]$
-)
-
+ 
 By default the function \code{idm} selects equidistant sequences of 7
-knots between the minimal and maximal event times. The same sequence
-of knots is used for all three transitions. In the Paq1000 example
-this led to the estimates shown in Figure \ref{fig:4} and the
-corresponding regression coefficients. The number of knots can be
-controlled by the argument \code{n.knots} of the function \code{idm}.
-By increasing the number of data points between a pair of knots,
-i.e. by selecting fewer knots, one achieves a more smooth but less
-flexible approximation (CELIA, PIERRE: this last statement is just my
-intuition, is it correct? you wrote: "Increasing the number of data
-points between a pair of knots leads to a better defined curve."  I
-did not understand what you meant.)
+knots. For the transition $h \rightarrow l$, the first knot is set
+to the minimal time from which there are subjects at risk of making the $h \rightarrow l$ transition
+and the last knot is set to the maximal time of the $h \rightarrow l$ transition times.
+For example, in the Paquid data set, the first knot for the transitions  $0 \rightarrow 1$ and  $0 \rightarrow 2$
+is the minimal age of entry into the cohort and the first knot for the  $1 \rightarrow 2$ transition
+is the minimal age of dementia of the subjects who have been observed demented.
+Since $0 \rightarrow 1$ times are interval-censored, the left bound of the interval is used.
+The last knot of the $0 \rightarrow 1$ transition is the maximal age of dementia 
+(the right bound of the interval is used)
+and the last knots of the $0 \rightarrow 2$ and $1 \rightarrow 2$ transitions are the maximum death time.
+(PIERRE: isn'it the better way to choose the knots ? If yes, it must be improved in the package)
 
-The user can specify sequences of knots that differ from the default
-choice. Generally the shape of a spline function is not very sensitive
+The placement of knots can be controlled by the argument \code{knots}. 
+They are equidistant by default, but a quantile-based placement can also be chosen
+or
+the user can specify in a list sequences of its own knots in the order $t^{01}$, $t^{02}$, $t^{12}$. 
+Generally the shape of a spline function is not very sensitive
 to knot placement. However, there must be several data points between
 each pair of different knots and there must be a knot before or at the
-first data point and after or at the last data point.
-
-The knot sequences are specified by the argument \code{knots}
-argument. It is a list with three elements, one for each transition
-intensity in the order $t^{01}$, $t^{02}$, $t^{12}$.
+first time from which there are subjects at risk and after or at the last time of transition.
 
 Here are results with a different choice of knots:
 
-(CELIA: here is the error :)
 #+BEGIN_SRC R :exports both :results output :cache yes 
 #x <- sort(unique(unlist(Paq1000[,c("l","r","t0","t")])))
 #hist(x)
@@ -676,30 +708,14 @@ knots=list(c(65,75,80,82,84,86,88,90,105),c(65,75,80,82,84,86,88,90,105),c(65,80
 print(fit.splines)
 #+END_SRC
 
-*** Choice of smoothing parameters
-
-The default values for the smoothing parameters are suitable for the
-\code{Paq1000} data set. However, these values can be expected to be
-very different depending on time scale and number of subjects. They
-can be changed into the \code{kappa} argument.  An approximate
-cross-validation technique to determine the smoothing parameters is
-also available with the option \code{CV=TRUE}.  In this case, the
-\code{kappa} argument contains the initial values for the smoothing
-parameters.  We use an approximate leave-one-out score proposed by
-\citet{O'Sullivan_1988} for survival models and extended for
-multi-state models \citep{Commenges_Joly_Gegout-Petit_Liquet_2007} for
-which only one estimation of the model is required by tested values of
-the smoothing parameters.
-
-
-*** Maximization algorithm
-
-The vectors of spline coefficients for fixed $\kappa_{01}$,
-$\kappa_{12}$ and $\kappa_{02}$ and the vectors of regression
-parameters $\hat \beta_{01}$, $\hat \beta_{02}$, $\hat \beta_{12}$ are
-obtained simultaneously by maximizing the penalized log-likelihood
-using the same maximization algorithm as with the Weibull
-parametrization (see Section \ref{sec-3-1}).
+The number of knots can be
+controlled by the argument \code{n.knots} of the function \code{idm}.
+By increasing the number of data points between a pair of knots,
+i.e. by selecting fewer knots, one achieves a more smooth but less
+flexible approximation (CELIA, PIERRE: this last statement is just my
+intuition, is it correct? you wrote: "Increasing the number of data
+points between a pair of knots leads to a better defined curve."  I
+did not understand what you meant.)
 
 Increasing the number of knots does not deteriorate the MPLE: this is
 because the degree of smoothing in the penalized likelihood method is
@@ -713,12 +729,21 @@ start with a small number of knots (e.g. 5 or 7) and increase the
 number of knots until the graph of the transition intensities function
 remains unchanged (rarely more than 12 knots).
 
-The choice of the smoothing parameters can be fastidious. The
-\code{idm} function can be run with the approximate cross-validation
-option.  However, the running time is very long and an empirical
-technique can be preferred.  It consists in repeating the idm running
+
+*** Choice of smoothing parameters
+
+The default values for the smoothing parameters are suitable for the
+\code{Paq1000} data set. However, these values can be expected to be
+very different depending on time scale and number of subjects. They
+can be changed into the \code{kappa} argument. 
+The can also be chosen using by cross-validation using the argument \code{CV} 
+(FALSE by default). In this case, the
+\code{kappa} argument contains the initial values for golden section search of the smoothing
+parameters. 
+However, the running time with cross-validation is very long and an empirical
+technique can be preferred. It consists in repeating the \code{idm} running
 trying different smoothing parameters.  After each estimation, the
-transition intensities can be plotted. This is done with the
+transition intensities are plotted. This can be done with the
 \code{plot} function. If the curves seem too smooth it may be useful
 to reduce the associated smoothing parameter. Similarly, if the curves
 are to wiggly, the associated smoothing parameter may be increased.
@@ -829,12 +854,13 @@ underestimated.
 #+LATEX_HEADER: \usepackage{tikz}
 #+LATEX_HEADER: \usepackage{hyperref}
 #+LATEX_HEADER: \usepackage{amsmath}
+#+LATEX_HEADER: \usepackage{amssymb}
 #+LATEX_HEADER: \usepackage{attrib}
 #+LATEX_HEADER: \Plainauthor{C\'elia Touraine, Thomas A. Gerds, Pierre Joly}
 #+LATEX_HEADER: \author{C\'elia Touraine\\University of Bordeaux \And Thomas A. Gerds\\University of Copenhagen \And Pierre Joly\\University of Bordeaux}
 #+LATEX_HEADER: \title{Illness-Death Model for Interval-Censored Data: The \pkg{SmoothHazard} Package for \proglang{R}}
 #+LATEX_HEADER: \Shorttitle{Illness-Death Model for Interval-Censored Data: The  \pkg{SmoothHazard} Package for \proglang{R}}
-#+LATEX_HEADER: \Keywords{illness-death model, interval-censored data, left-truncated data, survival model, proportional regression models, Smooth Transition intensities, Weibull}
+#+LATEX_HEADER: \Keywords{illness-death model, interval-censored data, left-truncated data, survival model, proportional regression models, smooth transition intensities, Weibull, penalized likelihood, M-splines}
 #+LATEX_HEADER: \Address{C\'elia Touraine\\Univ. Bordeaux\\ISPED\\Centre INSERM U-897-Epidemiologie-Biostatistique\\Bordeaux F-33000\\France\\E-mail: celia.touraine@isped.u-bordeaux2.fr\\URL: http://www.isped.u-bordeaux2.fr/}
 #+LATEX_HEADER: \Abstract{\input{jss-abstract.tex}}
 #+LATEX_HEADER: \lstset{
