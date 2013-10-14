@@ -4,19 +4,10 @@ The irreversible illness-death model is a special multi-state model
 which has many applications for example in medical research. The model
 allows subjects to make transitions from an initial state (health) to
 a terminal state (death) either directly or via an intermediate state
-(disease), see Figure \ref{fig:1}.
-
-#+BEGIN_SRC R :results silent  :exports none :session *R* :cache no
-user <- system("echo $USER",intern=TRUE)
-if (match(user,c("tag","grb615"),nomatch=0)) {
-    setwd("~/research/SoftWare/eventhistory/pkg/SmoothHazard/manuscript/")
-} else{
-    setwd("~/Dropbox/JSS2013/manuscript_50/")
-}
-#+END_SRC
+(disease).
 
 #+source: idm1
-#+BEGIN_SRC R :results graphics  :file "fig1.pdf" :exports code :cache yes 
+#+BEGIN_SRC R :results graphics :exports none :file "fig1.pdf" :cache yes 
 library(prodlim)
 plotIllnessDeathModel(stateLabels=c("0: Healthy","1: Diseased","2: Dead"),arrowLabelSymbol="alpha")
 #+END_SRC
@@ -32,7 +23,7 @@ plotIllnessDeathModel(stateLabels=c("0: Healthy","1: Diseased","2: Dead"),arrowL
 
 If the exact transition times are observed, standard procedures like
 those implemented in the \pkg{mstate} package can be used to estimate
-regression models for the three transitions
+cumulative transition intensities, regression coefficients and transition probabilities.
 \citep{deWreede_Fiocco_Putter_2010}. In particular, the regression
 coefficients can be estimated using Cox partial likelihood  \citep{coxpartial} without the
 need to specify the baseline intensities. However, this possibility is
@@ -45,184 +36,86 @@ between $L$ and $R$. Furthermore, for a subject who died without
 being diagnosed as diseased before, it may not be possible to
 determine if the subject developed disease between the last time he
 was seen and the time of death. 
-Even if time-to-disease only is of interest, 
-the risk of death should not be ignored using classical survival models,
-especially if risk of death for diseased subjects 
-is higher than risk of death for disease-free subjects. 
-A usual circumvention technique to handle subjects who died without
-being diagnosed as diseased before, consists in 
+A usual circumvention technique to handle these subjects consists in 
 right-censoring dead subjects without disease diagnostic 
 at the last time they were seen without disease. 
-But this approach can lead to an underestimation of the transition intensity of disease 
+By imputing onset time of disease for diseased subjects 
+(for example in the middle of the interval censoring interval $[L,R]$),
+classique multistate analyses as implemented in \pkg{mstate} may be applied.
+However, this approach can lead to an underestimation of the transition intensity of disease 
 (corresponding to the hazard function in survival models settings) \citep{Joly_Commenges_Helmer_Letenneur_2002} 
-and biases in the regression coefficients estimates \citep{Leffondre_2013}.
+and biases in the regression coefficients estimates \citep{Leffondre_2013},
+especially if risk of death for diseased subjects 
+is higher than risk of death for disease-free subjects. 
 
 The \pkg{msm} package \citep{Jackson_2010} allows to fit
-multi-state models to panel data (where states of each subjects are
+Markov multi-state models to panel data (where states of each subjects are
 only known at a finite series of times) and could be used
-to fit illness-death models to interval-censored data.
-However, the illness-death model for interval-censored data is very simple
-compared to more general multi-state models for panel data. 
-Consequently, the direct expression of the likelihood can be derived making possible to
-estimate more flexible transition intensities with less assumptions.
+to fit illness-death models to data with interval-censored disease times
+and exact death times.
+But in this package, the likelihood is calculated using the Kolmogorov differential equations
+that relate the transition probabilities and the transition intensities.
+It implies a time-homogeneity assumption: 
+constant or piecewise-constant transition intensities.
+The \pkg{msm} package allows for very general multi-state models where the number of possible pathways taken by a subject between two observation times can be infinite.
+By comparison, the illness-death model for interval-censored data is very simple 
+with a maximum of two possible pathways between two observation times. 
+The direct expression of the transition probabilities in terms of transition intensities
+ can be derived making possible to estimate more flexible transition intensities 
+without time-homogeneity assumption.
 
-The algorithms of the
-\pkg{SmoothHazard} package implement methods for estimating regression
-models under interval censoring if the transition times into the
-absorbing state (e.g. death of the subject) are either known exactly
-or right censored \citep{Joly_Commenges_Helmer_Letenneur_2002}. 
+The \pkg{SmoothHazard} package allows to estimate transition intensities of a 
+non-homogeneous Markov illness-death model under interval censoring if 
+the transition times into the absorbing state (e.g. death of the subject) 
+are either known exactly or right censored.
+Proportional transition intensities regression models
+allow for covariates on the three transitions. 
 Implemented are a parametric and a semi-parametric estimation
-approach. For the parametric approach, the Weibull distribution is
-used for the baseline transition intensities and the parameters are
+method. For the parametric approach, the Weibull distribution is
+used for the baseline transition intensities and the parameters 
+(regression coefficients and Weibull parameters) are
 estimated by maximising the likelihood. For the semi-parametric
-approach, M-splines are used to approximate the baseline transition
-intensities and the parameters are estimated maximising a penalized
+approach, a M-splines basis is used to approximate the baseline transition
+intensities and the parameters (regression coefficients and spline coefficients)
+are estimated maximising a penalized
 likelihood. The methods allow delayed entry of the subjects, i.e. that
 the event times are left truncated.
 
+The main functions of \pkg{SmoothHazard} are 
+ - \code{idm} : for fitting illness-death model based on possibly interval-censored disease times and exact death times;
+ - \code{shr} : for fitting survival model based on possibly interval-censored event times.
+Other packages can provide estimates in survival models 
+with exact (e.g. \pkg{survival}) or interval-censored (e.g. \pkg{intcox}) event times, 
+and estimates in illness-death model with exact transition times (\pkg{mstate}).
+We focus in this paper on what makes \pkg{SmoothHazard} especially appealing: 
+being able to fit illness-death model to interval-censored data.
+
+The above \code{R} functions are essentially an interface between the user and \proglang{FORTRAN} programs 
+which constitute the most part of the package.
+An object as returned by \code{shr} or \code{idm} can then be used as argument in other \code{R} functions.
+For example, a fitted illness-death model as produced by \code{idm} can be used to calculate 
+predictions for a given set of covariates: transition probabilities, cumulative event probabilities, life expectancies.
+
 Section 2 presents the model and the likelihood.
 Section 3 presents the estimation methods.
-Section 4 provides some examples illustrating \pkg{SmoothHazard} functions.
+Section 4 briefly presents predictions that can be made in an illness-death model. 
+Section 5 provides some examples illustrating \pkg{SmoothHazard}.
 
-* Data, model and questions
-  
-In order to illustrate the functionality of the package we provide a
-random subset containing data from 1000 subjects that were enrolled in
-the Paquid study \citep{letenneur1999sex}, a large cohort study on
-mental and physical aging.
-#+BEGIN_SRC R :exports code :results silent :cache yes 
-library(SmoothHazard)
-data(Paq1000)
-#+END_SRC
-
-The population consists of subjects aged 65 years and older living in
-Southwestern France. 
-The event of interest is dementia and death without
-dementia is a competing risk. Furthermore, the time to dementia onset
-is interval censored between the diagnostic visit and the previous one 
-and demented subjects are at risk of death.
-Thus, subjects who died without being diagnosed as demented at their last visit may have become demented between last visit and death.
-
-#+BEGIN_SRC R :exports none :results silent :cache yes 
-n.demented <- sum(Paq1000$dementia)
-n.died <- sum(Paq1000$death)
-n.died.notdiagnosed <- sum(Paq1000$death & !Paq1000$dementia)
-n.women <- sum(Paq1000$gender==0)
-n.men <- sum(Paq1000$gender==1)
-n.with <- sum(Paq1000$certif==0)
-n.without <- sum(Paq1000$certif==1)
-#+END_SRC
-
-In this subset SRC_R{n.demented} subjects are diagnosed as demented
-and SRC_R{n.died} died from whom SRC_R{n.died.notdiagnosed} without
-being diagnosed as demented before. Because of interval censoring 
-more than SRC_R{n.demented} should have been demented, more than
-SRC_R{n.died-n.died.notdiagnosed} should have been dead with dementia and
-less than SRC_R{n.died.notdiagnosed} should have been dead without dementia
-(see Figure \ref{fig:2}).
-There are two covariates in this
-subset: gender (SRC_R{n.women} women and SRC_R{n.men} men) and primary
-school diploma (SRC_R{n.with} with diploma and SRC_R{n.without} without
-diploma). Age is chosen as the basic time scale and subjects are dementia-free (and alive) at entry into study. 
-Consequently, we need to deal with left-truncated event times.
-
-#+BEGIN_SRC R :exports both :results output :cache yes
-head(Paq1000)
-#+END_SRC
-
-#+RESULTS[<2013-08-19 13:40:46> 60ede76b22c6837f0be70d7701a6da9bfa75a774]:
-:   dementia death      t0        l        r        t certif gender
-: 1        1     1 72.3333 82.34014 84.73303 87.93155      0      0
-: 2        0     1 77.9167 78.93240 78.93240 79.60048      0      1
-: 3        0     1 79.9167 79.91670 79.91670 80.92423      0      0
-: 4        0     1 74.6667 78.64750 78.64750 82.93501      1      1
-: 5        0     1 76.6667 76.66670 76.66670 79.16636      0      1
-: 6        0     0 66.2500 71.38070 71.38070 84.16975      1      0
-
-
-Each row in the data corresponds to one subject.  The variables
-\code{dementia} and \code{death} are the status variables (1 if an
-event occured, 0 otherwise) for dementia and death, respectively.  The
-variable \code{t0} contains ages of subjects at entry into study. The
-variables \code{l} and \code{r} contain the left and right endpoints
-of the censoring intervals.  For demented subjects, \code{r} is the
-age at the diagnostic visit and \code{l} is the age at the previous
-one.  For non demented subjects, \code{l} and \code{r} are the age at
-the latest visit without dementia (\code{l}=\code{r}).  The variable
-\code{t} is the age at death or at latest news. \code{certif} and
-\code{gender} are binary covariates.
-
-
-The function \code{idm} computes estimates for the three transition
-intensities $\alpha_{01}(.)$, $\alpha_{02}(.)$, $\alpha_{12}(.)$ which
-are age-specific incidence rate of dementia, age-specific mortality
-rate of dementia-free subjects and age-specific mortality rate of
-demented sujects, respectively.  Proportional transition intensities
-regression models allow for covariates on each transition.
-Covariates are specified independently for the regression models of
-the three transition intensities by the right hand side of the
-respective formula \code{formula01}, \code{formula02} and
-\code{formula12}.
-
-Interval censoring and left truncation must be specified at the left
-side of the formula arguments using the \code{Hist} function.  For
-left-truncated data, the \code{entry} argument of \code{Hist} must
-contain the vector of delayed entry times.  For interval-censored
-data, the \code{time} argument of \code{Hist} must contain a list of
-the left and right endpoints of the intervals.
-
-#+begin_latex
-\begin{center}
-\begin{figure}
-\label{fig:2}
-\centering
-\begin{tikzpicture}[scale=1]
-\node[draw] (nd) at (0,0) {dementia free};
-\node[draw] (d) at (4,0) {dementia};
-\node[draw] (dcd) at (2,-2) {death};
-\draw[->,>=latex] (nd) -- (d)node[label=$\geq 186$,pos=0.5]{};
-\draw[->,>=latex] (nd) -- (dcd) node[auto=right,pos=0.5]{$\leq 597$};
-\draw[->,>=latex] (d) -- (dcd) node[auto=left,pos=0.5]{$\geq 127$};
-\end{tikzpicture}
-\caption{The exact number of transitions in the illness-death model with interval-censored time to disease is unknown.}
-\end{figure}
-\end{center}
-#+end_latex
-
-A call of the \code{idm} function looks as follows:
-#+BEGIN_SRC R :exports code :results silent :cache yes :eval never
-fit <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=t0)~certif,
-           formula02=Hist(time=t,event=death,entry=t0)~certif+gender,
-           formula12= ~ 1,
-           data=Paq1000)
-#+END_SRC
-
-where the \code{data} argument contains the data frame in which to
-interpret the variables of \code{formula01}, \code{formula02} and
-\code{formula12}.
-
-Note that the left side of \code{formula12} does not need to be filled because all the data 
-informations are already contained in \code{formula01} and \code{formula02}.
-In fact, the \code{formula12} argument is required only if we want the covariates impacting 
-transition 12 different from those impacting transition 02.
-
-Questions ?
-TODO
-   
-* Fitting the illness-death model based on interval-censored data
+* Model and likelihood
 
 We consider an illness-death process $X=(X(t),t \geq 0)$. $X(t)$ has values in $\{0,1,2\}$.
-Subjects are initially dementia-free (state 0) and may become demented (transition $0 \rightarrow 1$) 
-and die (transition $1 \rightarrow 2$) or, die directly (transition $0 \rightarrow 2$.)
+Subjects are initially disease-free ($X(0)=0$) and may become diseased (transition $0 \rightarrow 1$) 
+and die (transition $1 \rightarrow 2$), or die directly (transition $0 \rightarrow 2$.)
 $X$ is assumed to be a non-homogeneous Markov process which means that the future evolution of the process
 $\{X(t),t>s\}$ depends on the current time $s$ and only on the current state $X(s)$. 
 X is fully characterized by the transition probabilities :
 $$ p_{hl}(s,t)=\mathbb{P}(X(t)=l|X(s)=h) $$
 or the transition intensities which are instantaneous transition probabilities :
 $$ \alpha_{hl}(t)=\frac{p_{hl}(t,t+\Delta t)}{\Delta t} $$
-The transition intensities in multi-state models are similar to hazard functions in survival models.
+The transition intensities in multi-state models are similar to hazard functions in survival models
+(see Figure \ref{fig:1}).
 
-We introduce covariates through proportional transition intensity models which are a natural extension of the Cox proportional hazard model :
+We introduce covariates on each transition through proportional transition intensities regression models which are a natural extension of the Cox proportional hazard model :
 
 \begin{equation}
 \alpha_{hl}(t|Z_{hli})=\alpha_{0,hl}(t)\exp\{\beta_{hl}^T Z_{hli}\};\qquad hl \in \{01,02,12\}
@@ -245,56 +138,57 @@ For subject $i$, let us denote the conditional event-free survival function by
 $$S(t|Z_{01i},Z_{02i})=e^{- A_{01}(t|Z_{01i}) -A_{02}(t|Z_{02i})}$$
 where ${A}_{hl}(.|Z_{hli})$ are the conditional cumulative intensity functions:
 $${A}_{hl}(t|Z_{hli})=\int_0^t {\alpha}_{hl}(u|Z_{hli})du$$
-Age is chosen as the basic time scale and the model assumes that subjects are dementia-free at entry into the cohort.
-Let us denote $T_{0i}$ the age of subject $i$ at entry into the cohort. 
-The left truncation condition $X(T_{0i})=0$ is taken into account into the likelihood by the term $\frac{1}{S(T_{0i}|Z_{01i},Z_{02i})}$.
-Note that without left truncation data, $T_{0i}=0$ and this term would disappear.
+Note that if subject $i$ has reached state 1, 
+the conditional survival function in state 1 between times $s$ and $t$ is:
+$$  \frac{
+e^{-{A}_{12}(t|Z_{12i})}}{e^{-{A}_{12}(s|Z_{12i})}}  $$
 
-We set $\delta_{1i}=1$ ($\delta_{1i}=0$) if subject $i$ has (has not)
-been observed diseased, and $\delta_{2i}=1$ ($\delta_{2i}=0$) if
-subject $i$ is (is not) dead.
-
+We set $\delta_{2i}=1$ ($\delta_{2i}=0$) if
+subject $i$ is (is not) dead. 
 If $\delta_{2i}=0$, $T_i$ is time to death; if $\delta_{2i}=0$, death
-event is right-censored at $T_i$.  We denote by $L_i$ and $R_i$ the
-interval censoring times.  If subject $i$ has been observed diseased
-at time $R_i$ and has last been seen non diseased at time $L_i$
-($L_i<R_i$), time to disease is interval-censored between $L_i$ and
-$R_i$.  The likelihood contribution for subject $i$ is:
+event is right-censored at $T_i$.
+Let us detail the likelihood contribution for subject $i$
+by distinguishing if subject $i$ has been observed in state 1 (diseased) or not.
 
+- If subject $i$ has first been observed diseased at time $R_i$ and has last been seen disease-free at time $L_i$ ($L_i<R_i$), disease time is interval-censored between $L_i$ and $R_i$. The likelihood contribution for subject $i$ is:
 \begin{equation}
 {\cal L}_i = \displaystyle
-\dfrac{1}{S(T_{0i}|Z_{01i},Z_{02i})}
 \int_{L_i}
 ^{R_i} S(u|Z_{01i},Z_{02i})
 \alpha_{01}(u|Z_{01i}) \frac{
 e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}\big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}du
-\end{equation}
-
-If subject $i$ has never been seen diseased, time to disease is
-right-censored and the interval censoring times are set to the right
-censoring time ($L_i=R_i$).  The likelihood contribution for subject
-$i$ is:
-
+\end{equation} Indeed, subject $i$ has survived in state 0 until some time $u$ between $L_i$ and $R_i$ and moved to state 1 at time $u$. 
+Then, he has survived in state 1 between times $u$ and time $T_i$ and died at time $T_i$ if $\delta_{2i}=1$.
+- If subject $i$ has never been seen diseased, let us denote the last time he has been observed disease-free by $R_i$. The likelihood contribution for subject $i$ is:
 \begin{multline}
 \label{eq:likelihood2}
 {\cal L}_i = \displaystyle
-\dfrac{1}{S(T_{0i}|Z_{01i},Z_{02i})}
-\Bigg( 
 S(T_i|Z_{01i},Z_{02i})
 \big(\alpha_{02}(T_i|Z_{02i})\big)^{\delta_{2i}} +\\
-\int_{L_i}^{T_i} S(u|Z_{01i},Z_{02i})
+\int_{R_i}^{T_i} S(u|Z_{01i},Z_{02i})
 \alpha_{01}(u|Z_{01i}) 
 \frac{
 e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}\big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}du
-\Bigg)
 \end{multline}
+Indeed, if subject $i$ has not died at $T_i$ (\delta_{2i}=0), he may have survived in state 0 (term at the left side of the plus sign)
+or he may have becomed diseased between $R_i$ and $T_i$ (term at the right side of the plus sign);
+if subject $i$ has died at $T_i$, he may have moved directly from state 0 to state 2 (term at the right side of the plus sign)
+or he may have became diseased at some time between $R_i$ and $L_i$ and then died (term at the right side of the plus sign).
 
 If time to disease and time to death are both right-censored at the
 same time, we have $L_i=R_i=T_i$ and the integral value in
 (\ref{eq:likelihood2}) is zero.
 
-\bigskip
+\medskip
 
+Suppose now that data are left truncated, i.e. 
+that subjects are under observation starting from time $T_0>0$.
+Let us denote $T_{0i}$ the time from which subject $i$ is under observation. 
+The left truncation condition $X(T_{0i})=0$ (subject $i$ has survived in state 0 until time $T_{0i}$) 
+is taken into account by 
+dividing the above likelihood contributions by the term ${S(T_{0i}|Z_{01i},Z_{02i})}$.
+
+* Estimation
 The \code{idm} function computes estimates for the three baseline transition
 intensities and for the regression parameters using likelihood-based estimation methods.
 In the parametric method and in the semi-parametric method, respectively the likelihood and
@@ -304,18 +198,11 @@ algorithm \citep{Levenberg_1944,Marquardt_1963} which is a combination of a Newt
 algorithm and a gradient descent algorithm (also known as the steepest descent algorithm). 
 This algorithm has the avantage of being more robust than the Newton-Raphson algorithm
 while preserving its fast convergence property.
- We stop the iterations when the differences between two consecutive
-parameters values, log-likelihood values, and gradient values is small
-enough.  The default convergence criteria are $10^{-5}$, $10^{-5}$ and
-$10^{-3}$ and can be changed by means of the \code{eps} argument.  The
-variances of parameter estimates are estimated using the inverse of
-the matrix of the second derivatives at convergence.
 
-** The Weibull parametrization
+** Parametric estimation
 
-The default estimation method in function \code{idm} computes the
-maximum likelihood estimate for the three transition intensities using
-a Weibull parametrization for the baseline transition intensities: $$
+In the default estimation method of function \code{idm},
+a Weibull parametrization for the baseline transition intensities is assumed: $$
 \alpha_{0,hl}(t)= a_{hl} ~ b_{hl}^{a_{hl}} ~ t^{a_{hl}-1}; ~~~ hl \in
 \{01,02,12\}.$$ where $a_{hl}$ and $b_{hl}$ are shape and scale
 parameters.
@@ -323,252 +210,27 @@ The Weibull parameters $a_{hl}$ and $b_{hl}$ and the vectors of
 regression parameter $\hat \beta_{hl}$ are obtained simultaneously by
 maximizing the log-likelihood. 
 
-#+BEGIN_SRC R :exports both :results output :cache yes 
-fit.weib <- idm(formula02=Hist(time=t,event=death,entry=t0)~certif+gender,
-                formula01=Hist(time=list(l,r),event=dementia,entry=t0)~certif+gender,
-                data=Paq1000,intensities="Weib")
-print(fit.weib)
-#+END_SRC
+\medskip
 
-#+RESULTS[<2013-08-19 13:59:10> be5bbf008a4b311d607d4ba6dcfac184f1c0000c]:
-#+begin_example
-Call:
-idm(formula01 = Hist(time = list(l, r), event = dementia, entry = t0) ~ 
-    certif + gender, formula02 = Hist(time = t, event = death, 
-    entry = t0) ~ certif + gender, data = Paq1000, intensities = "Weib")
+Confidence intervals for the regression parameters are obtained using estimated
+standard errors estimated by inverting the Hessian matrix of the log-likelihood.
+Confidence bands for the baseline transition intensities are obtained using a simulation-based approach
+explained below (section \ref{sec:CI}). (PIERRE: is it really right ? -> to be checked in the fortran programs of the package ?) 
 
-Illness-death model: Results of Weibull regression for the intensity functions.
-
-number of subjects:  1000 
-number of events '0-->1':  186 
-number of events '0-->2' or '0-->1-->2':  724 
-number of covariates:  2 2 2 
-number of deleted observations due to missing:  1 
-
-             coef SE.coef     HR          CI       Wald  p.value
-certif_01 -0.5194  0.2015 0.5949 [0.40;0.88]  6.6405121 0.009969
-gender_01 -0.1221  0.1599 0.8851 [0.65;1.21]  0.5832909 0.445025
-certif_02  0.1268  0.1264 1.1352 [0.89;1.45]  1.0066554 0.315705
-gender_02  0.5363  0.1200 1.7096 [1.35;2.16] 19.9877044 < 0.0001
-certif_12 -0.2079  0.2322 0.8123 [0.52;1.28]  0.8016825 0.370591
-gender_12  0.5792  0.1865 1.7846 [1.24;2.57]  9.6464868 0.001897
-
-               Without cov  With cov
-Log likelihood   -3075.308 -3048.791
-
-Parameters of the Weibull distribution: 'S(t) = exp(-(b*t)^a)'
-      alpha01    alpha02    alpha12
-a 11.18802185 8.62750164 7.50200262
-b  0.01099806 0.01078284 0.01294115
-
-----
-Model converged.
-number of iterations:  8 
-convergence criteria: parameters= 0.00000012 
-                    : likelihood= 0.0000007 
-                    : second derivatives= 0.00000000047
-#+end_example
-
-The regression parameters HR have the usual interpretation, as in a
-fully parametric Cox regression model (CELIA, PIERRE: is this correct?
-There are some confusing other parametrizations of the Weibull model,
-eg. the function `psm' of harrel's R-package rms)
-
-The three baseline transition intensity functions can be displayed as
-functions of time, functions of age in our illustrative example (Figure 3).
-
-#+source: paq-fit-weib
-#+BEGIN_SRC R :exports code  :results graphics :file "transition-intensities-paq-weib.pdf"
-par(mgp=c(4,1,0),mar=c(5,5,5,5))
-plot(fit.weib,conf.int=TRUE,lwd=3,citype="shadow",xlim=c(65,100), axis2.las=2,axis1.at=seq(65,100,5),xlab="Age (years)")
-#+END_SRC
-
-#+RESULTS[<2013-08-19 14:03:45> d6e0a6b60955a1a9925863c3028ddd258df9ed0c]:
-[[file:transition-intensities-paq-weib.pdf]]
-
-
-#+ATTR_LaTeX: :width 0.8\textwidth
-#+LABEL: fig:3
-#+CAPTION: Estimated baseline intensities using Weibull regression for all transitions in the \code{Paq1000} data.
-#+results: paq-fit-weib
-[[file:transition-intensities-paq-weib.pdf]]
-
-Data were simulated to illustrate the effect of the length between
-visit times on the properties of the estimtated regression parameters
-in the Weibull model.
-
-#+BEGIN_SRC R  :results output raw  :exports results  :session *R* :cache yes 
-library(Publish)
-library(foreach)
-scenario <- expand.grid(N=c(50,250,500),b01=c(log(2)),b02=c(0,log(2)),K=10,schedule=c(5,35),punctuality=1)
-setwd("~/research/SoftWare/SmoothHazard/manuscript/avakas/run/")
-files <- list.files(pattern="results.*rda")
-res.list <- foreach (i=1:NROW(scenario)) %dopar% {
-    ff <- grep(paste("results-",i,"-seed1735-NS-1000-",sep=""),files,value=TRUE)
-    rr <- get(load(ff))
-    truth <- unlist(rep(scenario[i,c("b01","b02")],c(1,2)))
-    bias <- colMeans(rr-truth)
-    #abs.bias <- colMeans(abs(rr-truth))
-    mse <- colMeans((rr-truth)^2)
-    #out <- rbind(bias,abs.bias,mse)
-    out <- paste(format(bias,digits=2,nsmall=1)," (",format(mse,digits=1,nsmall=1),")",sep="")
-    names(out) <- c("trans 0 -> 1","trans 0 -> 2","trans 1 -> 2")
-    out
- }
-publish(cbind(round(scenario[,c(1,2,3,5)],2),do.call("rbind",res.list)),org=TRUE)
-#+END_SRC
-
-#+RESULTS[<2013-09-20 15:17:27> 8a47b0bc99e4df8f5d50e673da68c4c0ee19bfa9]:
-|   N |  b01 |  b02 | schedule | trans 0 -> 1  | trans 0 -> 2  | trans 1 -> 2   |
-|-----+------+------+----------+---------------+---------------+----------------|
-|  50 | 0.69 | 0.00 |        5 | 0.51 (0.4)    | -0.26 (0.2)   | -0.22 (0.3)    |
-| 250 | 0.69 | 0.00 |        5 | 0.47 (0.3)    | -0.25 (0.2)   | -0.23 (0.2)    |
-| 500 | 0.69 | 0.00 |        5 | 0.47 (0.3)    | -0.24 (0.2)   | -0.23 (0.2)    |
-|  50 | 0.69 | 0.69 |        5 | 0.062 (0.09)  | 0.025 (0.08)  | -0.249 (0.23)  |
-| 250 | 0.69 | 0.69 |        5 | 0.051 (0.02)  | 0.019 (0.01)  | -0.279 (0.10)  |
-| 500 | 0.69 | 0.69 |        5 | 0.047 (0.008) | 0.015 (0.006) | -0.285 (0.090) |
-|  50 | 0.69 | 0.00 |       35 | 0.54 (0.5)    | -0.25 (0.2)   | -0.28 (0.3)    |
-| 250 | 0.69 | 0.00 |       35 | 0.48 (0.3)    | -0.24 (0.2)   | -0.29 (0.2)    |
-| 500 | 0.69 | 0.00 |       35 | 0.48 (0.3)    | -0.24 (0.2)   | -0.29 (0.2)    |
-|  50 | 0.69 | 0.69 |       35 | 0.068 (0.09)  | 0.034 (0.07)  | -0.404 (0.31)  |
-| 250 | 0.69 | 0.69 |       35 | 0.041 (0.01)  | 0.020 (0.01)  | -0.423 (0.20)  |
-| 500 | 0.69 | 0.69 |       35 | 0.039 (0.008) | 0.015 (0.006) | -0.433 (0.198) |
-
-
-#+BEGIN_SRC R  :results output raw  :exports results  :session *R* :cache yes 
-library(foreach)
-library(Publish)
-scenario <- expand.grid(schedule=c(0,5,20,35),N=c(100,250,500),b01=log(2),b02=log(2),K=10,punctuality=1)
-setwd("~/research/SoftWare/SmoothHazard/manuscript/avakas/results/")
-files <- list.files(pattern="results.*2013-09-24-.*rda")
-tablerow <- function(x,what,truth){
-    rr <- do.call("rbind",lapply(x,function(b){b[[what]]$coef}))
-    converged <- paste(100*mean(sapply(x,function(b){b[[what]]$conv})==1),"%")
-    #maxiter <- round(mean(sapply(x,function(b){b[[what]]$maxiter})))
-    bias <- colMeans(rr-truth)
-    mse <- colMeans((rr-truth)^2)
-    out <- paste(format(bias,digits=2,nsmall=1)," (",format(mse,digits=1,nsmall=1),")",sep="")
-    names(out) <- c("trans 0 -> 1","trans 0 -> 2","trans 1 -> 2")
-    out <- c(out,converged=converged)
-    out
-}
-#res.list <- foreach (i=1:NROW(scenario)) %dopar% {
-res.list <- foreach (i=1:length(files)) %dopar% {
-    ff <- grep(paste("results-",i,"-seed1735-NS-1000-",sep=""),files,value=TRUE)
-    x <- get(load(ff))
-    truth <- unlist(rep(scenario[i,c("b01","b02")],c(1,2)))
-    tablerow(x,"weib",truth)
-    #out <- rbind(quantiles=tablerow(x,"splines.quantiles",truth),
-                 #equidistant=tablerow(x,"splines.equi",truth),
-                 #weibull=tablerow(x,"weib",truth))
-#out
-}
-simtab <- do.call("rbind",res.list)
-publish(cbind(scenario[,c(1,2)],simtab),org=TRUE)
-#+END_SRC
-
-#+RESULTS[<2013-09-24 10:34:48> c7ccb5091ff2c52e543bcafc061e5b884655ffb9]:
-| schedule |   N | trans 0 -> 1   | trans 0 -> 2   | trans 1 -> 2   | converged |
-|----------+-----+----------------+----------------+----------------+-----------|
-|        0 | 100 | -0.27 (0.2)    | -0.23 (0.2)    | -0.16 (0.3)    | 59.8 %    |
-|        5 | 100 | -0.207 (0.2)   | -0.159 (0.2)   | -0.019 (0.3)   | 69.5 %    |
-|       20 | 100 | 0.0089 (0.04)  | 0.0694 (0.07)  | 0.1855 (0.18)  | 97.3 %    |
-|       35 | 100 | 0.020 (0.04)   | 0.077 (0.06)   | 0.151 (0.16)   | 98.6 %    |
-|        0 | 250 | -0.26 (0.2)    | -0.21 (0.2)    | -0.19 (0.2)    | 62.1 %    |
-|        5 | 250 | -0.132 (0.1)   | -0.063 (0.1)   | 0.022 (0.2)    | 81.3 %    |
-|       20 | 250 | 0.011 (0.01)   | 0.081 (0.02)   | 0.142 (0.06)   | 100 %     |
-|       35 | 250 | 0.012 (0.01)   | 0.082 (0.02)   | 0.101 (0.05)   | 100 %     |
-|        0 | 500 | -0.20 (0.1)    | -0.15 (0.1)    | -0.12 (0.2)    | 71 %      |
-|        5 | 500 | -0.0749 (0.06) | -0.0087 (0.06) | 0.0788 (0.09)  | 89.3 %    |
-|       20 | 500 | 0.009 (0.006)  | 0.072 (0.013)  | 0.120 (0.032)  | 100 %     |
-|       35 | 500 | 0.0096 (0.006) | 0.0723 (0.013) | 0.0814 (0.025) | 100 %     |
-
-
-** The penalized likelihood approach
-
-The other estimation option in the function \code{idm} permits to
+** Semi-parametric estimation
+#+begin_src latex
+\label{sec:semi-para}
+#+end_src
+The other estimation method in the function \code{idm} permits to
 relax the strict parametric assumptions of the Weibull regression
-models. With the option \code{intensities="Splines"}, linear combinations of M-splines are
+models: linear combinations of M-splines are
 used to approximate the three baseline transition
-intensities. Although this option implies a considerable amount of
-extra computations (see below), the call and the printed output are
-very similar to the Weibull model:
+intensities and the maximization of a penalized likelihood ensures to obtained smooth estimates of them.
 
-#+BEGIN_SRC R :exports both :results output :cache yes 
-fit.splines <- idm(formula02=Hist(time=t,event=death,entry=t0)~certif+gender,
-                   formula01=Hist(time=list(l,r),event=dementia,entry=t0)~certif+gender,
-                   data=Paq1000,intensities="Splines")
-print(fit.splines)
-#+END_SRC
-
-#+RESULTS[<2013-08-20 12:04:20> 3c872cdfe75627b6bce76a5a638c217a6459bcfc]:
-#+begin_example
-Call:
-idm(formula01 = Hist(time = list(l, r), event = dementia, entry = t0) ~ 
-    certif + gender, formula02 = Hist(time = t, event = death, 
-    entry = t0) ~ certif + gender, data = Paq1000, intensities = "Splines")
-
-Illness-death model using a penalized likelihood approach with splines
-approximation for the intensity functions.
-
-number of subjects:  1000 
-number of events '0-->1':  186 
-number of events '0-->2' or '0-->1-->2':  724 
-number of subjects:  1000 
-number of covariates:  2 2 2 
-number of deleted observations due to missing:  1 
-
-Smoothing parameters:
-      transition01 transition02 transition12
-knots            7            7            7
-kappa      1000000       500000        20000
-
-             coef SE.coef     HR          CI       Wald  p.value
-certif_01 -0.4981  0.2075 0.6077 [0.40;0.91]  5.7622609 0.016374
-gender_01 -0.0558  0.1655 0.9458 [0.68;1.31]  0.1135984 0.736084
-certif_02  0.1290  0.1283 1.1376 [0.88;1.46]  1.0101740 0.314861
-gender_02  0.5043  0.1215 1.6558 [1.30;2.10] 17.2238696 < 0.0001
-certif_12 -0.2037  0.2388 0.8157 [0.51;1.30]  0.7273826 0.393733
-gender_12  0.6449  0.1934 1.9058 [1.30;2.78] 11.1222626 0.000853
-
-                         Without cov  With cov
-Penalized log likelihood   -3073.099 -3046.848
-
-----
-Model converged.
-number of iterations:  8 
-convergence criteria: parameters= 0.0000000076 
-                    : likelihood= 0.0000002 
-                    : second derivatives= 0.00000000005
-#+end_example
-
-Again, the estimated baseline transition intensities can conveniently
-be visualized in a joint graph (Figure 4).
-
-#+source: paq-fit-splines
-#+BEGIN_SRC R :exports code  :results graphics :file "transition-intensities-paq-splines.pdf"
-par(mgp=c(4,1,0),mar=c(5,5,5,5))
- plot(fit.splines,conf.int=TRUE,lwd=3,citype="shadow",xlim=c(65,100), axis2.las=2,axis1.at=seq(65,100,5),xlab="Age (years)")
-#+END_SRC
-
-#+RESULTS[<2013-08-20 12:18:12> 8eb374a665df2b9475fc068f3750483fd1f7ce1b]:
-[[file:transition-intensities-paq-splines.pdf]]
-
-
-
-#+ATTR_LaTeX: :width 0.8\textwidth
-#+LABEL: fig:4
-#+CAPTION: Estimated baseline intensities using M-splines for all transitions in the \code{Paq1000} data.
-#+results: paq-fit-splines
-[[file:transition-intensities-paq-splines.pdf]]
-
-
-** Penalized likelihood
-
-Let us denote the log-likelihood by $l$.
+*** The penalized likelihood approach
 To control the smoothness of the estimated intensity functions, we
 penalize the log-likelihood by a term which specificies the curvature of
-the intensity functions that is the square of the second
+the intensity functions, that is the square of the second
 derivates. The penalized log-likelihood $(pl)$ is defined as:
 \begin{equation}
 \label{eq:77}
@@ -593,7 +255,7 @@ and extended by \citet{Commenges_Joly_Gegout-Petit_Liquet_2007} to multi-state m
 It requires maximizing the likelihood one time only 
 by tested values of the smoothing parameters.
 To find the values of $\kappa_{01}$, $\kappa_{02}$, $\kappa_{12}$ which maximize 
-this score we use a golden section search.
+this score we use a grid search method.
 
 For given smoothing parameters, maximization of (\ref{eq:77}) defines 
 the maximum penalized likelihood
@@ -602,16 +264,9 @@ ${\hat \alpha_{0,12}}$ which are approximated using a basis of M-splines.
 The parameters being maximized are the regression coefficients 
 and the coefficients of the linear combination of M-splines.
 
- # further parameters defined by a linear
- # combination of M-splines . The latter are described
- # in the remaining of this section.
+*** The splines approximation
 
-** Splines approximation 
-
- # A spline of order $k$ is a piecewise polynomial functions of degree
- # $k-1$. The places where the polynomial pieces connect are the knots.
-
-A M-spline (see \citep{Ramsay_1988}) is a non negative spline.
+A M-spline \citep{Ramsay_1988} is a non negative spline.
 A family of M-spline functions of order $k$, $M_1,\ldots,M_n$ is defined
 by a set of $m$ knots $t=(t_1 \leq t_2 \leq \ldots \leq t_{m})$ 
 where $n=m+k-2$. We use cubic M-splines, i.e. M-splines of order $k=4$.
@@ -619,48 +274,24 @@ where $n=m+k-2$. We use cubic M-splines, i.e. M-splines of order $k=4$.
 We denote by $t_{01}=(t_{01,1},\dots,t_{01,m_{01}})$ the sequence of
 $m_{01}$ knots used to define the cubic M-splines approximation of
 $\hat{\alpha}_{0,01}$, and by $t_{02}=(t_{02,1},\dots,t_{02,m_{02}})$ and
-$t_{12}=(t_{12,1,\dots,t_{12,m_{12}})$ similar sequences for
+$t_{12}=(t_{12,1},\dots,t_{12,m_{12}})$ similar sequences for
 $\hat{\alpha}_{0,02}$ and $\hat{\alpha}_{0,12}$, respectively.
-We denote by $M_{01,1},\ldots,M_{01,n_{hl}}$ the matching family 
+We denote by $M_{hl}^T=M_{hl,1},\ldots,M_{hl,n_{hl}}$ the matching families
 of $n_{hl}$ cubic M-splines, 
 with $n_{hl}=m_{hl}+2$.
 
 For $hl \in \{01,02,12\}$, the estimator $\hat{\alpha}_{hl}$ is approximated
 using the linear combination: 
 $$ \tilde \alpha_{0,hl}(x)=\sum_{i=1}^{n_{hl}} a_{hl,i} M_{hl,i}(x) $$ 
-where $a_{hl,i}$ are the coefficients to estimate.
+where $a_{hl,i}$ are coefficients to estimate.
 
 Non-negativity of $\tilde \alpha_{0,hl}$ is obtained by constraining
 the coefficients $a_{hl,i}$ to be positive. In practice, we estimate
 parameters $\theta_{hl,i}$ such that $a_{hl,i}=\theta_{hl,i}^2$. 
 
- # An $M$-spline of order $k$ is computed using the following recursion:
- # (CELIA, PIERRE: I dont understand the notation M(x|1,t).)
- # For $k=1$,
- # \begin{eqnarray*}
- # M_{j} (x |1,t)& = &\left\{
- # \begin{array}{ll}
- # \frac {1}{(t_{j+1}-t_{j})} \ \ \ \ \mbox{if} \ \ t_j \leq x < t_{j+1}\\
- # 0 \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{elsewhere} \\
- # \end{array}
- # \right.\\
- # \end{eqnarray*}
-
- # For $k>1$,
- # \begin{eqnarray*}
- # M_{j} (x |k,t)& = & \left\{
- # \begin{array}{ll}
- # \frac { k \left[ (x-t _{j})M_{j} (x |k-1,t)+ (t_{j+k}-x)M_{j+1} (x |k-1,t)
- # \right]}{(k-1)(t_{j+k}-t_{j})} \ \ \ \mbox{if} \ \ t_j \leq x < t _{j+k}\\
- # 0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
- # \ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \mbox{elsewhere} \\
- # \end{array}
- # \right.
- # \end{eqnarray*}
-
 The $n_{hl}$ M-splines can be integrated to produce a family of 
-monotone splines, called I-splines.
-With each M-spline $M_{hl,i}$ we associate an I-splines $I_{hl,i}$:
+monotone splines called I-splines.
+With each M-spline $M_{hl,i}$ we associate an I-spline $I_{hl,i}$:
 $$I_{hl,i}(x)=\int_{t_{hl,1}}^x M_{hl,i}(u) du$$
 Given the coefficients $a_{hl,i}$, we can approximate the estimators of the
 cumulative baseline transition intensities $\hat A_{hl}$ by a linear
@@ -669,55 +300,293 @@ $$ \tilde A_{0,hl}(x)=\sum_{i=1}^{n_{hl}} a_{hl,i}
 I_{hl,i}(x).$$ Because M-splines are non-negative, the positivity
 constraint on $a_{hl,i}$ ensures that $\tilde A_{0,hl}$ is monotone
 increasing. 
- # Each $M_j$ is a piecewise polynomial of degree $k-1$ and
- # each $I_j$ is a piecewise polynomial of degree $k$.
 
-*** Choice of the knots
+\medskip
+
+Confidence intervals of the regression parameters are obtained using estimated
+standard errors estimated by inverting the Hessian matrix of the log-likelihood.
+Confidence intervals for the transition intensities $\alpha_{hl}(t)$ are obtained using a Bayesian approach proposed by \citet{O'Sullivan_1988} for survival analysis 
+where the standard errors are estimated by $M_{hl}(t)^T H^{-1} M_{hl}(t)$ with $H$ the Hessian matrix of the penalized log-likelihood. (PIERRE: is it correct ?)
+* Predictions
+Most often in illness-death models, the functions of interest are the
+transition intensities.  However, other quantities which can
+be expressed in terms of the transition intensities
+\citep{Touraine_2013} may provide additional information and have
+a more natural interpretation.
+
+For example, given a set of covariates $Z_{01,i},Z_{02,i},Z_{12,i}$ for a subject $i$ who is diseased at time $s$,
+one could be interested in probability to be still alive at some time $t>s$, or in life expectancy;
+given a set of covariates $Z_{01,j},Z_{02,j},Z_{12,j}$ for a subject $j$ who is diseased-free at time $s$,
+one could be interested in lifetime risk of disease or in healthy life expectancy (expected remaining sojourn time in state 0).
+Since these quantities can be written in terms of the transition intensities, 
+\pkg{SmoothHazard} provides estimates of them using estimates of the transition intensities.
+Confidence intervals of these quantities are calculated using the simulation-based method immediately following.
+** Confidence regions
+#+begin_src latex
+\label{sec:CI}
+#+end_src
+A simulation based approach \citep{Mandel_2013} is used to calculate confidence intervals for 
+the transition intensities $\alpha_{hl}(t)$ in the parametric approach
+and for the quantities of interest (transition probabilities, cumulative probabilities 
+and life expectancies) in both parametric and semi-parametric approaches.
+
+We assume the asymptotic normality for the
+estimator $\hat{\theta}$ (either for the regression parameters and 
+the distribution parameters in the parametric approach, 
+or for the regression parameters and the spline parameters in the semi-parametric approach). 
+We denote by $\hat{V}_{\hat{\theta}}$ the estimated covariance matrix of $\hat{\theta}$. 
+We consider a multivariate normal distribution with the parameters estimates as expectation 
+and $\hat{V}_{\hat{\theta}}$ as covariance matrix. We generate $n$ vectors ($n=2000$ in practice) 
+from this distribution: $\theta^{(1)},\ldots,\theta^{(n)}$. 
+Based on them, we can calculate $n$ values for the transition intensities:
+$\alpha_{hl}^{(1)}(t)$,\ldots,$\alpha_{hl}^{(n)}(t)$, 
+and therefore $n$ values for any quantity of interest written in terms 
+of the transition intensities. 
+The $n$ values reflecting the sample variation \citep{Aalen_Farewell_De_Angelis_Day_Gill_1997},
+we order them and the $2.5^{\text{th}}$ and the $97.5^{\text{th}}$ 
+empirical percentiles are then used as lower and upper confidence bounds for 
+95\% confidence intervals. 
+This procedure can be repeated for any $t$, so we can obtain pointwise confidence bands 
+for ${\alpha}_{hl}(.)$.
+* Using SmoothHazard
+** How to prepare the data 
+
+| Case | Description                                           | $\delta_1$ | $\delta_2$ | L     | R     | T     | Remark                           |
+|------+-------------------------------------------------------+------------+------------+-------+-------+-------+----------------------------------|
+|    1 | Right censored, event-free                            |          0 |          0 | $L_i$ | $L_i$ | $C_i$ | Requires $L_i\le C_i$            |
+|    2 | Interval censored ill time, right censored death time |          1 |          0 | $L_i$ | $R_i$ | $C_i$ | $L_i<R_i$; requires $R_i\le C_i$ |
+|    3 | Exact ill time, right censored death time             |          1 |          0 | $L_i$ | $L_i$ | $C_i$ | Requires $L_i\le C_i$            |
+|    4 | Interval censored ill time, death time observed       |          1 |          1 | $L_i$ | $R_i$ | $T_i$ | $L_i<R_i$; requires $R_i\le T_i$ |
+|    5 | Exact ill time, death time observed                   |          1 |          1 | $L_i$ | $L_i$ | $T_i$ | Requires $L_i\le T_i$            |
+|    6 | No illness observed, death time observed              |          0 |          1 | $L_i$ | $L_i$ | $T_i$ | Requires $L_i\le T_i$            |
+
+Table XX shows how the program interpretes the structure of the data
+set. Some more details are necessary to distinguish the case where the
+ill status is diagnosed at the last follow-up time for death from the case where
+this is not possible. 
  
-By default the function \code{idm} selects equidistant sequences of 7
-knots. For the transition $h \rightarrow l$, the first knot is set
-to the minimal time from which there are subjects at risk of making the $h \rightarrow l$ transition
-and the last knot is set to the maximal time of the $h \rightarrow l$ transition times.
-For example, in the Paquid data set, the first knot for the transitions  $0 \rightarrow 1$ and  $0 \rightarrow 2$
-is the minimal age of entry into the cohort and the first knot for the  $1 \rightarrow 2$ transition
-is the minimal age of dementia of the subjects who have been observed demented.
-Since $0 \rightarrow 1$ times are interval-censored, the left bound of the interval is used.
-The last knot of the $0 \rightarrow 1$ transition is the maximal age of dementia 
-(the right bound of the interval is used)
-and the last knots of the $0 \rightarrow 2$ and $1 \rightarrow 2$ transitions are the maximum death time.
-(PIERRE: isn'it the better way to choose the knots ? If yes, it must be improved in the package)
+ - In case 1, if $L_i<C_i$ then it is assumed that the subject may
+   become ill between $L_i$ and $C_i$. If $L_i=C_i$ it is assumed that
+   the subject is disease-free at time $C_i$. In the latter case the
+   second part of the likelihood in equation EE equals zero.
+ - In case 6, if  $L_i<T_i$ then it is assumed that the subject may
+   become ill between $L_i$ and $T_i$. If $L_i=T_i$ it is assumed that
+   the subject is disease-free at time $T_i$. In the latter case the
+   second part of the likelihood in equation OO equals zero. 
+ - In all cases, $L_i$ may be equal to the entry time. 
 
-The placement of knots can be controlled by the argument \code{knots}. 
-They are equidistant by default, but a quantile-based placement can also be chosen
-or
-the user can specify in a list sequences of its own knots in the order $t^{01}$, $t^{02}$, $t^{12}$. 
-Generally the shape of a spline function is not very sensitive
-to knot placement. However, there must be several data points between
-each pair of different knots and there must be a knot before or at the
-first time from which there are subjects at risk and after or at the last time of transition.
 
-Here are results with a different choice of knots:
+** Paquid study 
+In order to illustrate the functionality of the package we provide a
+random subset containing data from 1000 subjects that were enrolled in
+the Paquid study \citep{letenneur1999sex}, a large cohort study on
+mental and physical aging.
+#+BEGIN_SRC R :exports code :results silent :cache yes 
+  library(SmoothHazard)
+  data(Paq1000)
+#+END_SRC
+The population consists of subjects aged 65 years and older living in
+Southwestern France. 
+The event of interest is dementia and death without
+dementia is a competing risk. Furthermore, the time to dementia onset
+is interval censored between the diagnostic visit and the previous one 
+and demented subjects are at risk of death.
+Thus, subjects who died without being diagnosed as demented at their last visit 
+may have become demented between last visit and death.
 
-#+BEGIN_SRC R :exports both :results output :cache yes 
-#x <- sort(unique(unlist(Paq1000[,c("l","r","t0","t")])))
-#hist(x)
-fit.splines <- idm(formula02=Hist(time=t,event=death,entry=t0)~certif+gender,
-                   formula01=Hist(time=list(l,r),event=dementia,entry=t0)~certif+gender,
-                   data=Paq1000,intensities="Splines",
-knots=list(c(65,75,80,82,84,86,88,90,105),c(65,75,80,82,84,86,88,90,105),c(65,80,90,105)))
-print(fit.splines)
+#+BEGIN_SRC R :exports none :results silent :cache yes 
+n.demented <- sum(Paq1000$dementia)
+n.died <- sum(Paq1000$death)
+n.died.notdiagnosed <- sum(Paq1000$death & !Paq1000$dementia)
+n.women <- sum(Paq1000$gender==0)
+n.men <- sum(Paq1000$gender==1)
+n.with <- sum(Paq1000$certif==0)
+n.without <- sum(Paq1000$certif==1)
 #+END_SRC
 
-The number of knots can be
-controlled by the argument \code{n.knots} of the function \code{idm}.
-By increasing the number of data points between a pair of knots,
-i.e. by selecting fewer knots, one achieves a more smooth but less
-flexible approximation (CELIA, PIERRE: this last statement is just my
-intuition, is it correct? you wrote: "Increasing the number of data
-points between a pair of knots leads to a better defined curve."  I
-did not understand what you meant.)
+In this subset SRC_R{n.demented} subjects are diagnosed as demented
+and SRC_R{n.died} died from whom SRC_R{n.died.notdiagnosed} without
+being diagnosed as demented before. Because of interval censoring 
+more than SRC_R{n.demented} should have been demented, more than
+SRC_R{n.died-n.died.notdiagnosed} should have been dead with dementia and
+less than SRC_R{n.died.notdiagnosed} should have been dead without dementia
+(see Figure \ref{fig:2}).
+#+begin_latex
+\begin{center}
+\begin{figure}
+\label{fig:2}
+\centering
+\begin{tikzpicture}[scale=1]
+\node[draw] (nd) at (0,0) {dementia free};
+\node[draw] (d) at (4,0) {dementia};
+\node[draw] (dcd) at (2,-2) {death};
+\draw[->,>=latex] (nd) -- (d)node[label=$\geq 186$,pos=0.5]{};
+\draw[->,>=latex] (nd) -- (dcd) node[auto=right,pos=0.5]{$\leq 597$};
+\draw[->,>=latex] (d) -- (dcd) node[auto=left,pos=0.5]{$\geq 127$};
+\end{tikzpicture}
+\caption{The exact number of transitions in the illness-death model with interval-censored time to disease is unknown.}
+\end{figure}
+\end{center}
+#+end_latex
+Age is chosen as the basic time scale and subjects are dementia-free (and alive) at entry into study. 
+Consequently, we need to deal with left-truncated event times.
 
-Increasing the number of knots does not deteriorate the MPLE: this is
+#+BEGIN_SRC R :exports both :results output :cache yes
+head(Paq1000)
+#+END_SRC
+
+#+RESULTS[<2013-08-19 13:40:46> 60ede76b22c6837f0be70d7701a6da9bfa75a774]:
+:   dementia death      t0        l        r        t certif gender
+: 1        1     1 72.3333 82.34014 84.73303 87.93155      0      0
+: 2        0     1 77.9167 78.93240 78.93240 79.60048      0      1
+: 3        0     1 79.9167 79.91670 79.91670 80.92423      0      0
+: 4        0     1 74.6667 78.64750 78.64750 82.93501      1      1
+: 5        0     1 76.6667 76.66670 76.66670 79.16636      0      1
+: 6        0     0 66.2500 71.38070 71.38070 84.16975      1      0
+
+
+Each row in the data corresponds to one subject.  The variables
+\code{dementia} and \code{death} are the status variables (1 if an
+event occurred, 0 otherwise) for dementia and death, respectively.  The
+variable \code{t0} contains ages of subjects at entry into study. The
+variables \code{l} and \code{r} contain the left and right endpoints
+of the censoring intervals.  For demented subjects, \code{r} is the
+age at the diagnostic visit and \code{l} is the age at the previous
+one.  For non demented subjects, \code{l} and \code{r} are the age at
+the latest visit without dementia (\code{l}=\code{r}).  The variable
+\code{t} is the age at death or at latest news on vital status. 
+There are two binary covariates: \code{certif} for  primary
+school diploma (SRC_R{n.with} with diploma and SRC_R{n.without} without
+diploma) and
+\code{gender} (SRC_R{n.women} women and SRC_R{n.men} men).
+
+The function \code{idm} computes estimates for the three transition
+intensities $\alpha_{01}(.)$, $\alpha_{02}(.)$, $\alpha_{12}(.)$ which
+are age-specific incidence rate of dementia, age-specific mortality
+rate of dementia-free subjects and age-specific mortality rate of
+demented subjects, respectively.  Proportional transition intensities
+regression models allow for covariates on each transition.
+Covariates are specified independently for the regression models of
+the three transition intensities by the right hand side of the
+respective formula \code{formula01}, \code{formula02} and
+\code{formula12}.
+
+Interval censoring and left truncation must be specified at the left
+side of the formula arguments using the \code{Hist} function.  For
+left-truncated data, the \code{entry} argument of \code{Hist} must
+contain the vector of delayed entry times.  For interval-censored
+data, the \code{time} argument of \code{Hist} must contain a list of
+the left and right endpoints of the intervals.
+The \code{data} argument contains the data frame in which to
+interpret the variables of \code{formula01}, \code{formula02} and
+\code{formula12}.
+The left side of \code{formula12} argument does not need to be filled because all the data 
+informations are already contained in \code{formula01} and \code{formula02}.
+The left side of \code{formula12} argument is required only if we want the covariates 
+impacting 
+transition 12 different from those impacting transition 02.
+
+** Fitting the illness-death model based on interval-censored data
+The main function \code{idm} computes estimates for the three baseline transition
+intensities and for the regression parameters of an illness-death model.
+The \code{intensities} argument by specifying the form of the transition intensities
+allows to select either a parametric 
+or a semi-parametric estimation method :
+- With the default value \code{"Weib"}, a Weibull distribution is assumed for the baseline transition intensities and the parameters are estimated by maximizing the log-likelihood;
+- With the \code{"Splines"} value, the estimation is conducted by maximizing a penalized log-likelihood where the transition intensities estimators are approximated by linear combinations of M-splines.
+
+We stop the iterations of the maximization algorithm when the differences 
+between two consecutive
+parameters values, log-likelihood values, and gradient values is small
+enough.  The default convergence criteria are $10^{-5}$, $10^{-5}$ and
+$10^{-3}$ and can be changed by means of the \code{eps} argument.
+
+We now illustrate how to fit the illness-death model to the 
+\code{Paq1000} data set, based on 
+interval-censored dementia times and exact death times.
+
+\bigskip
+
+In the following call, a Weibull parametrization is used for the three baseline 
+transition intensities and we include two covariates on the transition to dementia,
+one covariate on the transition from no dementia to death and no covariates 
+on the transition from dementia to death. Note that in case of missing \code{formula12}
+argument the covariates on the $1 \rightarrow 2$ transition are the same as 
+the ones specified in the  \code{formula02} argument.
+ # :eval never
+#+BEGIN_SRC R :exports both :results output :cache yes
+fit.weib <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=t0)~certif+gender,
+                formula02=Hist(time=t,event=death,entry=t0)~gender,
+                formula12= ~ 1,
+                data=Paq1000)
+fit.weib
+#+END_SRC
+
+The hazard ratios HR ($\mathrm{e}^{\text{coef}}$) have the usual interpretation, 
+as in a parametric Cox regression model.
+
+The three baseline transition intensity functions can be displayed as
+functions of time, functions of age in our illustrative example (Figure 3).
+#+source: paq-fit-weib
+#+BEGIN_SRC R :exports both :results graphics :file "transition-intensities-paq-weib.pdf"
+par(mgp=c(4,1,0),mar=c(5,5,5,5))
+plot(fit.weib,conf.int=TRUE,lwd=3,citype="shadow",xlim=c(65,100), axis2.las=2,axis1.at=seq(65,100,5),xlab="Age (years)")
+#+END_SRC
+
+#+RESULTS[<2013-08-19 14:03:45> d6e0a6b60955a1a9925863c3028ddd258df9ed0c]:
+[[file:transition-intensities-paq-weib.pdf]]
+
+\bigskip
+
+The other estimation option in the function \code{idm} permits to
+relax the strict parametric assumptions of the Weibull regression
+models. With the option \code{intensities="Splines"}, 
+linear combinations of M-splines are
+used to approximate the three baseline transition
+intensities. Although this option implies a considerable amount of
+extra computations (see Section \ref{sec:semi-para}), the call and the printed output are
+very similar to the Weibull model:
+ # :eval never
+#+BEGIN_SRC R :exports both :results output :cache yes
+fit.splines <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=t0)~certif+gender,
+                   formula02=Hist(time=t,event=death,entry=t0)~gender,
+                   formula12= ~ 1,
+                   intensities="Splines",data=Paq1000)
+fit.splines
+#+END_SRC
+Again, the estimated baseline transition intensities can conveniently
+be visualized in a joint graph (Figure 4).
+
+#+source: paq-fit-splines
+#+BEGIN_SRC R :exports both  :results graphics :file "transition-intensities-paq-splines.pdf"
+par(mgp=c(4,1,0),mar=c(5,5,5,5))
+plot(fit.splines,conf.int=TRUE,lwd=3,citype="shadow",xlim=c(65,100), axis2.las=2,axis1.at=seq(65,100,5),xlab="Age (years)")
+#+END_SRC
+
+#+RESULTS[<2013-08-20 12:18:12> 8eb374a665df2b9475fc068f3750483fd1f7ce1b]:
+[[file:transition-intensities-paq-splines.pdf]]
+
+*** Semi-parametric estimation method: specific options
+Some optional arguments are specific to the semi-parametric approach 
+(when using the option \code{intensities="Splines"}:
+- \code{n.knots} contains a vector (by default \code{c(7,7,7)}) specifying the number of knots on the $0 \rightarrow 1$, $0 \rightarrow 2$ and $1 \rightarrow 2$ transitions, respectively;
+- \code{knots} contains the choice of the knots placement (equidistant by default or quantile-based placement) or a list of sequences of knots for transitions $0 \rightarrow 1$, $0 \rightarrow 2$ and $1 \rightarrow 2$, respectively, to be specified by the user;
+- \code{CV} (FALSE by default) is set to TRUE for using approximate leave-one-out cross-validation score to choose the smoothing parameters $\kappa_{01}$, $\kappa_{02}$, $\kappa_{12}$;
+- \code{kappa} contains the smoothing parameters if \code{CV=FALSE} (arbitrary choice of the smoothing parameters $\kappa_{01}$, $\kappa_{02}$, $\kappa_{12}$); the initial smoothing parameters for the grid search method which maximize the approximate leave-one-out cross-validation score if \code{CV=TRUE}.   
+By default the function \code{idm} selects equidistant sequences of 7
+knots between the minimal and maximal event times (\code{t0}, \code{l} and \code{r} for \code{Paq1000}). 
+There must be several data points between each pair of different knots and 
+there must be a knot before or at the first time from which there are subjects 
+at risk and after or at the last time of transition.
+Five is the minimal number of knots that can be chosen for a transition.
+Indeed, the penalized likelihood approach has no interest with very few knots
+(PIERRE: Can you develop/give a better explanation, or do I delete ?).
+Consequently, the semi-parametric approach requires much more information than the 
+parametric one to achieve convergence. The number of parameters to be estimated is 
+larger, and enough observation times on each transition are required to fit the splines.
+In particular, in data sets where few $1 \rightarrow 2$ transitions times are observed, 
+we this approach is not recommended. 
+Increasing the number of knots does not deteriorate the estimates of the transition intensities: this is
 because the degree of smoothing in the penalized likelihood method is
 tuned by the smoothing parameters $\kappa_{01}$, $\kappa_{12}$ and
 $\kappa_{02}$.  On the other hand, once a sufficient number of knots
@@ -727,19 +596,12 @@ arise, particularly for a large number of knots. That is why the
 maximum number of knots is limited to 25. So it is recommended to
 start with a small number of knots (e.g. 5 or 7) and increase the
 number of knots until the graph of the transition intensities function
-remains unchanged (rarely more than 12 knots).
-
-
-*** Choice of smoothing parameters
+remains unchanged (from our own experience rarely more than 12 knots).
 
 The default values for the smoothing parameters are suitable for the
 \code{Paq1000} data set. However, these values can be expected to be
-very different depending on time scale and number of subjects. They
-can be changed into the \code{kappa} argument. 
-The can also be chosen using by cross-validation using the argument \code{CV} 
-(FALSE by default). In this case, the
-\code{kappa} argument contains the initial values for golden section search of the smoothing
-parameters. 
+very different depending on time scale, number of subjects and number of knots. 
+The cross-validation option can be used to find appropriate smoothing parameters.
 However, the running time with cross-validation is very long and an empirical
 technique can be preferred. It consists in repeating the \code{idm} running
 trying different smoothing parameters.  After each estimation, the
@@ -748,103 +610,71 @@ transition intensities are plotted. This can be done with the
 to reduce the associated smoothing parameter. Similarly, if the curves
 are to wiggly, the associated smoothing parameter may be increased.
 
-* Predicting parameters of life
-
-Most often in illness-death models, the functions of interest are the
-transition intensities.  However, other functions/quantities which can
-be expressed in terms of the transition intensities
-\citep{Touraine_2013} and may provide additional information and have
-a more natural interpretation.
-
+** Making predictions
 The function \code{idm} returns an ``idmWeib'' or ``idmSplines'' class
 object depending on the parametrization of the transition intensities
-(Weibull or splines).  These objects can be used in argument of the
-\code{predict.idmWeib} and \code{predict.idmSplines} functions in
-order to obtain transition probabilities between ages 70 and 80 (and
-cumulative probabilities).  For example, for a female subject who is
-healthy at age 70 and has primary school certificate:
-
+(Weibull or splines).  A object as returned by the \code{idm} function 
+can be used in argument of the \code{predict} function in
+order to obtain transition probabilities, cumulative probabilities of event and 
+life expectancies with confidence intervals. 
+For example, the following call give predictions regarding 
+a 70 years-old female subject who do not have primary school diploma, 
+over a 10 years horizon: 
 #+BEGIN_SRC R :exports both :results output :cache yes 
-TP <- predict(fit.weib,s=70,t=80,Z01=c(1,0),Z02=c(1,0),Z12=c(1,0))
-TP
+pred <- predict(fit.weib,s=70,t=80,Z01=c(1,1),Z02=1)
+pred
 #+END_SRC
+The covariates values must be specified in the \code{Z01}, \code{Z02} and \code{Z12} 
+arguments in the same order as they were entered in the preceding \code{idm} call.
 
-#+RESULTS[<2013-08-19 11:09:01> 190a65b45febb8eb8a02545c47a526bf2463d369]:
-#+begin_example
-$p00
-[1] 0.8899268 0.8245325 0.8759390
+The ouput attributes are:
+- for a dementia-free 70 years-old subject: 
+ - the probability of being still alive and dementia-free 10 years later $p_{00}(70,80)$,
+ - the probability of being still alive but demented 10 years later $p_{01}(70,80)$, 
+ - the probability of dying in the next 10 years $p_{02}(70,80)$ having been demented before ($p_{02}^1(70,80)$) or not ($p_{02}^0(70,80)$), 
+ - the absolute risk of dementia in the 10 years (10 years later, the subject may have die or not) $F_{01}(s,t)$, 
+ - the absolute risk of exit from state 0 in the 10 years $F_{0 \scriptscriptstyle{\bullet}}(s,t)$ (due to either dementia or death);
+- for a demented 70 years-old subject: the probability of dying in the next 10 years $p_{12}(s,t)$ or not $p_{11}(s,t)$.
 
-$p01
-[1] 0.03041876 0.02406653 0.05422249
-
-$p11
-[1] 0.2649379 0.2802728 0.7980570
-
-$p12
-[1] 0.7350621 0.2019430 0.7197272
-
-$p02_0
-[1] 0.06035533 0.07735229 0.12578106
-
-$p02_1
-[1] 0.01929910 0.00399737 0.02334086
-
-$p02
-[1] 0.07965443 0.09042787 0.13498797
-
-$F01
-[1] 0.04971786 0.03197171 0.07140308
-
-$F0.
-[1] 0.1100732 0.1240610 0.1754675
-#+end_example
-
-where \code{TP$p00}, \code{TP$p01}, \code{TP$p11}, \code{TP$p02} are
-the transition probabilities; \code{TP$p02_1} and \code{TP$p02_0} are
-the probabilities of transition from state 0 to state 2 coming through
-state 1 or not; \code{F01} is the probability for of becoming diseased
-between ages 70 and 80; \code{F0.} is the probability of exit from
-state 0 between ages 70 and 80.
-
-If the \code{predict} function is used with an \code{idmSplines}
-object, the \code{s} input must be greater than the first knot and the
-\code{t} input must be lower than the last knot.
-
-The ``idmWeib'' or ``idmSplines'' objects can also be used in argument
-of the \code{lifexpect} function to obtain life expectancies. For
-example, for a female subjects who has primary school certificate, the
-following code:
-
+The following calls give life expectancies regarding 
+a 70 years-old female subject who do not have primary school diploma based on the 
+transition intensities estimates from respectively the parametric approach 
+and the semi-parametric approach:
 #+BEGIN_SRC R :exports both :results output :cache yes
-LE_fit.weib <- lifexpect(fit.weib,s=90,Z01=c(1,0),Z02=c(1,0),Z12=c(1,0),CI=FALSE)
-LE_fit.weib
+LE.weib <- lifexpect(fit.weib,s=80,Z01=c(1,0),Z02=0)
+LE.weib
 #+END_SRC
+#+BEGIN_SRC R :exports both :results output :cache yes
+LE.splines <- lifexpect(fit.splines,s=80,Z01=c(1,0),Z02=0,CI=FALSE)
+LE.splines
+#+END_SRC
+The confidence intervals calculation may take time, especially using the splines estimates of the transition intensities.
+To suppress this calculation the \code{CI} argument must be set to \code{FALSE} (see above).
+The number of the simulations for calculating confidence intervals can also be modified using the \code{nsim} argument 
+(by default 2000 for the \code{predict} function and 1000 for the \code{lifexpect} function).
 
-#+RESULTS[<2013-08-19 11:37:07> 0c860b16c041274c8ae57f5ff05283ed3766a685]:
-: $life.in.0.expectancy
-: [1] 4.047053
-: 
-: $life.expectancy.nondis
-: [1] 5.416446
-: 
-: $life.expectancy.dis
-: [1] 4.057387
+The output attributes of  the \code{lifexpect} function are:
+- for a dementia-free 80 years-old subject:
+ - the life expectancy in state 0 (healthy life expectancy),
+ - the life expectancy;  
+- for a demented 80 years-old subject: the life expectancy.
+ 
+*** Warnings regarding predictions
+Predictions using the splines estimates of the transition intensities are not possible 
+if involving times prior to the first knot or times beyond the last knot. 
+Moreover, the life expectancies are calculated using integration until infinity using 
+the Weibull estimates and until the last knot using the splines estimates. 
+Consequently, to calculate life expectancies using the splines estimates, 
+we implicitly assume that the last knot time is the maximal time of death.   
+The above life expectancies calculating from 
+the Weibull estimates or the splines estimates of the transition intensities 
+are very close because the follow-up period of the \code{Paq1000} data set is long.
+However, in other data sets this assumption may not hold anymore.
+Finally, to avoid numerical problem in the predictions calculations, 
+the first and last knots must be the same or very close on each transition. 
 
 
-produces healthy life expectancy, life expectancy for a non diseased
-subject and life expectancy for a diseased subject.  Again, if this
-function is used with an \code{idmSplines} object, the \code{s} input
-must be greater than the first knot.  Moreover, life expectancies are
-calculated integrating up to infinity using an ``idmWeib'' object but
-up to the last knot using an ``idmSplines'' object.  Consequently
-using an ``idmSplines'' object, it must be acceptable to assume that
-any subject should be in state 2 (dead) at the age corresponding to
-the last knot.  Otherwise, the life expectancies would be
-underestimated.
-
-  # \bibliographystyle{apalike}
 \bibliography{smoothhazard}
-
 * COMMENT Latex header
 #+TITLE: Fitting regression models to interval-censored observations of illness-death models
 #+LANGUAGE:  en
