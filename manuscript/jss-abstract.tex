@@ -1,15 +1,18 @@
-The irreversible illness-death model allows subjects to move from an
-initial state (``health state'') to a terminal state (``death state'')
-either directly or through an intermediate state (``disease
-state''). Disease onset times may not be known exactly, for example if
-the disease status of a patient can only be assessed at follow-up
-visits. In this situation the disease onset times are usually
-interval-censored. This article presents the \pkg{SmoothHazard}
-package for \proglang{R}. It implements algorithms for simultaneously
-fitting regression models to the three transition intensities of an
-illness-death model where the times to the intermediate state may be
-interval-censored data. The three baseline hazard functions are either
-parametrized according to Weibull distributions or approximated by
-M-splines. For a given set of covariates, the transition intensities estimates can
-be combined into predictions of transition probabilities, cumulative event probabilities and
-life expectancies.
+The irreversible illness-death model describes the pathway from an
+initial state to a absorbing state either directly or through an
+intermediate state. This model is frequently used in medical
+applications where the intermediate state represents illness and the
+absorbing state represents death. In many studies, disease onset times
+are not known exactly. This happens for example if the disease status
+of a patient can only be assessed at regular visits. In this situation
+the disease onset times are interval-censored. This article presents
+the \pkg{SmoothHazard} package for \proglang{R}. It implements
+algorithms for simultaneously fitting regression models to the three
+transition intensities of an illness-death model where the transition
+times to the intermediate state may be interval-censored and the all
+event times can be right censored. The program parses the data
+structure to find the corresponding contribution to the likelihood.
+The three baseline hazard functions are modelled by Weibull
+distributions, or by M-splines. For a given set of covariates, the
+estimated transition intensities can be combined into predictions of
+cumulative event probabilities and life expectancies.
