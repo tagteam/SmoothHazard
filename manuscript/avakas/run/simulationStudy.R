@@ -33,11 +33,9 @@ runOne <- function(i,NS,seed){
         else
             form.ill <- Hist(time=list(L,R),event=ill)~X
         ## weibull model
-        try.weib <- try(weib <- idm(formula02=Hist(time=lifetime,event=status)~X,
-                                    formula01=form.ill,
-                                    data=dat,
-                                    maxiter=2000,
-                                    intensities="Weib"),silent=TRUE)
+        print(sum(dat$R>dat$lifetime))
+        print(sum(dat$illtime>dat$lifetime))
+        ## try.weib <- try(weib <- idm(formula02=Hist(time=lifetime,event=status)~X,formula01=form.ill,data=dat,maxiter=2000,intensities="Weib"),silent=TRUE)
         ## if (weib$converged==2) browser()
         if (inherits(try.weib,"try-error")==TRUE) {
             innerout <- list(weib=list(coef=NA,conv=NA))
@@ -81,7 +79,7 @@ runOne <- function(i,NS,seed){
     inner
 }
 
-## b <- runOne(i=5,NS=1,seed=1)
+b <- runOne(i=5,NS=10,seed=1)
 
 ## run simulation
 seed <- 1735
