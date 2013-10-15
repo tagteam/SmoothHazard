@@ -373,7 +373,9 @@ long run times we have implemented the following algorithm:
 
 Step 1. We ignore the covariates and use a grid search method to find
  the values for $(\kappa_{01}, \kappa_{02}, \kappa_{12})$ based on an
- approximiation of the marginal leave-one-out log-likelihood score.
+ approximiation of the 
+ # marginal 
+leave-one-out log-likelihood score.
  The approximation is equivalent to one step of the Newton-Raphson
  algorithm and reduces the number of calculations considerably. This
  approach was proposed by \citet{O'Sullivan_1988} for survival models
