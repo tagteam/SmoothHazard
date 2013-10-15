@@ -160,7 +160,6 @@ functions are restricted to the simple survival model with a single
 event and it does not seem to provide estimates of the standard errors
 which could be used to construct confidence limits and p-values.
 
-a change
 
 *** Outline
 
