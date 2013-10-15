@@ -186,13 +186,15 @@ idm <- function(formula01,
     ## a12_u|upper confidence band for a12|length 100|double|
 }else{
     #  	cat("------ Program Splines ------ \n")
+    browser()
     if (length(entrytime)>0){
-        alltimes <- sort(unique(Ltime, Rtime,entrytime,abstime))
+        alltimes <- sort(unique(c(Ltime, Rtime,entrytime,abstime)))
+
 	amax <- max(alltimes)
         amin <- min(alltimes)
     }
     else{
-        alltimes <- sort(unique(Ltime, Rtime,abstime))
+        alltimes <- sort(unique(c(Ltime, Rtime,abstime)))
         amax <- max(alltimes)
         amin <- 0
         }
