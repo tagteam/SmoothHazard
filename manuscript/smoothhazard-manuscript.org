@@ -340,10 +340,9 @@ simultaneously by maximizing the log-likelihood.
 
 Confidence intervals for the regression parameters are obtained using
 estimated standard errors estimated by inverting the Hessian matrix of
-the log-likelihood.  Confidence bands for the baseline transition
+the log-likelihood. Confidence bands for the baseline transition
 intensities are obtained using a simulation-based approach explained
 below (section \ref{sec:CI}).
-# PIERRE: is it really right ? -> to be checked in the fortran programs of the package ?
 
 ** Semi-parametric estimation
 \label{sec:semi-para}
@@ -409,29 +408,23 @@ used for $\hat{\alpha}_{0,01}$, and by
 $t_{02}=(t_{02,1},\dots,t_{02,m_{02}})$ and
 $t_{12}=(t_{12,1},\dots,t_{12,m_{12}})$ similar sequences of knots for
 $\hat{\alpha}_{0,02}$ and $\hat{\alpha}_{0,12}$, respectively. We
-denote by $M_{hl}^T=M_{hl,1},\ldots,M_{hl,n_{hl}}$ the matching
-families of $n_{hl}$ cubic M-splines, with $n_{hl}=m_{hl}+2$ and for
-# PIERRE: what does matching family mean?
-$hl \in \{01,02,12\}$. The estimator $\hat{\alpha}_{hl}$ is
-approximated using the following linear combination: $$ \tilde
-\alpha_{0,hl}(t)=\sum_{i=1}^{n_{hl}} a_{hl,i} M_{hl,i}(t) $$ where
-$a_{hl,i}$ are unkown parameters which are constrained to be positive.
-# PIERRE: I DONT UNDERSTAND why we need to mention theta_{hl}
-# and we already use theta for something else, later.
-# In practice, we estimate
-# parameters $\theta_{hl,i}$ such that $a_{hl,i}=\theta_{hl,i}^2$. 
-The $n_{hl}$ M-splines are integrated in order to produce a family of
-monotone splines, these are called I-splines. Thus, with each M-spline
-$M_{hl,i}$ we associate an I-spline $I_{hl,i}$:
-$$I_{hl,i}(t)=\int_{t_{hl,1}}^t M_{hl,i}(u) du.$$ For given values of
-the parameters $a_{hl,i}$, we can approximate the cumulative baseline
-transition intensities $A_{hl}$ by a linear combination of
-I-splines:
+denote by $M_{hl}^T=M_{hl,1},\ldots,M_{hl,n_{hl}}$ the families of
+$n_{hl}$ cubic M-splines, with $n_{hl}=m_{hl}+2$ and for $hl \in
+\{01,02,12\}$. The estimator $\hat{\alpha}_{hl}$ is approximated using
+the following linear combination: $$ \tilde
+\alpha_{0,hl}(t)=\sum_{i=1}^{n_{hl}} (a_{hl,i})^2 M_{hl,i}(t) $$ where
+$a_{hl,i}$ are unkown parameters. The $n_{hl}$ M-splines are integrated in order to
+produce a family of monotone splines, these are called
+I-splines. Thus, with each M-spline $M_{hl,i}$ we associate an
+I-spline $I_{hl,i}$: $$I_{hl,i}(t)=\int_{t_{hl,1}}^t M_{hl,i}(u) du.$$
+For given values of the parameters $a_{hl,i}$, we can approximate the
+cumulative baseline transition intensities $A_{hl}$ by a linear
+combination of I-splines:
 # PIERRE: It does not make sense to approximate an estimator which
 # is no where defined
-$$ \tilde A_{0,hl}(t)=\sum_{i=1}^{n_{hl}} a_{hl,i} I_{hl,i}(t).$$
+$$ \tilde A_{0,hl}(t)=\sum_{i=1}^{n_{hl}} (a_{hl,i})^2 I_{hl,i}(t).$$
 Because M-splines are non-negative, the positivity constraint on
-$a_{hl,i}$ ensures that $\tilde A_{0,hl}$ is monotone increasing.
+$(a_{hl,i})^2$ ensures that $\tilde A_{0,hl}$ is monotone increasing.
 
 
 Confidence intervals of the regression parameters are obtained using
