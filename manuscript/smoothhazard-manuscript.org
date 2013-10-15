@@ -46,9 +46,12 @@ intensities and of covariate effects when the data fall into one of
 the 6 cases that are displayed in Figure \ref{fig:0}.
 #+source: obspattern
 #+BEGIN_SRC ditaa :file obs-patterns.png :exports none :cache yes
-1. Right censored alive, never diseased
+1. Right censored alive, not diseased until
+   time L, disease status at C unknown
 
-  E-------------------------------> C
+                +---+
+  E-------------| L |-------------> C
+                +---+
 
 2. Interval censored disease onset time
    then right censored alive:
@@ -78,27 +81,31 @@ the 6 cases that are displayed in Figure \ref{fig:0}.
   E-------------| I |-------------> T
                 +---+
 
-6. Died, never diseased:
+6. Died, not diseased until
+   time L, disease status at T unknown
 
-  E-------------------------------> T
+               +---+
+ E-------------| L |--------------> T
+               +---+
 #+END_SRC
 
-#+RESULTS[<2013-10-14 22:18:52> 23c06dd7e337046c8748e4e5c3d1e6135badb2ab]:
+#+RESULTS[<2013-10-15 09:55:37> 3b363a1bfc01f6326adbe7464ef4e1c1285ca72e]:
 [[file:obs-patterns.png]]
+
 #+ATTR_LaTeX: :width 0.5\textwidth
 #+LABEL: fig:0
-#+CAPTION: Observational patterns that are recognized by \pkg{SmoothHazard}. The letters I and T denote the transition times into the intermediate and absorbing state, respectively. The letter E and C denote the start and end of followup, respectively, and the letters L and R the visit times between which the transition into the intermediate happened.  
+#+CAPTION: Observational patterns that are recognized by \pkg{SmoothHazard}. The letters I and T denote the transition times into the intermediate and absorbing state, respectively. The letters E and C denote the start and end of followup, respectively, and the letters L and R the visit times between which the transition into the intermediate happened.  
 #+results: obspattern
 [[file:obs-patterns.png]]
-Thus, the case of left-truncated event times (delayed entry) is
-covered, as well as the case where for some subjects the transition time
-into the intermediate state is observed exactly and for others it is
-interval censored.  Finally, the special case is covered where for
-some or all subjects no intermediate information is available about
-the disease status such that it is only known whether or not the
-subjects became diseased between the start and the end of
-followup. The latter occurs in Figure \ref{fig:0}
-when $E=L$ and $R=\min(T,C)$ in cases 2. or 4.
+Thus, the case of left-truncated event times
+(delayed entry) is covered, as well as the case where for some
+subjects the transition time into the intermediate state is observed
+exactly and for others it is interval censored.  Finally, the special
+case is covered where for some or all subjects no intermediate
+information is available about the disease status such that it is only
+known whether or not the subjects became diseased between the start
+and the end of followup. The latter occurs in Figure \ref{fig:0} when
+$E=L$ and $R=\min(T,C)$ in cases 2. or 4.
 
 To estimate covariate effects on the three transition intensities,
 implemented are regression models which assume proportional transition
@@ -143,13 +150,10 @@ setting includes the illness-death model and it can be used with
 interval-censored disease times and exact death times. However, in
 this package the likelihood is calculated using the Kolmogorov
 differential equations that relate the transition probabilities and
-the transition intensities and to make this work it is a
-time-homogeneity assumption is made where all transition intensities
-are constant or piecewise-constant. In the special cases of the
-illness-death model, the \pkg{SmoothHazard} generalizes this
-functionality by allowing flexible transition intensities without
-time-homogeneity assumption.
-   
+the transition intensities and to make this work a time-homogeneity
+assumption is made where all transition intensities are constant or
+piecewise-constant.
+
 The package \pkg{intcox} provides estimates of the Cox regression
 model based on interval-censored event times. However, presently the
 functions are restricted to the simple survival model with a single
@@ -199,7 +203,7 @@ natural extension of the Cox proportional hazard model:
 \alpha_{hl}(t|Z_{hli})=\alpha_{0,hl}(t)\exp\{\beta_{hl}^T Z_{hli}\};\qquad hl \in \{01,02,12\}.
 \end{equation}
 Here $\alpha_{0,hl}$ are baseline transition intensities, $Z_{hli}$
-are covariates vectors for subject $i$ and $\beta_{hl}$ are vectors of
+are covariate vectors for subject $i$ and $\beta_{hl}$ are vectors of
 regression parameters for transition $hl$.
 
 In the situation where the time to disease and the time to death are
@@ -221,27 +225,61 @@ intermediate state, the conditional survival function in the
 intermediate state between times $s$ and $t$ is given by: $$ \frac{
 e^{-{A}_{12}(t|Z_{12i})}}{e^{-{A}_{12}(s|Z_{12i})}}.$$
 
-HERE
+We allow that the event times are left truncated, i.e., that subjects
+enter the study at the delayed entry time $E>0$. The left truncation
+condition $X(E_{i})=0$ implies that subject $i$ has survived in state
+0 until time $E_{i}$. This is taken into account by dividing the above
+likelihood contributions by the term ${S(E_{i}|Z_{01i},Z_{02i})}$.
 
-We set $\delta_{2i}=1$ ($\delta_{2i}=0$) if
-subject $i$ is (is not) dead. 
-If $\delta_{2i}=0$, $T_i$ is time to death; if $\delta_{2i}=0$, death
-event is right-censored at $T_i$.
+In addition to the covariate vectors $Z_{01i},Z_{02i},Z_{12i}$ we
+observe the vector $(E_i,L_i,R_i,\delta_{1i},\tilde T_i,\delta_{2i})$
+where $\tilde T_i=\min(T_i,C_i)$ is the minimum between the transition
+time into the absorbing state $T_i$ and the right censoring time $C_i$
+and $\delta_{2i}=1\{T_i\le C_i\}$. Also, $\delta_{1i}=1$ if we know
+for sure that subject $i$ was diseased between $E_i$ and $\tilde T_i$
+and $\delta_{1i}=0$ otherwise. The visit times $L_i$ and $R_i$ are
+defined by $E_i\le L_i\le R_i\le \tilde T_i$ if $\delta_{1i}=1$ and by
+$E_i\le L_i \le \tilde T_i, R_i=\infty$ if $\delta_{1i}=0$. When the
+transition time into the intermediate state is observed exactly, we
+have $\delta_{1i}=1$ and $L_i=R_i$. In the latter case we also denote
+$I_i$ for the transition time into the intermediate state.
 
-Let us detail the likelihood contribution for subject $i$ by
-distinguishing if subject $i$ has been observed in state 1 (diseased)
-or not.
+We now detail the likelihood contributions according to the different
+observational patterns shown in Figure \ref{fig:0}:
 
-- If subject $i$ has first been observed diseased at time $R_i$ and
-  has last been seen disease-free at time $L_i$ ($L_i<R_i$), disease
-  time is interval-censored between $L_i$ and $R_i$. The likelihood
-  contribution for subject $i$ is:
-  #+BEGIN_LaTeX
-  \begin{equation} {\cal L}_i = \displaystyle \int_{L_i} ^{R_i}
-  S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{
-  e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}\big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}du
-  \end{equation} 
-  #+END_LaTeX
+# distinguishing if subject $i$ has been observed
+# in state 1 (diseased) or not.
+# - If subject $i$ has first been observed diseased at time $R_i$ and
+# has last been seen disease-free at time $L_i$ ($L_i<R_i$), disease
+# time is interval-censored between $L_i$ and $R_i$. The likelihood
+# contribution for subject $i$ is:
+ #+BEGIN_LaTeX
+\begin{align*}
+ %
+ \text{case 1:}\quad {\cal L}_i & = S(C_i|Z_{01i},Z_{02i}) + \int_{L_i}^{C_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(C_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}du \\
+ %
+ \text{case 2:}\quad {\cal L}_i & = \int_{L_i} ^{R_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(C_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}du\\
+ % 
+ \text{case 3:}\quad {\cal L}_i & =  S(I_i|Z_{01i},Z_{02i}) \alpha_{01}(I_i|Z_{01i}) \frac{e^{-{A}_{12}(C_i|Z_{12i})}}{e^{-{A}_{12}(I_i|Z_{12i})}}\\
+ %
+ \text{case 4:}\quad {\cal L}_i & = \int_{L_i} ^{R_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}} \alpha_{12}(T_i|Z_{12i})du\\
+ %
+ \text{case 5:}\quad  {\cal L}_i & =  S(I_i|Z_{01i},Z_{02i}) \alpha_{01}(I_i|Z_{01i}) \frac{e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(I_i|Z_{12i})}} \alpha_{12}(T_i|Z_{12i})\\ 
+ %
+ \text{case 6:}\quad {\cal L}_i & = S(T_i|Z_{01i},Z_{02i})\alpha_{02}(T_i|Z_{02i}) \\
+  \qquad & + \int_{L_i}^{T_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}} \alpha_{12}(T_i|Z_{12i}) du \\
+ %
+ \end{align*}
+  #+END_LaTeX 
+ # %
+ # \text{case 3:}\quad {\cal L}_i & = \int_{L_i} ^{R_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}\big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}du
+ # %
+# \big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}  
+
+ # {\cal L}_i = \displaystyle
+   # S(T_i|Z_{01i},Z_{02i}) \big(\alpha_{02}(T_i|Z_{02i})\big)^{\delta_{2i}} +\\
+   # \int_{R_i}^{T_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}\big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}du \\
+ # \end{equation} 
   Indeed, subject $i$ has survived in state 0 until some
   time $u$ between $L_i$ and $R_i$ and moved to state 1 at time $u$.
   Then, he has survived in state 1 between times $u$ and time $T_i$ and
@@ -274,23 +312,20 @@ If time to disease and time to death are both right-censored at the
 same time, we have $L_i=R_i=T_i$ and the integral value in
 (\ref{eq:likelihood2}) is zero.
 
-Suppose now that data are left truncated, i.e.  that subjects are
-under observation starting from time $T_0>0$.  Let us denote $T_{0i}$
-the time from which subject $i$ is under observation.  The left
-truncation condition $X(T_{0i})=0$ (subject $i$ has survived in state
-0 until time $T_{0i}$) is taken into account by dividing the above
-likelihood contributions by the term ${S(T_{0i}|Z_{01i},Z_{02i})}$.
+
 
 * Estimation
-The \code{idm} function computes estimates for the three baseline transition
-intensities and for the regression parameters using likelihood-based estimation methods.
-In the parametric method and in the semi-parametric method, respectively the likelihood and
-the penalized likelihood are maximized
-using the Levenberg-Marquardt's
-algorithm \citep{Levenberg_1944,Marquardt_1963} which is a combination of a Newton-Raphson
-algorithm and a gradient descent algorithm (also known as the steepest descent algorithm). 
-This algorithm has the avantage of being more robust than the Newton-Raphson algorithm
-while preserving its fast convergence property.
+  
+The \code{idm} function computes estimates for the three baseline
+transition intensities and for the regression parameters using
+likelihood-based estimation methods.  In the parametric method and in
+the semi-parametric method, respectively the likelihood and the
+penalized likelihood are maximized using the Levenberg-Marquardt's
+algorithm \citep{Levenberg_1944,Marquardt_1963} which is a combination
+of a Newton-Raphson algorithm and a gradient descent algorithm (also
+known as the steepest descent algorithm).  This algorithm has the
+avantage of being more robust than the Newton-Raphson algorithm while
+preserving its fast convergence property.
 
 ** Parametric estimation
 
