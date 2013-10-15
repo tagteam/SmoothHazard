@@ -38,7 +38,7 @@ data(Paq1000)
 d <- Paq1000
 names(d) <- c("dementia","mort","entry","L","R","time","certif","death")
 
-fit.weib <- idm(formula02=Hist(time=t,event=death,entry=t0)~1,
+fit.weib <- idm(formula02=Hist(time=t,event=death,entry=e)~1,
 formula01=Hist(time=list(l,r),event=dementia)~1,data=Paq1000)
 
 # no confidence bands

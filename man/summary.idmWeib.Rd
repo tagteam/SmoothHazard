@@ -48,7 +48,7 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 # Weibull illness-death model 
 data(Paq1000)
 
-fit <- idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+fit <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000) 
 
 }

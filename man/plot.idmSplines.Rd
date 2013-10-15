@@ -34,7 +34,7 @@
 # illness deaths model  ***/
 data(Paq1000)
 
-fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 		formula01=Hist(time=list(l,r),event=dementia)~certif,
                 formula12=~1,
                 intensities="Splines",
