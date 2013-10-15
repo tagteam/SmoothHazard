@@ -41,7 +41,7 @@ diagnosed as diseased at earlier visit times, it may or it may not be
 possible to determine retrospectively if and when the subject became
 diseased between the last visit time and the time of death.
 
-The \pkg{SmoothHazard} package provides estimates of the transition
+The \pkg{SmoothHazard} package provides estimates of the baseline transition
 intensities and of covariate effects when the data fall into one of
 the 6 cases that are displayed in Figure \ref{fig:0}.
 #+source: obspattern
@@ -104,7 +104,7 @@ exactly and for others it is interval censored.  Finally, the special
 case is covered where for some or all subjects no intermediate
 information is available about the disease status such that it is only
 known whether or not the subjects became diseased between the start
-and the end of followup. The latter occurs in Figure \ref{fig:0} when
+and the end of follow-up. The latter occurs in Figure \ref{fig:0} when
 $E=L$ and $R=\min(T,C)$ in cases 2. or 4.
 
 To estimate covariate effects on the three transition intensities,
@@ -118,6 +118,15 @@ the regression coefficients and Weibull parameters are estimated by
 maximising the likelihood, for the semi-parametric model, the
 coefficients of the M-splines and the regression coefficients are
 estimated by maximising a penalized likelihood.
+
+\pkg{SmoothHazard} then allow to do some predictions of
+transition probabilities, cumulative probabilities of event and 
+life expectancies for a given set of covariates, 
+based on estimated baseline transition intensities and on estimated 
+covariates effects. 
+
+
+\medskip
 
 If the exact transition times are observed, standard procedures like
 those implemented, e.g. in the packages \pkg{survival}, \pkg{rms},
@@ -163,10 +172,10 @@ which could be used to construct confidence limits and p-values.
 *** Outline
 
 The main functions of \pkg{SmoothHazard} are 
- - \code{shr} : for fitting survival regression models based on possibly interval-censored event times.
- - \code{idm} : for fitting illness-death regression models based on possibly interval-censored disease times and right censored death times;
- - \code{predict.idm} : ???
- - \code{lifexpect} : ???
+  # - \code{shr} : for fitting survival regression models based on possibly interval-censored event times.
+ - \code{idm} : for fitting illness-death regression models based on possibly interval-censored disease times and right censored times;
+ - \code{predict.idm} : for estimating transition probabilities and cumulative probabilities for a given set of covariates;
+ - \code{lifexpect} : for estimating life expectancies for a given set of covariates.
  
 The \code{R} functions are essentially an interface between the user
 and \proglang{FORTRAN} programs which constitute the heart of the
