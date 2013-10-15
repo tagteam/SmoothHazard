@@ -35,7 +35,7 @@ the time of the onset of the disease is interval censored between $L$
 and $R$ for this subject. Furthermore, both the process of visit times
 and the observation of the time of the transition into the absorbing
 state are usually right censored, i.e., limited to the individual
-followup period of the subjects. This yields a rather complex general
+follow-up period of the subjects. This yields a rather complex general
 observational pattern, because for a subject who died without being
 diagnosed as diseased at earlier visit times, it may or it may not be
 possible to determine retrospectively if and when the subject became
@@ -53,7 +53,7 @@ the 6 cases that are displayed in Figure \ref{fig:0}.
   E-------------| L |-------------> C
                 +---+
 
-2. Interval censored disease onset time
+2. Interval-censored disease onset time
    then right censored alive:
 
              +---+   +---+
@@ -67,7 +67,7 @@ the 6 cases that are displayed in Figure \ref{fig:0}.
   E-------------| I |-------------> C
                 +---+
 
-4. Interval censored disease onset time
+4. Interval-censored disease onset time
      then died:
 
              +---+   +---+
@@ -447,10 +447,10 @@ in probability to be still alive at some time $t>s$, or in life
 expectancy; given a set of covariates $Z_{01,j},Z_{02,j},Z_{12,j}$ for
 a subject $j$ who is diseased-free at time $s$, one could be
 interested in lifetime risk of disease or in healthy life expectancy
-(expected remaining sojourn time in state 0).  Since these quantities
+(expected remaining sojourn time in state 0). Since these quantities
 can be written in terms of the transition intensities,
 \pkg{SmoothHazard} provides estimates of them using estimates of the
-transition intensities.  Confidence intervals of these quantities are
+transition intensities. Confidence intervals of these quantities are
 calculated using the simulation-based method immediately following.
 
 ** Confidence regions
@@ -490,18 +490,20 @@ ${\alpha}_{hl}(.)$.
 * Using SmoothHazard
 ** How to prepare the data 
 
-| Case | Description                                           | $\delta_1$ | $\delta_2$ | L     | R     | T     | Remark                           |
-|------+-------------------------------------------------------+------------+------------+-------+-------+-------+----------------------------------|
-|    1 | Illness observed, right-censored death time           |          0 |          0 | $L_i$ | $L_i$ | $C_i$ | Requires $L_i\le C_i$            |
-|    2 | Interval-censored ill time, right-censored death time |          1 |          0 | $L_i$ | $R_i$ | $C_i$ | $L_i<R_i$; requires $R_i\le C_i$ |
-|    3 | Exact ill time, right-censored death time             |          1 |          0 | $L_i$ | $L_i$ | $C_i$ | Requires $L_i\le C_i$            |
-|    4 | Interval-censored ill time, death time observed       |          1 |          1 | $L_i$ | $R_i$ | $T_i$ | $L_i<R_i$; requires $R_i\le T_i$ |
-|    5 | Exact ill time, death time observed                   |          1 |          1 | $L_i$ | $L_i$ | $T_i$ | Requires $L_i\le T_i$            |
-|    6 | No illness observed, death time observed              |          0 |          1 | $L_i$ | $L_i$ | $T_i$ | Requires $L_i\le T_i$            |
+| Case | Description                                           | $\delta_1$ | $\delta_2$ | L     | R     | T     | Remark                  |
+|------+-------------------------------------------------------+------------+------------+-------+-------+-------+-------------------------|
+|    1 | No illness observed, right-censored death time        |          0 |          0 | $L_i$ | $L_i$ | $C_i$ | $L_i\le C_i$            |
+|    2 | Interval-censored ill time, right-censored death time |          1 |          0 | $L_i$ | $R_i$ | $C_i$ | $L_i<R_i$; $R_i\le C_i$ |
+|    3 | Exact ill time, right-censored death time             |          1 |          0 | $L_i$ | $L_i$ | $C_i$ | $L_i\le C_i$            |
+|    4 | Interval-censored ill time, death time observed       |          1 |          1 | $L_i$ | $R_i$ | $T_i$ | $L_i<R_i$; $R_i\le T_i$ |
+|    5 | Exact ill time, death time observed                   |          1 |          1 | $L_i$ | $L_i$ | $T_i$ | $L_i\le T_i$            |
+|    6 | No illness observed, death time observed              |          0 |          1 | $L_i$ | $L_i$ | $T_i$ | $L_i\le T_i$            |
+|      |                                                       |            |            |       |       |       |                         |
 
 Table XX shows how the program interpretes the structure of the data
-set. Some more details are necessary to distinguish the case where the
-ill status is diagnosed at the last follow-up time for death from the case where
+set. In all cases, $L_i$ may be equal to the entry time. 
+Some more details are necessary to distinguish the case where the
+ill status is known at the last follow-up time for death from the case where
 this is not possible. 
  
  - In case 1, if $L_i<C_i$ then it is assumed that the subject may
@@ -512,8 +514,7 @@ this is not possible.
    become ill between $L_i$ and $T_i$. If $L_i=T_i$ it is assumed that
    the subject is disease-free at time $T_i$. In the latter case the
    of the likelihood equals zero. 
- - In all cases, $L_i$ may be equal to the entry time. 
-
+ 
 ** Paquid study 
 In order to illustrate the functionality of the package we provide a
 random subset containing data from 1000 subjects that were enrolled in
@@ -585,8 +586,8 @@ head(round(Paq1000,1))
 : 6        0     0 66.2 71.4 71.4 84.2      1      0
 
 Each row in the data corresponds to one subject.  The variables
-\code{dementia} and \code{death} are the status variables (1 if an
-event occurred, 0 otherwise) for dementia and death, respectively.
+\code{dementia} and \code{death} are  $\delta_1$ and $\delta_2$ 
+the status variables for dementia and death.
 The variable \code{e} contains ages of subjects at entry into
 study. The variables \code{l} and \code{r} contain the left and right
 endpoints of the censoring intervals.  For demented subjects, \code{r}
@@ -601,7 +602,7 @@ SRC_R{n.men} men).
 
 The function \code{idm} computes estimates for the three transition
 intensities $\alpha_{01}(.)$, $\alpha_{02}(.)$, $\alpha_{12}(.)$ which
-are age-specific incidence rate of dementia, age-specific mortality
+represents age-specific incidence rate of dementia, age-specific mortality
 rate of dementia-free subjects and age-specific mortality rate of
 demented subjects, respectively.  Proportional transition intensities
 regression models allow for covariates on each transition.
