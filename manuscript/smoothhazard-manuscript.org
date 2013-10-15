@@ -160,6 +160,8 @@ functions are restricted to the simple survival model with a single
 event and it does not seem to provide estimates of the standard errors
 which could be used to construct confidence limits and p-values.
 
+a change
+
 *** Outline
 
 The main functions of \pkg{SmoothHazard} are 
@@ -284,7 +286,6 @@ observational patterns shown in Figure \ref{fig:0}:
 # plus sign).  If time to disease and time to death are both
 # right-censored at the same time, we have $L_i=R_i=T_i$ and the
 # integral value in is zero.
-
 
 * Estimation
   
