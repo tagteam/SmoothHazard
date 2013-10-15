@@ -160,7 +160,6 @@ functions are restricted to the simple survival model with a single
 event and it does not seem to provide estimates of the standard errors
 which could be used to construct confidence limits and p-values.
 
-
 *** Outline
 
 The main functions of \pkg{SmoothHazard} are 
@@ -255,7 +254,8 @@ observational patterns shown in Figure \ref{fig:0}:
 # time is interval-censored between $L_i$ and $R_i$. The likelihood
 # contribution for subject $i$ is:
  #+BEGIN_LaTeX
-\begin{align*}
+\begin{equation}\label{eq:1}
+ \begin{split}
  %
  \text{case 1:}\quad {\cal L}_i & = S(C_i|Z_{01i},Z_{02i}) + \int_{L_i}^{C_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(C_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}du \\
  %
@@ -270,7 +270,8 @@ observational patterns shown in Figure \ref{fig:0}:
  \text{case 6:}\quad {\cal L}_i & = S(T_i|Z_{01i},Z_{02i})\alpha_{02}(T_i|Z_{02i}) \\
   \qquad & + \int_{L_i}^{T_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}} \alpha_{12}(T_i|Z_{12i}) du \\
  %
- \end{align*}
+ \end{split}
+ \end{equation}
 #+END_LaTeX 
 
 
@@ -289,13 +290,11 @@ observational patterns shown in Figure \ref{fig:0}:
 * Estimation
   
 The \code{idm} function computes estimates for the three baseline
-transition intensities and for the regression parameters using
-likelihood-based estimation methods.  In the parametric method and in
-the semi-parametric method, respectively the likelihood and the
-penalized likelihood are maximized using the Levenberg-Marquardt's
-algorithm \citep{Levenberg_1944,Marquardt_1963} which is a combination
-of a Newton-Raphson algorithm and a gradient descent algorithm (also
-known as the steepest descent algorithm).  This algorithm has the
+transition intensities and for the regression parameters using the
+Levenberg-Marquardt's algorithm \citep{Levenberg_1944,Marquardt_1963}
+to maximize the (penalized) likelihood.  The algorithm is a
+combination of a Newton-Raphson algorithm and a gradient descent
+algorithm (also known as the steepest descent algorithm). It has the
 avantage of being more robust than the Newton-Raphson algorithm while
 preserving its fast convergence property.
 
@@ -307,14 +306,18 @@ parametrization for the baseline transition intensities is assumed: $$
 \{01,02,12\}.$$ where $a_{hl}$ and $b_{hl}$ are shape and scale
 parameters.  The Weibull parameters $a_{hl}$ and $b_{hl}$ and the
 vectors of regression parameter $\hat \beta_{hl}$ are obtained
-simultaneously by maximizing the log-likelihood.
+simultaneously by maximizing the likelihood which is the product over the
+subjects' contributions according to equation \ref{eq:1}:
 
+$${\cal{L}}(\beta_{01},\beta_{02},\beta_{12},a_{01},a_{02},a_{12},b_{01},b_{02},b_{12})
+= \prod_{i=1}^n{\cal{L}}_i(\beta_{01},\beta_{02},\beta_{12},a_{01},a_{02},a_{12},b_{01},b_{02},b_{12}).$$
 
 Confidence intervals for the regression parameters are obtained using
-estimated standard errors estimated by inverting the Hessian matrix of
-the log-likelihood. Confidence bands for the baseline transition
-intensities are obtained using a simulation-based approach explained
-below (section \ref{sec:CI}).
+standard errors estimated by inverting the Hessian matrix of the
+log-likelihood, that is the matrix of the second partial derivatives
+of $\log{\cal L}$ given in the previous display. Confidence bands for
+the baseline transition intensities are obtained using a
+simulation-based approach explained below (section \ref{sec:CI}).
 
 ** Semi-parametric estimation
 \label{sec:semi-para}
@@ -325,7 +328,7 @@ leave the baseline intensity functions completely unspecified, as in
 the Cox regression model. Unfortunately, in interval censored data
 there is no direct analogue to the partial likelihood and the Breslow
 estimator of the Cox model in right censored data. 
- # To approximate the likelihood simulateously for the regression coefficients and the baseline intensities, t
+# To approximate the likelihood simulateously for the regression coefficients and the baseline intensities, t
 The function \code{idm} implements a
 semi-parametric model where the three baseline transition intensities
 are approximated by linear combinations of M-splines. In this section
@@ -446,18 +449,21 @@ calculated using the simulation-based method immediately following.
 \label{sec:CI}
 #+end_src
 
-A simulation based approach \citep{Mandel_2013} is used to
-calculate confidence intervals for the transition intensities
-$\alpha_{hl}(t)$ in the parametric approach and for the quantities of
-interest (transition probabilities, cumulative probabilities and life
-expectancies) in both parametric and semi-parametric approaches.
+A simulation based approach \citep{Mandel_2013} is used to calculate
+confidence intervals for the transition intensities $\alpha_{hl}(t)$
+in the parametric approach and for the quantities of interest
+(transition probabilities, cumulative probabilities and life
+expectancies) in both parametric and semi-parametric approaches. The
+approach is the same for the regression parameters in both models and
+for the distribution parameters in the parametric model and for the
+spline parameters in the semi-parametric model. To briefly outline how
+it works we generically denote by $\theta$ the vector of all the
+parameters that characterize the likelihood and by $\hat\theta$ the
+maximum (penalized) likelihood estimator.
 
-We assume the asymptotic normality for the estimator $\hat{\theta}$
-(either for the regression parameters and the distribution parameters
-in the parametric approach, or for the regression parameters and the
-spline parameters in the semi-parametric approach).  We denote by
-$\hat{V}_{\hat{\theta}}$ the estimated covariance matrix of
-$\hat{\theta}$.  We consider a multivariate normal distribution with
+We assume the asymptotic normality for the estimator $\hat{\theta}$.
+and denote by $\hat{V}_{\hat{\theta}}$ the estimated covariance matrix
+of $\hat{\theta}$. We consider a multivariate normal distribution with
 the parameters estimates as expectation and $\hat{V}_{\hat{\theta}}$
 as covariance matrix. We generate $n$ vectors ($n=2000$ in practice)
 from this distribution: $\theta^{(1)},\ldots,\theta^{(n)}$.  Based on
