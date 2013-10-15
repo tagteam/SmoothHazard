@@ -163,7 +163,7 @@ this package the likelihood is calculated using the Kolmogorov
 differential equations that relate the transition probabilities and
 the transition intensities and to make this work a time-homogeneity
 assumption is made where all transition intensities are constant or
-piecewise-constant between observation times.
+piecewise-constant between two successive observation times.
 
  # The package \pkg{intcox} provides estimates of the Cox regression
  # model based on interval-censored event times. However, presently the
