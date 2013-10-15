@@ -270,48 +270,20 @@ observational patterns shown in Figure \ref{fig:0}:
   \qquad & + \int_{L_i}^{T_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}} \alpha_{12}(T_i|Z_{12i}) du \\
  %
  \end{align*}
-  #+END_LaTeX 
- # %
- # \text{case 3:}\quad {\cal L}_i & = \int_{L_i} ^{R_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}\big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}du
- # %
-# \big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}  
+#+END_LaTeX 
 
- # {\cal L}_i = \displaystyle
-   # S(T_i|Z_{01i},Z_{02i}) \big(\alpha_{02}(T_i|Z_{02i})\big)^{\delta_{2i}} +\\
-   # \int_{R_i}^{T_i} S(u|Z_{01i},Z_{02i}) \alpha_{01}(u|Z_{01i}) \frac{e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}\big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}du \\
- # \end{equation} 
-  Indeed, subject $i$ has survived in state 0 until some
-  time $u$ between $L_i$ and $R_i$ and moved to state 1 at time $u$.
-  Then, he has survived in state 1 between times $u$ and time $T_i$ and
-  died at time $T_i$ if $\delta_{2i}=1$.
-- If subject $i$ has never been seen diseased, let us denote the last
-  time he has been observed disease-free by $R_i$. The likelihood
-  contribution for subject $i$ is:
-  #+BEGIN_LaTeX
-  \begin{multline}
-  \label{eq:likelihood2}
-  {\cal L}_i = \displaystyle
-  S(T_i|Z_{01i},Z_{02i})
-  \big(\alpha_{02}(T_i|Z_{02i})\big)^{\delta_{2i}} +\\
-  \int_{R_i}^{T_i} S(u|Z_{01i},Z_{02i})
-  \alpha_{01}(u|Z_{01i}) 
-  \frac{
-  e^{-{A}_{12}(T_i|Z_{12i})}}{e^{-{A}_{12}(u|Z_{12i})}}\big(\alpha_{12}(T_i|Z_{12i})\big)^{\delta_{2i}}du
-  \end{multline}
-  #+END_LaTeX
-  Indeed, if subject $i$ has not died at $T_i$ (\delta_{2i}=0), he may
-  have survived in state 0 (term at the left side of the plus sign) or
-  he may have becomed diseased between $R_i$ and $T_i$ (term at the
-  right side of the plus sign); if subject $i$ has died at $T_i$, he
-  may have moved directly from state 0 to state 2 (term at the right
-  side of the plus sign) or he may have became diseased at some time
-  between $R_i$ and $L_i$ and then died (term at the right side of the
-  plus sign).
 
-If time to disease and time to death are both right-censored at the
-same time, we have $L_i=R_i=T_i$ and the integral value in
-(\ref{eq:likelihood2}) is zero.
 
+# Indeed, if subject $i$ has not died at $T_i$ (\delta_{2i}=0), he may
+# have survived in state 0 (term at the left side of the plus sign) or
+# he may have becomed diseased between $R_i$ and $T_i$ (term at the
+# right side of the plus sign); if subject $i$ has died at $T_i$, he
+# may have moved directly from state 0 to state 2 (term at the right
+# side of the plus sign) or he may have became diseased at some time
+# between $R_i$ and $L_i$ and then died (term at the right side of the
+# plus sign).  If time to disease and time to death are both
+# right-censored at the same time, we have $L_i=R_i=T_i$ and the
+# integral value in is zero.
 
 
 * Estimation
@@ -425,7 +397,6 @@ combination of I-splines:
 $$ \tilde A_{0,hl}(t)=\sum_{i=1}^{n_{hl}} (a_{hl,i})^2 I_{hl,i}(t).$$
 Because M-splines are non-negative, the positivity constraint on
 $(a_{hl,i})^2$ ensures that $\tilde A_{0,hl}$ is monotone increasing.
-
 
 Confidence intervals of the regression parameters are obtained using
 estimated standard errors which are obtained by inverting the Hessian
