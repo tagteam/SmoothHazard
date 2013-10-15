@@ -576,7 +576,7 @@ head(round(Paq1000,1))
 #+END_SRC
 
 #+RESULTS[<2013-10-14 14:27:05> 26c6215ce6cb7367493ce150635b48facab8286b]:
-:   dementia death   t0    l    r    t certif gender
+:   dementia death   e    l    r    t certif gender
 : 1        1     1 72.3 82.3 84.7 87.9      0      0
 : 2        0     1 77.9 78.9 78.9 79.6      0      1
 : 3        0     1 79.9 79.9 79.9 80.9      0      0
@@ -587,7 +587,7 @@ head(round(Paq1000,1))
 Each row in the data corresponds to one subject.  The variables
 \code{dementia} and \code{death} are the status variables (1 if an
 event occurred, 0 otherwise) for dementia and death, respectively.
-The variable \code{t0} contains ages of subjects at entry into
+The variable \code{e} contains ages of subjects at entry into
 study. The variables \code{l} and \code{r} contain the left and right
 endpoints of the censoring intervals.  For demented subjects, \code{r}
 is the age at the diagnostic visit and \code{l} is the age at the
@@ -661,8 +661,8 @@ argument the covariates on the $1 \rightarrow 2$ transition are the same as
 the ones specified in the  \code{formula02} argument.
 
 #+BEGIN_SRC R :exports both :results output :cache yes
-fit.weib <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=t0)~certif+gender,
-                formula02=Hist(time=t,event=death,entry=t0)~gender,
+fit.weib <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=e)~certif+gender,
+                formula02=Hist(time=t,event=death,entry=e)~gender,
                 formula12= ~ 1,
                 data=Paq1000)
 fit.weib
@@ -671,9 +671,9 @@ fit.weib
 #+RESULTS[<2013-10-14 14:29:43> b9309c8cd742eb1c8f1b6b6e869d8558ae14543b]:
 #+begin_example
 Call:
-idm(formula01 = Hist(time = list(l, r), event = dementia, entry = t0) ~ 
+idm(formula01 = Hist(time = list(l, r), event = dementia, entry = e) ~ 
     certif + gender, formula02 = Hist(time = t, event = death, 
-    entry = t0) ~ gender, formula12 = ~1, data = Paq1000)
+    entry = e) ~ gender, formula12 = ~1, data = Paq1000)
 
 Illness-death model: Results of Weibull regression for the intensity functions.
 
@@ -729,8 +729,8 @@ extra computations (see Section \ref{sec:semi-para}), the call and the printed o
 very similar to the Weibull model:
 
 #+BEGIN_SRC R :exports both :results output :cache yes
-fit.splines <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=t0)~certif+gender,
-                   formula02=Hist(time=t,event=death,entry=t0)~gender,
+fit.splines <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=e)~certif+gender,
+                   formula02=Hist(time=t,event=death,entry=e)~gender,
                    formula12= ~ 1,
                    intensities="Splines",data=Paq1000)
 fit.splines
@@ -739,9 +739,9 @@ fit.splines
 #+RESULTS[<2013-10-14 14:31:34> 8518629ae0670ea86de514942e085d4717017265]:
 #+begin_example
 Call:
-idm(formula01 = Hist(time = list(l, r), event = dementia, entry = t0) ~ 
+idm(formula01 = Hist(time = list(l, r), event = dementia, entry = e) ~ 
     certif + gender, formula02 = Hist(time = t, event = death, 
-    entry = t0) ~ gender, formula12 = ~1, data = Paq1000, intensities = "Splines")
+    entry = e) ~ gender, formula12 = ~1, data = Paq1000, intensities = "Splines")
 
 Illness-death regression model using M-spline approximations
  of the baseline transition intensities.
@@ -808,7 +808,7 @@ Some optional arguments are specific to the semi-parametric approach
   cross-validation score if \code{CV=TRUE}.
   
 By default the function \code{idm} selects equidistant sequences of 7
-knots between the minimal and maximal event times (\code{t0}, \code{l}
+knots between the minimal and maximal event times (\code{e}, \code{l}
 and \code{r} for \code{Paq1000}). There must be a knot before or at
 the first time from which there are subjects at risk and after or at
 the last time of transition. The current implementation of our program
