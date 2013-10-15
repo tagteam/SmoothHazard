@@ -324,9 +324,9 @@ not fit the data very well one can think of extending the model and to
 leave the baseline intensity functions completely unspecified, as in
 the Cox regression model. Unfortunately, in interval censored data
 there is no direct analogue to the partial likelihood and the Breslow
-estimator of the Cox model in right censored data. To approximate the
-likelihood simulateously for the regression coefficients and the
-baseline intensities the function \code{idm} implements a
+estimator of the Cox model in right censored data. 
+ # To approximate the likelihood simulateously for the regression coefficients and the baseline intensities, t
+The function \code{idm} implements a
 semi-parametric model where the three baseline transition intensities
 are approximated by linear combinations of M-splines. In this section
 we explain the basic steps of the approach.
@@ -349,8 +349,13 @@ trade-off between the data fit and the smoothness of the functions. It
 is proposed that the penalization parameters are chosen by maximizing
 a cross-validated likelihood score. Here, leave-one-out is appealing
 as the result does not depend on the random seed as it would, e.g.,
-for 10-fold cross-validation. However, since leave-one-out requires as
-many computations of the likelihood as there are subjects in the data
+for 10-fold cross-validation
+(PIERRE: is it the reason for which leave-one-out has been chose
+instead of K-fold cross-validation ?).
+ However, since leave-one-out requires as
+many 
+ # computations 
+maximizations of the likelihood as there are subjects in the data
 set, this can be computationally very expensive. To avoid extremely
 long run times we have implemented the following algorithm:
 
@@ -360,12 +365,15 @@ Step 1. We ignore the covariates and use a grid search method to find
  The approximation is equivalent to one step of the Newton-Raphson
  algorithm and reduces the number of calculations considerably. This
  approach was proposed by \citet{O'Sullivan_1988} for survival models
- and extended and studied by
- \citet{Joly_Commenges_Helmer_Letenneur_2002} in a multi-state model
+ and 
+ # extended and 
+studied by
+ \citet{Joly_Commenges_Helmer_Letenneur_2002} in an illness-death model
+ #  multi-state model
  with interval censored data.
   
 Step 2. We use the results of Step 1, i.e. the optimized value of
-  $(\kappa_{01}, \kappa_{02}, \kappa_{12}) to maximize the penalized
+  $(\kappa_{01}, \kappa_{02}, \kappa_{12})$ to maximize the penalized
   likelihood \eqref{eq:77} with covariates. The parameters being
   maximized are the regression coefficients and the coefficients of
   the linear combination of the M-splines defined below.
@@ -376,13 +384,18 @@ A family of M-spline functions of order $k$, $M_1,\ldots,M_n$ is
 defined by a set of $m$ knots where $n=m+k-2$ \citep{Ramsay_1988}. We
 consider only cubic M-splines of order $k=4$. Denote by
 $t_{01}=(t_{01,1},\dots,t_{01,m_{01}})$ a sequence of $m_{01}$ knots
-used for $\hat{\alpha}_{0,01}$, and by
+used for 
+ # $\hat{\alpha}_{0,01}$, 
+approximating $\alpha_{01}$ and by
 $t_{02}=(t_{02,1},\dots,t_{02,m_{02}})$ and
 $t_{12}=(t_{12,1},\dots,t_{12,m_{12}})$ similar sequences of knots for
-$\hat{\alpha}_{0,02}$ and $\hat{\alpha}_{0,12}$, respectively. We
+ # $\hat{\alpha}_{0,02}$ and $\hat{\alpha}_{0,12}$, 
+approximating $\alpha_{02}$ and $\alpha_{12}$ respectively. We
 denote by $M_{hl}^T=M_{hl,1},\ldots,M_{hl,n_{hl}}$ the families of
 $n_{hl}$ cubic M-splines, with $n_{hl}=m_{hl}+2$ and for $hl \in
-\{01,02,12\}$. The estimator $\hat{\alpha}_{hl}$ is approximated using
+\{01,02,12\}$. 
+ # The estimator $\hat{\alpha_{hl}$
+ The baseline intensity of transition $\alpha_{0,hl}$ is approximated using
 the following linear combination: $$ \tilde
 \alpha_{0,hl}(t)=\sum_{i=1}^{n_{hl}} (a_{hl,i})^2 M_{hl,i}(t) $$ where
 $a_{hl,i}$ are unkown parameters. The $n_{hl}$ M-splines are integrated in order to
@@ -400,7 +413,7 @@ $(a_{hl,i})^2$ ensures that $\tilde A_{0,hl}$ is monotone increasing.
 
 Confidence intervals of the regression parameters are obtained using
 estimated standard errors which are obtained by inverting the Hessian
-matrix of the log-likelihood.
+matrix of the penalized (PIERRE: penalized or not?) log-likelihood.
 # PIERRE: Here some details are to be filled in
 Confidence intervals for the transition intensities $\alpha_{hl}(t)$
 are obtained using the Bayesian approach proposed in
@@ -464,10 +477,10 @@ ${\alpha}_{hl}(.)$.
 
 | Case | Description                                           | $\delta_1$ | $\delta_2$ | L     | R     | T     | Remark                           |
 |------+-------------------------------------------------------+------------+------------+-------+-------+-------+----------------------------------|
-|    1 | Right censored, disease-free                     |          0 |          0 | $L_i$ | $L_i$ | $C_i$ | Requires $L_i\le C_i$            |
-|    2 | Interval censored ill time, right censored death time |          1 |          0 | $L_i$ | $R_i$ | $C_i$ | $L_i<R_i$; requires $R_i\le C_i$ |
-|    3 | Exact ill time, right censored death time             |          1 |          0 | $L_i$ | $L_i$ | $C_i$ | Requires $L_i\le C_i$            |
-|    4 | Interval censored ill time, death time observed       |          1 |          1 | $L_i$ | $R_i$ | $T_i$ | $L_i<R_i$; requires $R_i\le T_i$ |
+|    1 | Illness observed, right-censored death time           |          0 |          0 | $L_i$ | $L_i$ | $C_i$ | Requires $L_i\le C_i$            |
+|    2 | Interval-censored ill time, right-censored death time |          1 |          0 | $L_i$ | $R_i$ | $C_i$ | $L_i<R_i$; requires $R_i\le C_i$ |
+|    3 | Exact ill time, right-censored death time             |          1 |          0 | $L_i$ | $L_i$ | $C_i$ | Requires $L_i\le C_i$            |
+|    4 | Interval-censored ill time, death time observed       |          1 |          1 | $L_i$ | $R_i$ | $T_i$ | $L_i<R_i$; requires $R_i\le T_i$ |
 |    5 | Exact ill time, death time observed                   |          1 |          1 | $L_i$ | $L_i$ | $T_i$ | Requires $L_i\le T_i$            |
 |    6 | No illness observed, death time observed              |          0 |          1 | $L_i$ | $L_i$ | $T_i$ | Requires $L_i\le T_i$            |
 
@@ -479,11 +492,11 @@ this is not possible.
  - In case 1, if $L_i<C_i$ then it is assumed that the subject may
    become ill between $L_i$ and $C_i$. If $L_i=C_i$ it is assumed that
    the subject is disease-free at time $C_i$. In the latter case the
-   second part of the likelihood in equation EE equals zero.
+   integral of the likelihood equals zero.
  - In case 6, if  $L_i<T_i$ then it is assumed that the subject may
    become ill between $L_i$ and $T_i$. If $L_i=T_i$ it is assumed that
    the subject is disease-free at time $T_i$. In the latter case the
-   second part of the likelihood in equation OO equals zero. 
+   of the likelihood equals zero. 
  - In all cases, $L_i$ may be equal to the entry time. 
 
 ** Paquid study 
