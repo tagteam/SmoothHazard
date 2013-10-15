@@ -217,14 +217,27 @@ idm <- function(formula01,
             knots12 <- quantile(abstime,seq(0,1,1/(nknots12-1)))
         }
         else{## user specified knots
-            knots01 <- knots[[1]]
-            knots02 <- knots[[2]]
-            knots12 <- knots[[3]]
+            knots01 <- sort(knots[[1]])
+            knots02 <- sort(knots[[2]])
+            knots12 <- sort(knots[[3]])
             nknots01 <- length(knots01)
             nknots02 <- length(knots02)
             nknots12 <- length(knots12)
         }
     }
+    if (truncated){
+        if (min(knots01)>min(entrytime))
+            stop("The first knot for the 0->1 transition has to be before or at the smallest entrytime")
+        if (min(knots02)>min(entrytime))
+            stop("The first knot for the 0->2 transition has to be before or at the smallest entrytime")
+    } else{
+        if (min(knots01)>0)
+            stop("The first knot for the 0->1 transition has to be zero")
+        if (min(knots02)>0)
+            stop("The first knot for the 0->2 transition has to be zero")
+    } 
+    if (min(knots12)>min(Ltime))
+        stop("The first knot for the 1->2 transition has to be before or at the first time where someone may be in the ill-state.")
     ## print(knots01)
     ## print(knots02)
     ## print(knots12)
