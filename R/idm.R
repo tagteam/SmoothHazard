@@ -196,7 +196,6 @@ idm <- function(formula01,
         amax <- max(alltimes)
         amin <- 0
         }
-    amin12 <- min(Ltime[idm==1])
     
     if (knots=="equidistant"){
         nknots01 <- n.knots[1]
@@ -204,7 +203,7 @@ idm <- function(formula01,
         nknots12 <- n.knots[3]
         knots01 <- seq(amin,amax,(amax-amin)/(nknots01-1))
         knots02 <- seq(amin,amax,(amax-amin)/(nknots02-1))
-        knots12 <- seq(amin12,amax,(amax-amin12)/(nknots12-1))
+        knots12 <- seq(amin,amax,(amax-amin)/(nknots12-1))
     }
     else{
         if (knots=="quantiles"){
