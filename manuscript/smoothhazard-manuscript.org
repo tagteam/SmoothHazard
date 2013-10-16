@@ -329,7 +329,7 @@ $${\cal{L}}(\beta_{01},\beta_{02},\beta_{12},a_{01},a_{02},a_{12},b_{01},b_{02},
 Confidence intervals for the regression parameters are obtained using
 standard errors estimated by inverting the Hessian matrix of the
 log-likelihood, that is the matrix of the second partial derivatives
-of $\log{\cal L}$ given in the previous display. Confidence bands for
+of $\log{\cal L}$ given in the previous display. Pointwise confidence bands for
 the baseline transition intensities are obtained using a
 simulation-based approach explained below (section \ref{sec:CI}).
 
