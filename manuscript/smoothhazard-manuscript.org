@@ -239,8 +239,7 @@ e^{-{A}_{12}(t|Z_{12i})}}{e^{-{A}_{12}(s|Z_{12i})}}.$$
 We allow that the event times are left truncated, i.e., that subjects
 enter the study at the delayed entry time $E>0$. The left truncation
 condition $X(E_{i})=0$ implies that subject $i$ has survived in state
-0 until time $E_{i}$. This is taken into account by dividing the above
-likelihood contributions by the term ${S(E_{i}|Z_{01i},Z_{02i})}$.
+0 until time $E_{i}$.
 
 In addition to the covariate vectors $Z_{01i},Z_{02i},Z_{12i}$ we
 observe the vector $(E_i,L_i,R_i,\delta_{1i},\tilde T_i,\delta_{2i})$
@@ -256,14 +255,18 @@ have $\delta_{1i}=1$ and $L_i=R_i$. In the latter case we also denote
 $I_i$ for the transition time into the intermediate state.
 
 We now detail the likelihood contributions according to the different
-observational patterns shown in Figure \ref{fig:0}:
-
+observational patterns shown in Figure \ref{fig:0} in the special
+case where there is no left truncation i.e. $E_i=0$.
+Left-truncated event times are taken into account by simply dividing 
+the above
+likelihood contributions by the term ${S(E_{i}|Z_{01i},Z_{02i})}$.
 # distinguishing if subject $i$ has been observed
 # in state 1 (diseased) or not.
 # - If subject $i$ has first been observed diseased at time $R_i$ and
 # has last been seen disease-free at time $L_i$ ($L_i<R_i$), disease
 # time is interval-censored between $L_i$ and $R_i$. The likelihood
 # contribution for subject $i$ is:
+ #  {S(E_{i}|Z_{01i},Z_{02i})}
  #+BEGIN_LaTeX
 \begin{equation}\label{eq:1}
  \begin{split}
