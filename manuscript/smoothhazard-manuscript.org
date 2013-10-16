@@ -85,7 +85,7 @@ the 6 cases that are displayed in Figure \ref{fig:0}.
    time L, disease status at T unknown
 
                +---+
- E-------------| L |--------------> T
+  E-------------| L |--------------> T
                +---+
 #+END_SRC
 
@@ -142,7 +142,7 @@ packages listed above.
 Indeed, the approach to handle subjects who died with unknown disease 
 status, consists in artificially ending their follow-up 
 at the last time they were seen without disease and subsequently 
-treat them as right-censored. 
+treat them as right censored. 
  # For example, one can artificially end the follow-up for subjects who died with
  # unknown disease status at the last time they were seen without disease
  # and subsequently treat them as right-censored. 
@@ -219,7 +219,7 @@ regression parameters for transition $h \rightarrow l$.
 
 In the situation where the time to disease and the time to death are
 not interval censored but either observed exactly or right censored,
-the regression coefficients can be estimated by the partial likelihood
+the regression coefficients could be estimated by the partial likelihood
 method without the need to specify and estimate the baseline hazard
 functions $\alpha_{0,hl}(t)$. For interval-censored transition times
 to the intermediate state, the situation is more complex. It turns out
@@ -314,7 +314,7 @@ preserving its fast convergence property.
 In the default estimation method of function \code{idm}, a Weibull
 parametrization for the baseline transition intensities is assumed: $$
 \alpha_{0,hl}(t)= a_{hl} ~ b_{hl}^{a_{hl}} ~ t^{a_{hl}-1}; ~~~ hl \in
-\{01,02,12\}.$$ where $a_{hl}$ and $b_{hl}$ are shape and scale
+\{01,02,12\}.$$ where $a_{hl}$ and $\frac{1}{b_{hl}}$ are shape and scale
 parameters.  The Weibull parameters estimates $\hat{a}_{hl}$ and $\hat{b}_{hl}$ and the
 vectors of regression parameters estimates $\hat \beta_{hl}$ are obtained
 simultaneously by maximizing the likelihood which is the product over the
@@ -336,9 +336,9 @@ simulation-based approach explained below (section \ref{sec:CI}).
 In situations where it is suspected that the Weibull distribution does
 not fit the data very well one can think of extending the model and to
 leave the baseline intensity functions completely unspecified, as in
-the Cox regression model. Unfortunately, in interval censored data
+the Cox regression model. Unfortunately, in interval-censored data
 there is no direct analogue to the partial likelihood and the Breslow
-estimator of the Cox model in right censored data. 
+estimator of the Cox model in right-censored data. 
 # To approximate the likelihood simulateously for the regression coefficients and the baseline intensities, t
 The function \code{idm} implements a
 semi-parametric model where the three baseline transition intensities
@@ -447,7 +447,7 @@ interpretation.
 For example, given a set of covariates $Z_{01,i},Z_{02,i},Z_{12,i}$
 for a subject $i$ who is diseased at time $s$, one could be interested
 in probability to be still alive at some time $t>s$, or in life
-expectancy; given a set of covariates $Z_{01,j},Z_{02,j},Z_{12,j}$ for
+expectancy. Given a set of covariates $Z_{01,j},Z_{02,j},Z_{12,j}$ for
 a subject $j$ who is diseased-free at time $s$, one could be
 interested in lifetime risk of disease or in healthy life expectancy
 (expected remaining sojourn time in the healthy state). 
@@ -477,7 +477,7 @@ $\theta$ contains the Weibull parameters in the parametric model,
 the spline parameters in the semi-parametric model
 and the regression parameters in both models. 
 
-We assume the asymptotic normality for the estimator $\hat{\theta}$.
+We assume the asymptotic normality for the estimator $\hat{\theta}$
 and denote by $\hat{V}_{\hat{\theta}}$ the estimated covariance matrix
 of $\hat{\theta}$. We consider a multivariate normal distribution with
 the parameters estimates as expectation and $\hat{V}_{\hat{\theta}}$
@@ -540,7 +540,7 @@ this is not possible.
  - In case 6, if  $L_i<T_i$ then it is assumed that the subject may
    become ill between $L_i$ and $T_i$. If $L_i=T_i$ it is assumed that
    the subject is disease-free at time $T_i$. In the latter case the
-   of the likelihood equals zero. 
+   integral of the likelihood equals zero. 
  
 ** Paquid study 
 In order to illustrate the functionality of the package we provide a
@@ -580,7 +580,6 @@ less than SRC_R{n.died.notdiagnosed} should have been dead without dementia
 #+begin_latex
 \begin{center}
 \begin{figure}
-\label{fig:2}
 \centering
 \begin{tikzpicture}[scale=1]
 \node[draw] (nd) at (0,0) {dementia free};
@@ -590,7 +589,8 @@ less than SRC_R{n.died.notdiagnosed} should have been dead without dementia
 \draw[->,>=latex] (nd) -- (dcd) node[auto=right,pos=0.5]{$\leq 597$};
 \draw[->,>=latex] (d) -- (dcd) node[auto=left,pos=0.5]{$\geq 127$};
 \end{tikzpicture}
-\caption{The exact number of transitions in the illness-death model with interval-censored time to disease is unknown.}
+\caption{The exact number of transitions in the illness-death model with interval-censored time to disease is unknown: example of the \code{Paq1000} data set.}
+\label{fig:2}
 \end{figure}
 \end{center}
 #+end_latex
@@ -690,14 +690,14 @@ argument the covariates on the $1 \rightarrow 2$ transition are the same as
 the ones specified in the  \code{formula02} argument.
 
 #+BEGIN_SRC R :exports both :results output :cache yes
- fit.weib <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=e)~certif+gender,
+fit.weib <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=e)~certif+gender,
                 formula02=Hist(time=t,event=death,entry=e)~gender,
                 formula12= ~ 1,
                 data=Paq1000)
 fit.weib
 #+END_SRC
 
-#+RESULTS[ab59f5681cb7209c4702f73272b46bc82e9c5e1a]:
+#+RESULTS[533b8033ecebe360826bcd8031f9ecfc5e82d599]:
 #+begin_example
 Call:
 idm(formula01 = Hist(time = list(l, r), event = dementia, entry = e) ~ 
@@ -736,15 +736,23 @@ The hazard ratios HR ($\mathrm{e}^{\text{coef}}$) have the usual interpretation,
 as in a parametric Cox regression model.
 
 The three baseline transition intensity functions can be displayed as
-functions of time, functions of age in our illustrative example (Figure 3).
+functions of time, functions of age in our illustrative example 
+(Figure \ref{fig:alpha_weib}).
 #+source: paq-fit-weib
-#+BEGIN_SRC R :exports both :results graphics :file "transition-intensities-paq-weib.pdf" :cache yes
+ # #+BEGIN_SRC R :exports both :results graphics :file "transition-intensities-paq-weib.pdf" :cache yes
+#+BEGIN_SRC R :exports code :results graphics :file "transition-intensities-paq-weib.pdf" :cache yes
 par(mgp=c(4,1,0),mar=c(5,5,5,5))
 plot(fit.weib,conf.int=TRUE,lwd=3,citype="shadow",xlim=c(65,100), axis2.las=2,axis1.at=seq(65,100,5),xlab="Age (years)")
 #+END_SRC
 
-#+RESULTS[<2013-10-14 14:30:01> 59d47fe4ea303c6431aca8cab00739b8525a98dc]:
+#+RESULTS[59d47fe4ea303c6431aca8cab00739b8525a98dc]:
 [[file:transition-intensities-paq-weib.pdf]]
+
+#+ATTR_LaTeX: :width 0.7\textwidth
+#+LABEL: fig:alpha_weib
+#+CAPTION: Baseline transition intensities estimated using the Weibull parametrization of the parametric approach
+#+results: paq-fit-weib
+file:transition-intensities-paq-weib.pdf
 
 \bigskip
 
@@ -803,16 +811,24 @@ convergence criteria: parameters= 4e-09
 #+end_example
 
 Again, the estimated baseline transition intensities can conveniently
-be visualized in a joint graph (Figure 4).
+be visualized in a joint graph (Figure \ref{fig:alpha_splines}).
 
 #+source: paq-fit-splines
-#+BEGIN_SRC R :exports both  :results graphics :file "transition-intensities-paq-splines.pdf"
+ # #+BEGIN_SRC R :exports both  :results graphics :file "transition-intensities-paq-splines.pdf"
+#+BEGIN_SRC R :exports code  :results graphics :file "transition-intensities-paq-splines.pdf"
 par(mgp=c(4,1,0),mar=c(5,5,5,5))
 plot(fit.splines,conf.int=TRUE,lwd=3,citype="shadow",xlim=c(65,100), axis2.las=2,axis1.at=seq(65,100,5),xlab="Age (years)")
 #+END_SRC
 
 #+RESULTS[<2013-10-14 14:32:25> 24af9890d284b46581ef5b3cfeb99315bcaa0617]:
 [[file:transition-intensities-paq-splines.pdf]]
+
+#+ATTR_LaTeX: :width 0.7\textwidth
+#+LABEL: fig:alpha_splines
+#+CAPTION: Baseline transition intensities estimated using the splines approximation of the semi-parametric approach
+#+results: paq-fit-splines
+file:transition-intensities-paq-splines.pdf
+
 
 *** Semi-parametric estimation method: choice of smoothing parameters
 
@@ -876,7 +892,7 @@ transition intensities are plotted.
  # This can be done with the \code{plot} function. 
 If the curves seem too smooth, it may be useful
 to reduce the smoothing parameter. Similarly, if the curves
-are to wiggly, the smoothing parameter may be increased.
+are too wiggly, the smoothing parameter may be increased.
 
 ** Making predictions
  # The function \code{idm} returns an ``idmWeib'' or ``idmSplines'' class
