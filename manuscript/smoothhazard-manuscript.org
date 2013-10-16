@@ -84,9 +84,9 @@ the 6 cases that are displayed in Figure \ref{fig:0}.
 6. Died, not diseased until
    time L, disease status at T unknown
 
-               +---+
+                +---+
   E-------------| L |--------------> T
-               +---+
+                +---+
 #+END_SRC
 
 #+RESULTS[<2013-10-15 09:55:37> 3b363a1bfc01f6326adbe7464ef4e1c1285ca72e]:
