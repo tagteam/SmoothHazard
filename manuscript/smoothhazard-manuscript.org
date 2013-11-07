@@ -1008,6 +1008,11 @@ Finally, to
 avoid numerical problem in the predictions calculations, the first and
 last knots  for all transitions must be the same or very close.
 
+#+begin_src latex
+\section*{Acknowledgments}
+This work was supported by the grant 2010 PRSP 006 01 from the \textit{Agence Nationale de la Recherche} 
+for the MOBIDYQ project and by the \textit{Région Aquitaine}.
+#+end_src
 
 \bibliography{smoothhazard}
 * COMMENT Latex header
