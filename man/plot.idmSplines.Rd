@@ -31,7 +31,6 @@
 
 
 \dontrun{
-# illness deaths model  ***/
 data(Paq1000)
 
 fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,

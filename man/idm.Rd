@@ -12,7 +12,7 @@ State 0 corresponds to the initial state, state 1 to the transient one, state 2 
 \usage{
 idm(formula01, formula02, formula12, data, maxiter=200, eps=c(5,5,3), 
 n.knots=c(7,7,7), knots, CV=FALSE,kappa = c(1000000,500000,20000),
-intensities="Weib", conf_bands=TRUE, print.iter=FALSE, subset=NULL, na.action=na.omit)
+intensities="Weib", conf.bands=TRUE, print.iter=FALSE, subset=NULL, na.action=na.omit)
 }
 
 \arguments{
