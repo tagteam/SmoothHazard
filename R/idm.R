@@ -147,7 +147,7 @@ idm <- function(formula01,
                      basepar=as.double(rep(0,6)),
                      regpar=as.double(rep(0,size1)),
                      v=as.double(rep(0,size2)),
-                     converged=as.integer(0),
+                     converged=as.integer(rep(0,2)),
                      cv=as.double(rep(0,3)),
                      niter=as.integer(0),
                      t=as.double(rep(0,99)),
@@ -186,7 +186,7 @@ idm <- function(formula01,
     ## a12_u|upper confidence band for a12|length 100|double|
 }else{
     #  	cat("------ Program Splines ------ \n")
-    browser()
+ 
     if (length(entrytime)>0){
         alltimes <- sort(unique(c(Ltime, Rtime,entrytime,abstime)))
 
@@ -249,6 +249,7 @@ idm <- function(formula01,
     size1 <- NC01 + NC02 + NC12
     size_V <- size1 + nknots01+nknots02+nknots12 + 6
     size2 <- size1**2
+    browser()
     ffit <- .Fortran("idmPl",
                      ## input
                      as.double(entrytime),               #entrytime=
@@ -272,7 +273,7 @@ idm <- function(formula01,
                      loglik=as.double(rep(0,2)),
                      regpar=as.double(rep(0,size1)),
                      v=as.double(rep(0,size2)),
-                     converged=as.integer(0),
+                     converged=as.integer(rep(0,2)),
                      cv=as.double(rep(0,3)),
                      niter=as.integer(0),
                      t=as.double(matrix(0,nrow=99,ncol=3)),
@@ -305,16 +306,29 @@ idm <- function(formula01,
                      package="SmoothHazard")
 }
 
-  if (ffit$converged == 4){
+  if (ffit$converged[1] == 4){
       warning("Problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
   }
 
-  if (ffit$converged == 2){
+  if (ffit$converged[1] == 2){
     warning("Model did not converge. You could change the 'maxit' parameter")
   }
 
-  if (ffit$converged == 3){
+  if (ffit$converged[1] == 3){
     warning("Fisher information matrix non-positive definite.")
+  }
+  if (ffit$converged[2] != 0){
+    if (ffit$converged[2] == 4){
+      warning("With covariates, problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
+    }
+
+    if (ffit$converged[2] == 2){
+    warning("With covariates, model did not converge. You could change the 'maxit' parameter")
+  }
+
+    if (ffit$converged[2] == 3){
+      warning("With covariates, Fisher information matrix non-positive definite.")
+    }
   }
 
   fit <- NULL

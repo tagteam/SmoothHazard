@@ -25,7 +25,8 @@
         integer,intent(in)::truncated,maxiter0
         integer,dimension(3),intent(in)::eps
 !  variables sortant
-        integer,intent(out)::converged,niter
+        integer,dimension(2),intent(out)::converged
+        integer,intent(out)::niter
 ! istop 
         double precision,dimension(p01+p02+p12),intent(out)::regpar
         double precision,dimension(99),intent(out)::t,a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u
@@ -178,8 +179,16 @@
         np = npw
         
         call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,idmLikelihood)
-        if (istop.ne.1) goto 1000
-
+       
+        if (istop.ne.1)then
+        b(1) = 1.d0
+        b(2) = dsqrt(dble(som_idm)/ts)
+        b(3) = 1.d0
+        b(4) = dsqrt(dble(som_idd)/ts)  
+        b(5) = 1.d0     
+        b(6) = b(4)
+        endif
+        converged(1) = istop
         loglik(1) = res
 !            write(*,*)'niter1',niter,res
 
@@ -197,8 +206,9 @@
 
                 call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,idmLikelihood)
                 loglik(2) = res
+                converged(2)=istop
                 if (istop.ne.1) goto 1000
-                
+
                 do i=npw+1,np
                         regpar(i-npw) = b(i)
                 end do        
@@ -382,7 +392,7 @@
 		end if
 
 1000    continue
-        converged = istop
+        
         deallocate(t0,t1,t2,t3,ve01,ve02,ve12,c)
 
         end subroutine idmWeib
