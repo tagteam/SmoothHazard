@@ -63,7 +63,8 @@
         double precision,dimension(p01+p02+p12),intent(out)::regpar
         double precision,dimension((p01+p02+p12)*(p01+p02+p12)),intent(out)::v
         double precision,dimension(2),intent(out)::loglik       
-        integer,intent(out)::converged,niter
+        integer,dimension(2),intent(out)::converged
+        integer,intent(out)::niter
         double precision,dimension(99,3),intent(out)::t
         double precision,dimension(99),intent(out)::a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u
         double precision,external::idmPlLikelihood
@@ -457,6 +458,8 @@
         allocate(hessienne(np,np))
 !       write(*,*) '====> marquardt sans variable expli'
         call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,idmPlLikelihood)
+        converged(1) = istop
+
 !       write(*,*) 'apres marquardt'
         
 
@@ -465,8 +468,11 @@
 
 
         if (istop.ne.1) then
-                deallocate(hessienne)
-                goto 1000
+!           deallocate(hessienne)
+           do i=1,np
+              b(i)=5.d-1
+           end do
+           ! goto 1000
         end if
 
         loglik(1)=res
@@ -516,13 +522,12 @@
 
                 call marq98(b,npar,niter,v1,res,ier,istop,ca,cb,dd,idmPlLikelihood)
                 ind_hess=0
-!               write(*,*) '====> '
-! Modif CT 4juillet2012
+                converged(2)=istop
                 if (istop.ne.1) then
                         deallocate(hessienne)
                         goto 1000
                 end if
-! Fin modif CT 4juillet2012
+
                 
 !               write(*,*)'log-vrais',res,' nb iter ',niter
                 loglik(2) = res
@@ -618,7 +623,7 @@
         kappa=k0
 
 1000    continue        
-        converged = istop
+       
         deallocate(b,hes,v1)
         deallocate(t0,t1,t2,t3,t4,c,zi01,zi12,zi02,omeg01,omeg12,omeg02,&
         mm3a,mm2a,mm1a,mma,im3a,im2a,im1a,ima,mm3b,mm2b,mm1b,mmb,im3b,im2b,im1b,&

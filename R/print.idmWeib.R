@@ -55,12 +55,13 @@ print.idmWeib <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 
               }
         if( (sum(x$NC)>0)&(x$converged[1]==1)&(x$converged[2]!=1) ){
-          cat("The model did converge without covariates but did not converge with covariates","\n")
+          warning("The model did converge without covariates but did not converge with covariates","\n")
           switch(as.character(x$converged[2]),
 		"2"={ warning("Maximum number of iterations reached.",call.=FALSE)},
 		"3"={ warning("Model did not converge.",call.=FALSE)})
           cat("Log-likelihood without covariates: ",x$loglik[1], "\n")
         }
+        
         if( (sum(x$NC)>0)&(x$converged[1]!=1)&(x$converged[2]==1) ){
           cat("The model did converge with covariates but did not converge without covariates","\n")
           switch(as.character(x$converged[1]),
@@ -110,10 +111,10 @@ print.idmWeib <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
 
         }
         if( ((x$converged[1]!=1)&(x$converged[2]!=1)) ){
-          cat("The model did not converge.","\n")
-		switch(as.character(x$converged[1]),
-		"2"={ warning("Maximum number of iterations reached.",call.=FALSE)},
-		"3"={ warning("Model did not converge.",call.=FALSE)})	
+          warning("The model did not converge.","\n")
+          switch(as.character(x$converged[1]),
+                 "2"={ warning("Maximum number of iterations reached.",call.=FALSE)},
+                 "3"={ warning("Fisher information matrix non-positive definite.",call.=FALSE)})	
         }
 
 }
