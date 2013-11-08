@@ -249,7 +249,7 @@ idm <- function(formula01,
     size1 <- NC01 + NC02 + NC12
     size_V <- size1 + nknots01+nknots02+nknots12 + 6
     size2 <- size1**2
-    browser()
+
     ffit <- .Fortran("idmPl",
                      ## input
                      as.double(entrytime),               #entrytime=
