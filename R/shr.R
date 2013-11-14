@@ -123,7 +123,7 @@ shr <- function(formula,
                      basepar=as.double(rep(0.1,2)),
                      regpar=as.double(rep(0.1,NC)),
                      v=as.double(rep(0,NC*NC)),
-                     converged=as.integer(0),
+                     converged=as.integer(rep(0,2)),
                      cv=as.double(rep(0,3)),
                      niter=as.integer(0),
                      t=as.double(rep(0,100)),
@@ -156,7 +156,7 @@ shr <- function(formula,
                      loglik=as.double(rep(0,2)),
                      regpar=as.double(rep(0.1,NC)),
                      v=as.double(rep(0,NC*NC)),
-                     converged=as.integer(0),
+                     converged=as.integer(rep(0,2)),
                      cv=as.double(rep(0,3)),
                      niter=as.integer(0),
                      t=as.double(rep(0,99)),
@@ -197,18 +197,31 @@ shr <- function(formula,
   ## h_l 	lower confidence band for h function 	length 100 	double 	
   ## h_u 	upper confidence band for h 	length 100 	double 	
   
-  if (ffit$converged == 4){
+  if (ffit$converged[1] == 4){
     warning("Problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
   }
 	
-  if (ffit$converged == 2){
+  if (ffit$converged[1] == 2){
     warning("Model did not converge. Change the 'maxit' parameter")
   }
 
-  if (ffit$converged == 3){
-    warning("Matrix non-positive definite.")
+  if (ffit$converged[1] == 3){
+    warning("Fisher information matrix non-positive definite.")
   }
+  if (ffit$converged[2] != 0){
+     if (ffit$converged[2] == 4){
+      warning("With covariates, problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
+    }
 
+    if (ffit$converged[2] == 2){
+      warning("With covariates, model did not converge. You could change the 'maxit' parameter")
+    }
+
+    if (ffit$converged[2] == 3){
+      warning("With covariates, Fisher information matrix non-positive definite.")
+    }
+  }
+  
   if(hazard=="Weib") weibullParameter <- ffit$basepar
 
   # }}}

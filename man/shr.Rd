@@ -11,7 +11,7 @@ Left-truncated, right-censored, and interval-censored data are allowed.
 \usage{
 shr(formula, data, eps = c(5, 5, 3), nknots=7,
 CV=FALSE , kappa = 10000, maxiter = 200, hazard = "Weib",
-conf_bands=TRUE, print.iter = FALSE, na.action = na.omit)
+conf.bands=TRUE, print.iter = FALSE, na.action = na.omit)
 }
 
 \arguments{

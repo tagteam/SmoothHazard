@@ -21,7 +21,8 @@
         integer,intent(in)::truncated,interval,maxiter0
         integer,dimension(3),intent(in)::eps
 !  variables sortant
-        integer,intent(out)::converged,niter
+        integer,dimension(2),intent(out)::converged
+        integer,intent(out)::niter
 ! istop 
         double precision,dimension(p),intent(out)::regpar
         double precision,dimension(100),intent(out)::t,S,S_l,S_u,h,h_l,h_u       
@@ -196,9 +197,12 @@
         nva=0
         call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,survLikelihood)
         
-        if (istop.ne.1) goto 1000
+        if (istop.ne.1)then ! goto 1000
+           b(1) = 1.d0
+           b(2) = dsqrt(som/ts)
+        endif
+        converged(1) = istop
         loglik(1) = res
-
         
         if(noVar.ne.1) then
                 nva=p
@@ -213,13 +217,14 @@
                 niter=0
 !               write(*,*)'second call of marquardt '
                 call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,survLikelihood)
-                
+                loglik(2) = res
+                converged(2)=istop
                 if (istop.ne.1) goto 1000
 !c           write(*,*)'niter2',niter
                 do i=npw+1,np
                         regpar(i-npw) = b(i)
                 end do 
-                loglik(2) = res
+                
         else
                 regpar=0.d0
                 loglik(2) = 0.d0
@@ -435,7 +440,7 @@
 	end if
 
 1000    continue
-        converged = istop
+!        converged = istop
         deallocate(t0,t1,t2,ve,c)
 
         end subroutine survWeib

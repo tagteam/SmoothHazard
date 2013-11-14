@@ -47,7 +47,8 @@
         double precision,dimension(nva),intent(out)::regpar
         double precision,dimension(nva*nva),intent(out)::v
         double precision,dimension(2),intent(out)::loglik       
-        integer,intent(out)::converged,niter
+        integer,dimension(2),intent(out)::converged
+        integer,intent(out)::niter
 ! istop
         double precision,dimension(99),intent(out)::t,S,S_l,S_u,h,h_l,h_u
         double precision,external::survPlLikelihood
@@ -272,13 +273,17 @@
         CVcrit = crit/dble(no)
 
         allocate(v1(np*(np+3)/2))
-
-!       write(*,*)'avant marq98',np,k0Surv      
+     
         call marq98(b,np,niter,v1,res,ier,istop,ca,cb,dd,survPlLikelihood)
-!       write(*,*)'apres marq98',niter,res,istop
-        if (istop.ne.1) goto 1000
+        converged(1) = istop
+
+        if (istop.ne.1)then 
+           do i=1,np
+              b(i)=5.d-1
+           end do
+        endif
         loglik(1)=res
-!       write(*,*)'loglik',loglik(1)
+
 
         if(noVar .ne. 1)then
 !               write(*,*)' '
@@ -297,21 +302,17 @@
                 end do  
 
                 call marq98(b,npar,niter,v1,res,ier,istop,ca,cb,dd,survPlLikelihood)
-                if (istop.ne.1) goto 1000
-                
-!               write(*,*)'log-vrais',res,' nb iter ',niter
+                converged(2) = istop
                 loglik(2) = res
-                
-   
+                if (istop.ne.1) goto 1000
+               
+!               write(*,*)'log-vrais',res,' nb iter ',niter
 
                 do i=1,nva
                         ii = npar-nva+i
                         regpar(i)=b(ii)
                 end do 
 
-
-
-                
         
 !               write(*,*)' '
 !               write(*,*)nomfichregr,' fichier variables explicatives'
