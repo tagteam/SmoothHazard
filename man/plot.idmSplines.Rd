@@ -4,7 +4,8 @@
 \title{Plot method for an illness-death model using a penalized likelihood approach.}
 
 \description{
-  Plot estimated baseline transition intensities from a \code{idmSplines} class object. Confidence bands are allowed. 
+  Plot estimated baseline transition intensities from a
+  \code{idmSplines} class object. Pointwise confidence intervals are available. 
 }
 
 \usage{

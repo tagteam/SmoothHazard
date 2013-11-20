@@ -5,7 +5,8 @@
 Plot method for a survival model.
 }
 \description{
-  Plot estimated baseline survival function from an object of class \code{shr}. Confidence bands are allowed. 
+  Plot estimated baseline survival function from an object of class
+  \code{shr}. Pointwise confidence limits are available. 
 }
 \usage{
 
@@ -73,10 +74,10 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 data(test)
 fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test) 
 
-# confidence bands
+# pointwise confidence limits
 plot(fit.su)
 
-# no confidence bands
+# no pointwise confidence limits
 plot(fit.su,confint=FALSE)
 
 }

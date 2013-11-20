@@ -5,7 +5,8 @@
 Plot method for an illness-death model.
 }
 \description{
-  Plot estimated baseline transition intensities from an object of class \code{idmWeib} or \code{idmPl}. Confidence bands are allowed. 
+  Plot estimated baseline transition intensities from an object of class
+  \code{idmWeib} or \code{idmPl}. Pointwise confidence intervals are available. 
 }
 \usage{
 
@@ -16,7 +17,8 @@ transition, ...)
 \arguments{
   \item{x}{a \code{idmWeib} class object or a \code{idmSplines} class object (output from calling \code{\link{idm}}
     function).}
-  \item{conf.int}{logical value. Determines whether confidence bands will be plotted. The default is FALSE.}
+  \item{conf.int}{logical value. Determines whether pointwise confidence
+    intervals will be plotted. The default is FALSE.}
   \item{ylim}{vector containing the y limites (min, max) of the plot. The default is the min and the max of all the values of the three transition intensities}  
   \item{transition}{a vector of the transitions to plotted on separate graphs. Possible value are "01","02" and "12". The default is a plot of the 3 intensities on the same graph.}  
   \item{\dots}{other graphical parameters.}
@@ -41,10 +43,10 @@ data(Paq1000)
 fit.weib <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000) 
 
-# no confidence bands
+# no pointwise confidence intervals
 plot(fit.weib)
 
-# confidence bands for transition 0 --> 1
+# pointwise confidence intervals for transition 0 --> 1
 plot(fit.weib,conf.int=TRUE,transition="01")
 }
 }

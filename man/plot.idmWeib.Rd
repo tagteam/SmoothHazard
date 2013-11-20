@@ -6,7 +6,8 @@
 \title{Plot method for an illness-death model using a Weibull approach.}
 
 \description{
-  Plot estimated baseline transition intensities from an object of class \code{idmWeib}. Confidence bands are allowed. 
+  Plot estimated baseline transition intensities from an object of class
+  \code{idmWeib}. Confidence limits are available. 
 }
 
 \usage{
@@ -38,9 +39,10 @@ data(Paq1000)
 fit.weib <- idm(formula02=Hist(time=t,event=death,entry=e)~1,
 formula01=Hist(time=list(l,r),event=dementia)~1,data=Paq1000)
 
+# no pointwise confidence intervals
 plot(fit.weib)
  
-} 
+}
 
 }
 

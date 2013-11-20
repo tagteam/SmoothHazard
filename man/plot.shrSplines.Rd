@@ -6,7 +6,8 @@
 \title{Plot method for a survival model using a penalized likelihood approach.}
 
 \description{
-  Plot estimated baseline survival function from an object of class \code{shrSplines}. Confidence bands are allowed. 
+  Plot estimated baseline survival function from an object of class
+  \code{shrSplines}. Pointwise confidence limits are available. 
 }
 
 \usage{
@@ -36,10 +37,10 @@
 data(test)
 fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test,hazard="Splines") 
 
-# no confidence bands
+# no pointwise confidence limits
 plot(fit.su,conf.int=FALSE)
 
-# confidence bands
+# pointwise confidence limits
 plot(fit.su)
  
 } 

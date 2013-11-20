@@ -4,7 +4,7 @@ shr <- function(formula,
                  nknots=7,
                  CV=FALSE,
                  kappa=10000,
-                 conf.bands=TRUE,
+                 conf.int=TRUE,
                  maxiter=200,
                  hazard="Weib",
                  print.iter=FALSE,
@@ -133,7 +133,7 @@ shr <- function(formula,
                      h=as.double(rep(0,100)),
                      h_l=as.double(rep(0,100)),
                      h_u=as.double(rep(0,100)),
-		     as.integer(conf.bands),
+		     as.integer(conf.int),
                      as.integer(print.iter),
                      V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                      package="SmoothHazard")
@@ -170,7 +170,7 @@ shr <- function(formula,
                      as.integer(CV),
                      as.double(kappa),
                      kappa=as.double(0),
-                     as.integer(conf.bands),
+                     as.integer(conf.int),
                      CVcrit=as.double(0),
                      mdf=as.double(0),
                      ti=as.double(rep(0,(nknots+6))),
@@ -191,11 +191,11 @@ shr <- function(formula,
   ## converged 	0=converged,1=invert fails,2=no 	length 1 	integer 	
   ## t 	time to plot S(t) and h(t) 	length 100 	double 	
   ## S 	survival function 	length 100 	double 	
-  ## S_l 	lower confidence band for S 	length 100 	double 	
-  ## S_u 	Upper confidence band for S 	length 100 	double 	
+  ## S_l 	lower confidence limit for S 	length 100 	double 	
+  ## S_u 	Upper confidence limit for S 	length 100 	double 	
   ## h 	hazard function 	length 100 	double 	
-  ## h_l 	lower confidence band for h function 	length 100 	double 	
-  ## h_u 	upper confidence band for h 	length 100 	double 	
+  ## h_l 	lower confidence limit for h function 	length 100 	double 	
+  ## h_u 	upper confidence limit for h 	length 100 	double 	
   
   if (ffit$converged[1] == 4){
     warning("Problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    

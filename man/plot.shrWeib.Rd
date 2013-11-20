@@ -6,7 +6,8 @@
 \title{Plot Method for survival using a parametrical approach.}
 
 \description{
-  Plot estimated survival hazard function, more generally of a class `shrWeib' object. Confidence bands are allowed. 
+  Plot estimated survival hazard function, more generally of a class
+  `shrWeib' object. Pointwise confidence limits are available.
 }
 
 \usage{
@@ -37,10 +38,10 @@
 data(test)
 fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test) 
 
-# no confidence bands
+# no pointwise confidence limits
 plot(fit.su,conf.int=FALSE)
 
-# confidence bands
+# pointwise confidence limits
 plot(fit.su)
  
 } 

@@ -23,7 +23,7 @@ Predictions for an illness-death model using the Weibull approach.
 }
 
 \value{
-     a list containing the following predictions with confidence bands:
+     a list containing the following predictions with pointwise confidence intervals:
    \item{p00}{the transition probability \eqn{p_{00}}.}
    \item{p01}{the transition probability \eqn{p_{01}}.}
    \item{p11}{the transition probability \eqn{p_{11}}.}

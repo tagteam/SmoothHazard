@@ -12,7 +12,7 @@ State 0 corresponds to the initial state, state 1 to the transient one, state 2 
 \usage{
 idm(formula01, formula02, formula12, data, maxiter=200, eps=c(5,5,3), 
 n.knots=c(7,7,7), knots, CV=FALSE,kappa = c(1000000,500000,20000),
-intensities="Weib", conf.bands=TRUE, print.iter=FALSE, subset=NULL, na.action=na.omit)
+intensities="Weib", conf.int=TRUE, print.iter=FALSE, subset=NULL, na.action=na.omit)
 }
 
 \arguments{
@@ -68,8 +68,8 @@ a vector of length 3.  If CV=FALSE, smoothing parameters for the transition 0 --
   \item{intensities}{
 type of estimation method: "Splines" for a penalized likelihood approach with approximation of the transition intensities by M-splines, "Weib" for a parametric approach with a Weibull distribution on the transition intensities. Default is "Weib".
 }
-  \item{conf.bands}{
-Boolean parameter. Equals to \code{TRUE} to calculate confidence bands for the transition intensities curves, \code{FALSE} otherwise. Default is \code{TRUE}.
+  \item{conf.int}{
+Boolean parameter. Equals to \code{TRUE} to calculate pointwise confidence intervals for the transition intensities curves, \code{FALSE} otherwise. Default is \code{TRUE}.
 }
   \item{print.iter}{
 boolean parameter. Equals to \code{TRUE} to print the likelihood during the iteration process, \code{FALSE} otherwise. Default is \code{FALSE}. This option is not running on Windows.

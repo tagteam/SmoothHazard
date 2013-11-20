@@ -1,4 +1,8 @@
-idmModel <- function(scale=1/100,cens="interval",K=5,schedule=1/scale,punctuality=10*scale){
+idmModel <- function(scale=1/100,
+                     cens="interval",
+                     K=5,
+                     schedule=1/scale,
+                     punctuality=10*scale){
     require(lava)
     ## ===============================================
     ## illness-death-model
@@ -29,7 +33,17 @@ idmModel <- function(scale=1/100,cens="interval",K=5,schedule=1/scale,punctualit
     attr(idm,"cens") <- cens
     idm
 }
-sim.idmModel <- function(x,n=100,compliance=1,p=NULL,normal=FALSE,cond=FALSE,sigma = 1, rho=0.5,X,unlink=FALSE,...){
+sim.idmModel <- function(x,
+                         n=100,
+                         compliance=1,
+                         p=NULL,
+                         normal=FALSE,
+                         cond=FALSE,
+                         sigma = 1,
+                         rho=0.5,
+                         X,
+                         unlink=FALSE,
+                         ...){
     # simulate latent data
     class(x) <- "lvm"
     dat <- sim(x,n=n,...)
@@ -39,14 +53,11 @@ sim.idmModel <- function(x,n=100,compliance=1,p=NULL,normal=FALSE,cond=FALSE,sig
     # reset illtime for subjects that were never ill 
     dat$illtime[!ill] <- dat$lifetime[!ill]
     cens <- attr(x,"cens")
-    ## if (cens=="right"){
-    # right censoring
-    ## } else
     if (cens=="interval") {
         ipos <- grep("inspection[0-9]+",names(dat))
         interval <- do.call("rbind",lapply(1:n,function(i){
             ## cumulate times between inspections
-            itimes <- cumsum(c(0,pmax(0,dat[i,ipos,drop=TRUE])))
+            itimes <- unique(cumsum(c(0,pmax(0,dat[i,ipos,drop=TRUE]))))
             itimes <- c(itimes[itimes<dat$lifetime[i]],dat[i,"lifetime"])
             if (compliance!=1){
                 comp <- rbinom(length(itimes),1,compliance)
@@ -62,9 +73,9 @@ sim.idmModel <- function(x,n=100,compliance=1,p=NULL,normal=FALSE,cond=FALSE,sig
         }))
         colnames(interval) <- c("L","R","ill")
         dat <- cbind(dat[,-c(ipos,match(c("time","waittime"),names(dat)))],interval)
+        ## right censored?
+        dat$censtime <- pmax(dat$censtime,dat$R)
     }
-    ## right censored?
-    dat$censtime <- pmax(dat$censtime,dat$R)
     dat$status <- 1*(dat$lifetime<dat$censtime) 
     dat$lifetime <- pmin(dat$lifetime,dat$censtime)
     ## dat <- dat[,-match(c("censtime","illtime"),names(dat))]

@@ -329,7 +329,7 @@ $${\cal{L}}(\beta_{01},\beta_{02},\beta_{12},a_{01},a_{02},a_{12},b_{01},b_{02},
 Confidence intervals for the regression parameters are obtained using
 standard errors estimated by inverting the Hessian matrix of the
 log-likelihood, that is the matrix of the second partial derivatives
-of $\log{\cal L}$ given in the previous display. Pointwise confidence bands for
+of $\log{\cal L}$ given in the previous display. Pointwise confidence intervals for
 the baseline transition intensities are obtained using a
 simulation-based approach explained below (section \ref{sec:CI}).
 
@@ -366,26 +366,19 @@ trade-off between the data fit and the smoothness of the functions. It
 is proposed that the penalization parameters are chosen by maximizing
 a cross-validated likelihood score. Here, leave-one-out is appealing
 as the result does not depend on the random seed as it would, e.g.,
-for 10-fold cross-validation.
- However, since leave-one-out requires as
-many 
- # computations 
-maximizations of the likelihood as there are subjects in the data
-set, this can be computationally very expensive. To avoid extremely
-long run times we have implemented the following algorithm:
+for 10-fold cross-validation.  However, since leave-one-out requires
+as many maximizations of the likelihood as there are subjects in the
+data set, this can be computationally very expensive. To avoid
+extremely long run times we have implemented the following algorithm:
 
 Step 1. We ignore the covariates and use a grid search method to find
  the values for $(\kappa_{01}, \kappa_{02}, \kappa_{12})$ based on an
- approximiation of the 
- # marginal 
-leave-one-out log-likelihood score.
- The approximation is equivalent to one step of the Newton-Raphson
+ approximiation of the leave-one-out log-likelihood score.  The
+ approximation is equivalent to one step of the Newton-Raphson
  algorithm and reduces the number of calculations considerably. This
  approach was proposed by \citet{O'Sullivan_1988} for survival models
- and 
- # extended and 
-studied by
- \citet{Joly_Commenges_Helmer_Letenneur_2002} in an illness-death model
+ and studied by \citet{Joly_Commenges_Helmer_Letenneur_2002} in an
+ illness-death model
  #  multi-state model
  with interval censored data.
   
@@ -494,7 +487,7 @@ variation \citep{Aalen_Farewell_De_Angelis_Day_Gill_1997}, we order
 them and the $2.5^{\text{th}}$ and the $97.5^{\text{th}}$ empirical
 percentiles are then used as lower and upper confidence bounds for
 95\% confidence intervals.  This procedure can be repeated for any
-$t$, so we can obtain pointwise confidence bands for
+$t$, so we can obtain pointwise confidence limits for
 ${\alpha}_{hl}(.)$.
 
 * Using SmoothHazard

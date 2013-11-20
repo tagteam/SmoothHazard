@@ -9,7 +9,7 @@ idm <- function(formula01,
                 CV=FALSE,
                 kappa=c(800000,200000,50000),
                 intensities="Weib",
-		conf.bands=TRUE,
+		conf.int=TRUE,
                 print.iter=FALSE,
                 subset,
                 na.action = na.fail){
@@ -160,7 +160,7 @@ idm <- function(formula01,
                      a12=as.double(rep(0,99)),
                      a12_l=as.double(rep(0,99)),
                      a12_u=as.double(rep(0,99)),
-		     as.integer(conf.bands),
+		     as.integer(conf.int),
                      as.integer(print.iter),
                      V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                      package="SmoothHazard")
@@ -186,7 +186,6 @@ idm <- function(formula01,
     ## a12_u|upper confidence band for a12|length 100|double|
 }else{
     #  	cat("------ Program Splines ------ \n")
- 
     if (length(entrytime)>0){
         alltimes <- sort(unique(c(Ltime, Rtime,entrytime,abstime)))
 
@@ -295,7 +294,7 @@ idm <- function(formula01,
                      as.integer(CV),
                      as.double(kappa),
                      kappa=as.double(rep(0,3)),
-		     as.integer(conf.bands),
+		     as.integer(conf.int),
                      CVcrit=as.double(0),
                      mdf=as.double(0),
                      theta01=as.double(rep(0,(nknots01+2))),

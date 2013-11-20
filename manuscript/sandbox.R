@@ -9,17 +9,55 @@ testdat1 <- sim(u,500)
 plot(prodlim(Hist(lifetime,event)~1,data=testdat1),xlim=c(0,200))
 u <- idmModel(K=10,schedule=15,punctuality=1/20)
 distribution(u,"lifetime") <- coxWeibull.lvm(scale=1/120000,shape=2.5)
-distribution(u,"waittime") <- coxWeibull.lvm(scale=1/120000,shape=2.5)
+## distribution(u,"waittime") <- coxWeibull.lvm(scale=1/120000,shape=2.5)
+
+## distribution(u,"waittime") <- coxExponential.lvm(scale=1/120)
+distribution(u,"waittime") <- coxWeibull.lvm(scale=1/120,shape=1.5)
+distribution(u,"illtime") <- coxWeibull.lvm(scale=1/120,shape=1.5)
+regression(u,from="X",to="illtime") <- 1
 regression(u,from="X",to="lifetime") <- log(2)
-regression(u,from="X",to="waittime") <- log(2)
-testdat1 <- sim(u,500)
+regression(u,from="X",to="waittime") <- -log(2)
+
 plot(prodlim(Hist(lifetime,event)~1,data=testdat1),col=2,add=TRUE)
 
-tmp <- idm(formula02=Hist(time=lifetime,event=event!=0)~X,
+set.seed(173)
+testdat1 <- sim(u,500)
+system.time(tmp <- idm(formula02=Hist(time=lifetime,event=status)~X,
            formula01=Hist(time=list(L,R),event=ill)~X,
            data=testdat1,
-           igraph=0,
-           intensities="Weib")
+           conf.int=FALSE,
+           intensities="Weib"))
+system.time(tmp1 <- idm(formula02=Hist(time=lifetime,event=status)~X,
+           formula01=Hist(time=illtime,event=ill)~X,
+           data=testdat1,
+           conf.int=FALSE,
+           intensities="Weib"))
+
+
+set.seed(173)
+testdat1 <- sim(u,200)
+system.time(tmp <- idm(formula02=Hist(time=lifetime,event=status)~X,
+           formula01=Hist(time=list(L,R),event=ill)~X,
+           data=testdat1,
+           conf.int=FALSE,
+           intensities="Splines"))
+
+write.csv(testdat1,file="~/tmp/testdat1.csv")
+system.time(tmp1 <- idm(formula02=Hist(time=lifetime,event=status)~X,
+                        formula01=Hist(time=illtime,event=ill)~X,
+                        data=testdat1,
+                        conf.int=FALSE,
+                        n.knots=c(7,7,7),
+                        kappa=c(100,100,100),
+                        intensities="Splines"))
+system.time(tmp2 <- idm(formula02=Hist(time=lifetime,event=status)~X,
+                        formula01=Hist(time=list(L,R),event=ill)~X,
+                        data=testdat1,
+                        conf.int=FALSE,
+                        n.knots=c(7,7,7),
+                        kappa=c(100,100,100),
+                        intensities="Splines"))
+
 
 set.seed(17)
 u <- idmModel(K=10,schedule=15,punctuality=1/20)

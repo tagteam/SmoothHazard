@@ -11,7 +11,7 @@ Left-truncated, right-censored, and interval-censored data are allowed.
 \usage{
 shr(formula, data, eps = c(5, 5, 3), nknots=7,
 CV=FALSE , kappa = 10000, maxiter = 200, hazard = "Weib",
-conf.bands=TRUE, print.iter = FALSE, na.action = na.omit)
+conf.int=TRUE, print.iter = FALSE, na.action = na.omit)
 }
 
 \arguments{
@@ -44,8 +44,9 @@ maximum number of iterations. The default is 200.
   \item{hazard}{
 type of estimation method: "Splines" for a penalized likelihood approach with approximation of the hazard function by M-splines, "Weib" for a parametric approach with a Weibull distribution on the hazard function. Default is "Weib".
 }
-  \item{conf.bands}{
-Boolean parameter. Equals to \code{TRUE} to calculate confidence bands for the survival or hazard curves, \code{FALSE} otherwise. Default is \code{TRUE}.
+  \item{conf.int}{
+Boolean parameter. Equals to \code{TRUE} to calculate pointwise confidence
+intervals for the survival or hazard curves, \code{FALSE} otherwise. Default is \code{TRUE}.
   }
   \item{print.iter}{
 boolean parameter. Equals to \code{TRUE} to print the likelihood during the iteration process, \code{FALSE} otherwise. Default is \code{FALSE}. This option is not running on Windows.
@@ -70,11 +71,11 @@ how NAs are  treated. The default is first, any na.action attribute of data, sec
   \item{converged}{integer equal to 1 when the model converged, 2, 3 or 4 otherwise.}
   \item{time}{times for which survival and hazard functions have been evaluated for plotting.}
   \item{hazard}{matched values of the hazard function.}
-  \item{lowerHazard}{lower confidence band for hazard function.}  
-  \item{upperHazard}{upper confidence band for hazard function.}
+  \item{lowerHazard}{lower confidence limits for hazard function.}  
+  \item{upperHazard}{upper confidence limits for hazard function.}
   \item{surv}{matched values of the survival function.}
-  \item{lowerSurv}{lower confidence band for survival function.}
-  \item{upperSurv}{upper confidence band for survival function.} 
+  \item{lowerSurv}{lower confidence limits for survival function.}
+  \item{upperSurv}{upper confidence limits for survival function.} 
   \item{RR}{vector of relative risks.}
   \item{V}{variance-covariance matrix.}
   \item{se}{standart errors.}
