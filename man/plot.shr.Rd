@@ -10,9 +10,24 @@ Plot method for a survival model.
 }
 \usage{
 
-\method{plot}{shr}(x, type="shr", add = FALSE, newdata=NULL, cause=NULL, col, lty, lwd,
-	ylim, xlim, xlab="Time" ,ylab, legend=TRUE, confint=TRUE, timeOrigin=0,
-	axes=TRUE, percent=TRUE,...)
+\method{plot}{shr}(x,
+		    type="shr",
+		    add = FALSE,
+		    newdata=NULL,
+		    cause=NULL,
+		    col,
+		    lty,
+		    lwd,
+		    ylim,
+		    xlim,
+		    xlab="Time" ,
+		    ylab,
+		    legend=TRUE,
+		    confint=TRUE,
+		    timeOrigin=0,
+		    axes=TRUE,
+		    percent=TRUE,
+		    ...)
 }
 \arguments{
   \item{x}{a \code{shrWeib} or a \code{shrSplines} class object (output from calling \code{\link{shr}}
@@ -71,8 +86,8 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 \examples{
 \dontrun{
 # Weibull survival model 
-data(test)
-fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test) 
+data(testdata)
+fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata) 
 
 # pointwise confidence limits
 plot(fit.su)

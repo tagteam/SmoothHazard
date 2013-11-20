@@ -7,11 +7,11 @@ idm <- function(formula01,
                 n.knots=c(7,7,7),
                 knots="equidistant",
                 CV=FALSE,
-                kappa=c(800000,200000,50000),
+                kappa=c(1000000,500000,20000),
                 intensities="Weib",
 		conf.int=TRUE,
                 print.iter=FALSE,
-                subset,
+                subset=NULL,
                 na.action = na.fail){
     
   # {{{ check formula
@@ -163,7 +163,7 @@ idm <- function(formula01,
 		     as.integer(conf.int),
                      as.integer(print.iter),
                      V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
-                     package="SmoothHazard")
+                     PACKAGE="SmoothHazard")
     
     ## ===Fortran delivers===
     ## Variable name| Explanation|Dimension|Storage mode|Remark
@@ -302,7 +302,7 @@ idm <- function(formula01,
                      theta12=as.double(rep(0,(nknots12+2))),
                      as.integer(print.iter),
                      V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
-                     package="SmoothHazard")
+                     PACKAGE="SmoothHazard")
 }
 
   if (ffit$converged[1] == 4){

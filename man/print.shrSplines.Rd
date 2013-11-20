@@ -45,8 +45,8 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 \examples{
 \dontrun{
 # a penalized survival model 
-data(test)
-fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test,hazard="Splines") 
+data(testdata)
+fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,hazard="Splines") 
 print(fit.su) 
 }
 }

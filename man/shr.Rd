@@ -8,10 +8,17 @@ Fit a survival model
 Fit a survival model using either a semi-parametric approach (penalized likelihood with an approximation of the hazard function by linear combination of M-splines) or a parametric approach (specifying a Weibull distribution on the hazard function).
 Left-truncated, right-censored, and interval-censored data are allowed.
 }
-\usage{
-shr(formula, data, eps = c(5, 5, 3), nknots=7,
-CV=FALSE , kappa = 10000, maxiter = 200, hazard = "Weib",
-conf.int=TRUE, print.iter = FALSE, na.action = na.omit)
+\usage{shr(formula,
+	   data,
+	   eps=c(5,5,3),
+	   nknots=7,
+	   CV=FALSE,
+	   kappa=10000,
+	   conf.int=TRUE,
+	   maxiter=200,
+	   hazard="Weib",
+	   print.iter=FALSE,
+	   na.action=na.omit)
 }
 
 \arguments{
@@ -106,8 +113,8 @@ Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 \examples{
 \dontrun{
 # Weibull survival model 
-data(test)
-fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test) 
+data(testdata)
+fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata) 
 
 ## to print
 fit.su

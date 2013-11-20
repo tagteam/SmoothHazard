@@ -136,7 +136,7 @@ shr <- function(formula,
 		     as.integer(conf.int),
                      as.integer(print.iter),
                      V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
-                     package="SmoothHazard")
+                     PACKAGE="SmoothHazard")
   }else{
     size1 <- NC
     size2 <- size1^2
@@ -177,7 +177,7 @@ shr <- function(formula,
                      theta=as.double(rep(0,(nknots+2))),
                      as.integer(print.iter),
                      V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
-                     package="SmoothHazard")
+                     PACKAGE="SmoothHazard")
 
 
 

@@ -1,9 +1,22 @@
+##' Function to generate an illness-death model for simulation.
+##'
+##' Based on the functionality of the lava PACKAGE a latent variable model is
+##' generated which contains the variables illtime, lifetime, waiting time and
+##' censoring time.
+##' @title Generate illness-death model objects
+##' @param scale Rate for Weibull models 
+##' @param cens Type of censoring 
+##' @param K Number of intervals
+##' @param schedule Average time for the next inspection time.
+##' @param punctuality Standard deviation of time for the next inspection time.
+##' @return A latent variable model object \code{lvm}
+##' @author Thomas Alexander Gerds
 idmModel <- function(scale=1/100,
                      cens="interval",
                      K=5,
                      schedule=1/scale,
                      punctuality=10*scale){
-    require(lava)
+    ## require(lava)
     ## ===============================================
     ## illness-death-model
     ## ===============================================
@@ -13,15 +26,15 @@ idmModel <- function(scale=1/100,
     ## ===============================================
     idm <- lvm()
     latent(idm) <- c("illtime","lifetime","waittime")
-    distribution(idm,"illtime") <- coxWeibull.lvm(scale=1/100)
-    distribution(idm,"lifetime") <- coxWeibull.lvm(scale=1/100)
+    distribution(idm,"illtime") <- coxWeibull.lvm(scale=scale)
+    distribution(idm,"lifetime") <- coxWeibull.lvm(scale=scale)
     idm <- eventTime(idm,time~min(illtime=1,lifetime=2),"event")
-    distribution(idm,"waittime") <- coxWeibull.lvm(scale=1/100)
+    distribution(idm,"waittime") <- coxWeibull.lvm(scale=scale)
     ## ===============================================
     ## censoring model
     ## ===============================================
     ## if (cens=="right"){
-    distribution(idm,"censtime") <- coxWeibull.lvm(scale=1/100)
+    distribution(idm,"censtime") <- coxWeibull.lvm(scale=scale)
     ## } else{
     if (cens=="interval"){
         for (k in 1:K){
@@ -33,16 +46,21 @@ idmModel <- function(scale=1/100,
     attr(idm,"cens") <- cens
     idm
 }
+
+##' Function to simulate illness-death model data
+##'
+##' Based on the functionality of the lava PACKAGE 
+##' @title Simulate illness-death model data
+##' @param x An \code{idmModel} object as obtained with
+##' \code{idmModel}
+##' @param n Number of observations
+##' @param compliance Probability of missing inspection time.
+##' @param ... Extra arguments given to \code{sim}
+##' @return A data set with interval censored observations from an illness-death model
+##' @author Thomas Alexander Gerds
 sim.idmModel <- function(x,
                          n=100,
                          compliance=1,
-                         p=NULL,
-                         normal=FALSE,
-                         cond=FALSE,
-                         sigma = 1,
-                         rho=0.5,
-                         X,
-                         unlink=FALSE,
                          ...){
     # simulate latent data
     class(x) <- "lvm"

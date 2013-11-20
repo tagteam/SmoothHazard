@@ -34,8 +34,8 @@
 
 \dontrun{
 /*** a penalized survival model ***/
-data(test)
-fit.su <- shr(Hist(time=list(l,r),id)~cov,data=test,hazard="Splines") 
+data(testdata)
+fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,hazard="Splines") 
 
 # no pointwise confidence limits
 plot(fit.su,conf.int=FALSE)

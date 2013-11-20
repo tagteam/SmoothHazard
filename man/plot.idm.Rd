@@ -9,17 +9,41 @@ Plot method for an illness-death model.
   \code{idmWeib} or \code{idmPl}. Pointwise confidence intervals are available. 
 }
 \usage{
-
-\method{plot}{idm}(x, conf.int=FALSE, ylim,
-transition, ...)
-
+\method{plot}{idm}(x,
+		    conf.int=FALSE,
+		    citype="shadow",
+		    add=FALSE,
+		    axes=TRUE,
+		    col,
+		    lwd,
+		    lty,
+		    xlim,
+		    ylim,
+		    xlab,
+		    ylab,
+		    legend=TRUE,
+		    transition=c("01","02","12"),
+		    ...)
 }
 \arguments{
   \item{x}{a \code{idmWeib} class object or a \code{idmSplines} class object (output from calling \code{\link{idm}}
     function).}
   \item{conf.int}{logical value. Determines whether pointwise confidence
     intervals will be plotted. The default is FALSE.}
-  \item{ylim}{vector containing the y limites (min, max) of the plot. The default is the min and the max of all the values of the three transition intensities}  
+  \item{citype}{Type of pointwise confidence intervals, either "shadow"
+    or "lines".}
+  \item{add}{If TRUE no new plot is generated.}
+  \item{axes}{If FALSE no axes are drawn.}
+  \item{col}{Colour of the lines}
+  \item{lwd}{Thickness of the lines}
+  \item{lty}{lty of the lines}
+  \item{xlim}{Limits of the x-axis}
+  \item{ylim}{vector containing the y limites (min, max) of the
+    plot. The default is the min and the max of all the values of the
+    three transition intensities}  
+  \item{xlab}{Label for the x-axis}
+  \item{ylab}{Label for the y-axis}
+  \item{legend}{Whether to show the legend.}
   \item{transition}{a vector of the transitions to plotted on separate graphs. Possible value are "01","02" and "12". The default is a plot of the 3 intensities on the same graph.}  
   \item{\dots}{other graphical parameters.}
 }

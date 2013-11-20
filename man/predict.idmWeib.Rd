@@ -8,7 +8,15 @@ Predictions for an illness-death model using the Weibull approach.
   Predict transition probabilities and cumulative probabilities from an object of class \code{idmWeib}. Confidence intervals are calculated. 
 }
 \usage{
- \method{predict}{idmWeib}(object, s, t, Z01, Z02, Z12, nsim=2000, CI=TRUE, ...)
+ \method{predict}{idmWeib}(object,
+			    s,
+			    t,
+			    Z01,
+			    Z02,
+			    Z12,
+			    nsim=2000,
+			    CI=TRUE,
+			    ...)
 }
 \arguments{
   \item{object}{an \code{idmWeib} class objects returned by a call to the \code{\link{idm}} function with \code{intensities}="Weib".}
