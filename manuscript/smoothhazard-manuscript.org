@@ -205,7 +205,7 @@ of X is fully characterized by the set of transition probabilities: $$
 p_{hl}(s,t)=\mathbb{P}(X(t)=l|X(s)=h)\qquad hl \in \{01,02,12\}.$$ The
 transition probabilities are related to the instantaneous transition
 intensities $\alpha_{hl}$ shown in Figure \ref{fig:1} by the relation:
-$$ \alpha_{hl}(t)=\frac{p_{hl}(t,t+\Delta t)}{\Delta t}.$$
+$$ \alpha_{hl}(t)=\lim_{\Delta t \to 0}\frac{p_{hl}(t,t+\Delta t)}{\Delta t}.$$
 
 We introduce covariate effects separately for each transition through
 proportional transition intensities regression models which are a
@@ -386,10 +386,12 @@ Step 2. We use the results of Step 1, i.e. the optimized value of
   $(\kappa_{01}, \kappa_{02}, \kappa_{12})$ to maximize the penalized
   likelihood \eqref{eq:77} with covariates. The parameters being
   maximized are the regression coefficients and the coefficients of
-  the linear combination of the M-splines defined below.
+  the linear combinations of the M-splines defined below.
 
 *** M-splines
 
+We use linear combinations of M-spline basis functions which are positive splines 
+and variants of B-splines.
 A family of M-spline functions of order $k$, $M_1,\ldots,M_n$ is
 defined by a set of $m$ knots where $n=m+k-2$ \citep{Ramsay_1988}. We
 consider only cubic M-splines of order $k=4$. Denote by
@@ -532,11 +534,11 @@ this is not possible.
  - In case 1, if $L_i<C_i$ then it is assumed that the subject may
    become ill between $L_i$ and $C_i$. If $L_i=C_i$ it is assumed that
    the subject is disease-free at time $C_i$. In the latter case the
-   integral of the likelihood equals zero.
+   integral in the second term of the likelihood equals zero.
  - In case 6, if  $L_i<T_i$ then it is assumed that the subject may
    become ill between $L_i$ and $T_i$. If $L_i=T_i$ it is assumed that
    the subject is disease-free at time $T_i$. In the latter case the
-   integral of the likelihood equals zero. 
+   integral in the second term of the likelihood equals zero. 
  
 ** Paquid study 
 In order to illustrate the functionality of the package we provide a
