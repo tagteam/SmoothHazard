@@ -1,4 +1,3 @@
-
 \name{plot.idmWeib}
 \alias{plot.idmWeib}
 

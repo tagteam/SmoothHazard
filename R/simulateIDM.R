@@ -16,7 +16,7 @@ idmModel <- function(scale=1/100,
                      K=5,
                      schedule=1/scale,
                      punctuality=10*scale){
-    ## require(lava)
+    require(lava)
     ## ===============================================
     ## illness-death-model
     ## ===============================================
@@ -46,7 +46,6 @@ idmModel <- function(scale=1/100,
     attr(idm,"cens") <- cens
     idm
 }
-
 ##' Function to simulate illness-death model data
 ##'
 ##' Based on the functionality of the lava PACKAGE 

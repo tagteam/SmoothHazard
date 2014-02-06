@@ -127,3 +127,4 @@ summary(fit.su)
 \keyword{methods}
 \keyword{shrSplines}
 \keyword{shrWeib}
+

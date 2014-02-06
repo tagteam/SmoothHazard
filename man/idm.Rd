@@ -10,6 +10,7 @@ Left-truncated, right-censored, and interval-censored data are allowed.
 State 0 corresponds to the initial state, state 1 to the transient one, state 2 to the absorbant one. The allowed transitions are: 0 --> 1, 0 --> 2 and 1 --> 2. 
 }
 \usage{
+<<<<<<< HEAD
 idm(formula01,
                 formula02,
                 formula12,
@@ -25,6 +26,11 @@ idm(formula01,
                 print.iter=FALSE,
                 subset=NULL,
                 na.action = na.fail)
+=======
+idm(formula01, formula02, formula12, data, maxiter=200, eps=c(5,5,3), 
+n.knots=c(7,7,7), knots, CV=FALSE,kappa = c(1000000,500000,20000),
+intensities="Weib", conf.int=TRUE, print.iter=FALSE, subset=NULL, na.action=na.omit)
+>>>>>>> saves before pulling Celia's changes
 }
 \arguments{
   \item{formula01}{

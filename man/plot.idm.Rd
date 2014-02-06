@@ -44,6 +44,10 @@ Plot method for an illness-death model.
   \item{xlab}{Label for the x-axis}
   \item{ylab}{Label for the y-axis}
   \item{legend}{Whether to show the legend.}
+  \item{ylim}{vector containing the y limites (min, max) of the plot. The default is the min and the max of all the values of the three transition intensities}  
+ \item{pos.legend}{The location of the legend can be specified by setting this argument to a single keyword from the  list "bottomright", "bottom", "bottomleft", "left", "topleft", "top", "topright", "right" and
+     "center". The default is "topleft"}
+  \item{main}{title of plot}
   \item{transition}{a vector of the transitions to plotted on separate graphs. Possible value are "01","02" and "12". The default is a plot of the 3 intensities on the same graph.}  
   \item{\dots}{other graphical parameters.}
 }
@@ -58,7 +62,7 @@ Plot method for an illness-death model.
 }
 
 \author{
-T. A. Gerds
+  Thomas Alexander. Gerds
 }
 
 \examples{
