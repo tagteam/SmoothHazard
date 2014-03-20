@@ -26,11 +26,6 @@ idm(formula01,
                 print.iter=FALSE,
                 subset=NULL,
                 na.action = na.fail)
-=======
-idm(formula01, formula02, formula12, data, maxiter=200, eps=c(5,5,3), 
-n.knots=c(7,7,7), knots, CV=FALSE,kappa = c(1000000,500000,20000),
-intensities="Weib", conf.int=TRUE, print.iter=FALSE, subset=NULL, na.action=na.omit)
->>>>>>> saves before pulling Celia's changes
 }
 \arguments{
   \item{formula01}{
