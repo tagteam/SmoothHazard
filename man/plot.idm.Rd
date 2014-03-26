@@ -69,7 +69,8 @@ Plot method for an illness-death model.
 \dontrun{
 data(Paq1000)
 fit.weib <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
-formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000) 
+		formula01=Hist(time=list(l,r),event=dementia)~certif,
+		data=Paq1000) 
 
 # no pointwise confidence intervals
 plot(fit.weib)

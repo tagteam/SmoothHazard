@@ -12,12 +12,8 @@ Description: SmoothHazard is a package for fitting illness-death (and survival)
     Estimation of parameters is conducted by likelihood maximization in the
     parametric approach or penalized likelihood maximization in the
     semi-parametric approach.
-Depends:
-    R (>= 1.9.1),
-    survival,
-    prodlim,
-    lava,
-    mvtnorm
+Depends: R (>= 1.9.1), prodlim 
+Imports: survival, lava, mvtnorm
 Maintainer: Thomas Alexander Gerds <tag@biostat.ku.dk>
 License: GPL (>= 2)
 Packaged: Wed May 6 15:36:28 2010; tag

@@ -10,7 +10,6 @@ Left-truncated, right-censored, and interval-censored data are allowed.
 State 0 corresponds to the initial state, state 1 to the transient one, state 2 to the absorbant one. The allowed transitions are: 0 --> 1, 0 --> 2 and 1 --> 2. 
 }
 \usage{
-<<<<<<< HEAD
 idm(formula01,
                 formula02,
                 formula12,

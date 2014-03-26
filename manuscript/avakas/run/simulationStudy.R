@@ -35,7 +35,7 @@ runOne <- function(i,NS,seed){
         ## weibull model
         ## print(sum(dat$R>dat$lifetime))
         ## print(sum(dat$illtime>dat$lifetime))
-        browser()
+        ## browser()
         try.weib <- try(weib <- idm(formula02=Hist(time=lifetime,event=status)~X,
                                     formula01=Hist(time=illtime,event=ill)~X,
                                     ## formula01=form.ill,
