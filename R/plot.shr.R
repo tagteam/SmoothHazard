@@ -24,7 +24,7 @@ plot.shr <- function(x,type="shr",add = FALSE,newdata=NULL,cause=NULL,col,lty,lw
   legend.DefaultArgs <- list(legend=names(Y),lwd=lwd,col=col,lty=lty,cex=1.5,bty="n",y.intersp=1.3,x="topright")
   confint.DefaultArgs <- list(x=x,newdata=newdata,type=type,citype="shadow",times=plot.times,cause=cause,density=55,col=col[1:nlines],lwd=rep(2,nlines),lty=rep(3,nlines))
   # }}}
-  smartA <- SmartControl(call= list(...),
+  smartA <- prodlim::SmartControl(call= list(...),
                          keys=c("plot","lines","legend","confint","axis1","axis2"),
                          ignore=c("x","type","cause","newdata","add","col","lty","lwd","ylim","xlim","xlab","ylab","legend","marktime","confint","automar","atrisk","timeOrigin","percent","axes","atrisk.args","confint.args","legend.args"),
                          defaults=list("plot"=plot.DefaultArgs,

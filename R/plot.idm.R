@@ -51,7 +51,7 @@ plot.idmWeib <- plot.idmPl <- plot.idm <- function(x,
 
     # }}}
 
-    control <- SmartControl(call=  list(...),
+    control <- prodlim::SmartControl(call=  list(...),
                             keys=c("plot","lines","legend","confint","axis1","axis2"),
                             ignore=c("x","transition","add","col","lty","lwd","ylim","xlim","xlab","ylab","legend","conf.int","axes"),
                             defaults=list("plot"=plot.DefaultArgs,"lines"=lines.DefaultArgs,"legend"=legend.DefaultArgs,"confint"=confint.DefaultArgs,"axis1"=axis1.DefaultArgs,"axis2"=axis2.DefaultArgs),

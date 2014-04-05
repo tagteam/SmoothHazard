@@ -73,7 +73,7 @@ lifexpect.idmWeib <- function(xx,s,Z01,Z02,Z12,nsim,CI,...) {
 			XbZ12 <- as.list(NULL)
 
 			set.seed(21)
-			X <- rmvnorm(nsim,Vmean,Mcov) 
+			X <- mvtnorm::rmvnorm(nsim,Vmean,Mcov) 
 			for(i in (1:nsim) ) {
 				Xa01[[i]]=X[i,1]^2
 				Xb01[[i]]=1/(X[i,2]^2)

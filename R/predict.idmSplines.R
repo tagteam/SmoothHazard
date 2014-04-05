@@ -77,7 +77,7 @@ predict.idmSplines <- function(object,s,t,Z01,Z02,Z12,nsim=2000,CI=TRUE,...) {
 			XbZ12 <- as.list(NULL)
 			
 			set.seed(21)
-			X <- rmvnorm(nsim,Vmean,Mvar) 
+			X <- mvtnorm::rmvnorm(nsim,Vmean,Mvar) 
 			# 1 set of simulated parameters for each element of the list
 			
 			for(i in (1:nsim) ) {

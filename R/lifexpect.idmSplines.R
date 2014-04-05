@@ -74,7 +74,7 @@ lifexpect.idmSplines <- function(xx,s,Z01,Z02,Z12,nsim,CI,...) {
 			XbZ12 <- as.list(NULL)
 
 			set.seed(21)
-			X <- rmvnorm(nsim,Vmean,Mcov) 
+			X <- mvtnorm::rmvnorm(nsim,Vmean,Mcov) 
 			for(i in (1:nsim) ) {
 				Xtheta01[[i]]=X[i,1:(nz01+2)]^2
 				Xtheta02[[i]]=X[i,(nz01+3):(nz01+nz02+4)]^2

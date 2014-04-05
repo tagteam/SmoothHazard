@@ -1,9 +1,6 @@
 useDynLib(SmoothHazard)
-export(idm,idmModel,sim.idmModel,shr,lifexpect) 
-
-import(mvtnorm)
-import(survival)
-
+importFrom(prodlim,Hist)
+export(idm,idmModel,sim.idmModel,shr,lifexpect,Hist) 
 S3method(plot,shr)
 S3method(plot,idm)
 
