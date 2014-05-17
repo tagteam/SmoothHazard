@@ -12,8 +12,8 @@
 #' @param eps convergence criterion used for p-values.
 #' @param \dots other unusued arguments.
 #' @author Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr>
-#' @seealso \code{\link{shr}}, \code{\link{print.shrSplines}},
-#' \code{\link{plot.shrSplines}}
+#' @seealso \code{\link{shr}}, \code{\link{print.shr}},
+#' \code{\link{plot.shr}}
 #' @keywords methods
 #' @examples
 #' 

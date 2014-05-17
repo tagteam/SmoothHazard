@@ -12,8 +12,8 @@
 #' @param \dots other unusued arguments.
 #' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> Fortran:
 #' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
-#' @seealso \code{\link{idm}}, \code{\link{print.idmSplines}},
-#' \code{\link{plot.idm}} \code{\link{plot.idmSplines}}
+#' @seealso \code{\link{idm}}, \code{\link{print.idm}},
+#' \code{\link{plot.idm}} 
 #' @keywords methods
 #' @examples
 #' 

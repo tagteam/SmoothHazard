@@ -4,10 +4,22 @@
 #' \code{idm} optionally with confidence limits.
 #' 
 #' 
-#' @param x a \code{idmWeib} class object (output from calling \code{idm} with
-#' the (default) option \code{intensities}="Weib".
-#' @param \dots other graphical parameters like those in
-#' \code{\link{plot.idm}}.
+#' @param x a \code{idmWeib} class object (output from calling
+#' \code{idm} with the (default) option \code{intensities}="Weib".
+#' @param conf.int If TRUE show confidence limits
+#' @param citype Type of confidence limits, can be "shadow" or "bars"
+#' @param add If TRUE add to existing plot
+#' @param axes If TRUE axes are drawn
+#' @param col Color of the lines
+#' @param lwd Width of the lines
+#' @param lty Type of the lines
+#' @param xlim Limits for x-axis
+#' @param ylim Limits for y-axis
+#' @param xlab Label for x-axis
+#' @param ylab Label for y-axis
+#' @param legend If TRUE a legend is drawn, which can be further controlled via \code{\link{SmartControl}}.
+#' @param transition Choose one of the transition intensities: \code{c("01","02","12")}.
+#' @param ... Passed to \code{\link{SmartControl}}
 #' @return Print a plot of the baseline transition intensities of an
 #' illness-death model estimated using a Weibull approach.
 #' @seealso

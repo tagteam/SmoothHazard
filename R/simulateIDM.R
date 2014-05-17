@@ -25,7 +25,7 @@
 ##' # distributed times
 ##' m <- idmModel()
 ##' sim(m,6)
-##'
+##' 
 ##' # Estimate the parameters of the Weibull models
 ##' # based on the uncensored exact event times
 ##' # and the uncensored illstatus.
@@ -33,67 +33,81 @@
 ##' d <- sim(m,10,latent=TRUE)
 ##' d$uncensored.status <- 1
 ##' f <- idm(formula01=Hist(time=illtime,event=illstatus)~1,
-##'     formula02=Hist(time=lifetime,event=uncensored.status)~1,data=d,conf.int=FALSE)
+##'          formula02=Hist(time=lifetime,event=uncensored.status)~1,
+##'          data=d,
+##'          conf.int=FALSE)
 ##' print(f)
-##'
+##' 
 ##' # Lower the rate of the 0->2 and 0->1 transitions
 ##' # increase the rate of the 1->2 transition
 ##' # and also lower the censoring rate
-##' m <- idmModel(scale.lifetime=1/2000,scale.waittime=1/30,scale.illtime=1/1000,scale.censtime=1/1000)
+##' m <- idmModel(scale.lifetime=1/2000,
+##'               scale.waittime=1/30,
+##'               scale.illtime=1/1000,
+##'               scale.censtime=1/1000)
 ##' set.seed(18)
 ##' d <- sim(m,100,latent=TRUE)
 ##' d$uncensored.status <- 1
 ##' 
 ##' f <- idm(formula01=Hist(time=observed.illtime,event=illstatus)~1,
-##'     formula02=Hist(time=observed.lifetime,event=uncensored.status)~1,data=d,conf.int=FALSE)
+##'          formula02=Hist(time=observed.lifetime,event=uncensored.status)~1,
+##'          data=d,
+##'          conf.int=FALSE)
 ##' print(f)
-##'
+##' 
 ##' # Estimate based on the right censored observations
 ##' fc <- idm(formula01=Hist(time=illtime,event=seen.ill)~1,
-##'     formula02=Hist(time=observed.lifetime,event=seen.exit)~1,data=d,conf.int=FALSE)
+##'           formula02=Hist(time=observed.lifetime,event=seen.exit)~1,
+##'           data=d,
+##'           conf.int=FALSE)
 ##' print(fc)
-##'
+##' 
 ##' # Estimate based on interval censored and right censored observations
 ##' fi <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~1,
-##'     formula02=Hist(time=observed.lifetime,event=seen.exit)~1,data=d,conf.int=FALSE)
+##'           formula02=Hist(time=observed.lifetime,event=seen.exit)~1,
+##'           data=d,
+##'           conf.int=FALSE)
 ##' print(fi)
 ##' 
 ##' # Estimation of covariate effects:
-##' # diabetes, systolic bloodpressure, good cholesterol (hdl)
-##' m <- idmModel(shape.waittime=2,scale.lifetime=1/2000,scale.waittime=1/30,scale.illtime=1/1000,scale.censtime=1/1000)
-##' distribution(m,"diabetes") <- binomial.lvm(p=0.3)
-##' distribution(m,"sbp") <- normal.lvm(mean=120,sd=20)
-##' distribution(m,"hdl") <- normal.lvm(mean=50,sd=20)
-##' regression(m,to="latent.illtime",from="diabetes") <- 1.7
-##' regression(m,to="latent.illtime",from="sbp") <- 0.07
-##' regression(m,to="latent.illtime",from="hdl") <- -0.1
-##' regression(m,to="latent.waittime",from="diabetes") <- 1.8
-##' regression(m,to="latent.lifetime",from="diabetes") <- 0.7
+##' # X1, X2, X3
+##' m <- idmModel(shape.waittime=2,
+##'               scale.lifetime=1/2000,
+##'               scale.waittime=1/30,
+##'               scale.illtime=1/1000,
+##'               scale.censtime=1/1000)
+##' distribution(m,"X1") <- binomial.lvm(p=0.3)
+##' distribution(m,"X2") <- normal.lvm(mean=120,sd=20)
+##' distribution(m,"X3") <- normal.lvm(mean=50,sd=20)
+##' regression(m,to="latent.illtime",from="X1") <- 1.7
+##' regression(m,to="latent.illtime",from="X2") <- 0.07
+##' regression(m,to="latent.illtime",from="X3") <- -0.1
+##' regression(m,to="latent.waittime",from="X1") <- 1.8
+##' regression(m,to="latent.lifetime",from="X1") <- 0.7
 ##' set.seed(21)
-##' d <- sim(m,500,latent=TRUE)
+##' d <- sim(m,00,latent=TRUE)
 ##' head(d)
-##'
+##' 
 ##' # Estimation based on uncensored data
 ##' d$uncensored.status <- 1
 ##' # uncensored data
-##' F1 <- idm(formula01=Hist(time=illtime,event=illstatus)~diabetes+sbp+hdl,
-##'     formula02=Hist(time=lifetime,event=uncensored.status)~diabetes+sbp+hdl,
-##'     data=d,conf.int=FALSE)
+##' F1 <- idm(formula01=Hist(time=illtime,event=illstatus)~X1+X2+X3,
+##'           formula02=Hist(time=lifetime,event=uncensored.status)~X1+X2+X3,
+##'           data=d,conf.int=FALSE)
 ##' print(F1)
-##'
+##' 
 ##' # Estimation based on right censored data
-##' F2 <- idm(formula01=Hist(time=illtime,event=seen.ill)~diabetes+sbp+hdl,
-##'     formula02=Hist(time=observed.lifetime,event=seen.exit)~diabetes+sbp+hdl,
-##'     data=d,conf.int=FALSE)
+##' F2 <- idm(formula01=Hist(time=illtime,event=seen.ill)~X1+X2+X3,
+##'           formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2+X3,
+##'           data=d,conf.int=FALSE)
 ##' print(F2)
 ##' 
 ##' # Estimation based on interval censored and right censored data
-##' F3 <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~diabetes+sbp+hdl,
-##'     formula02=Hist(time=observed.lifetime,event=seen.exit)~diabetes+sbp+hdl,
-##'     data=d,conf.int=FALSE)
+##' F3 <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2+X3,
+##'           formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2+X3,
+##'           data=d,conf.int=FALSE)
 ##' print(F3)
-##' cbind(uncensored=F1$coef,right.censore=F2$coef,interval.censored=F3$coef)
-##' 
+##' cbind(uncensored=F1$coef,right.censored=F2$coef,interval.censored=F3$coef)
 ##' @return A latent variable model object \code{lvm}
 ##' @author Thomas Alexander Gerds
 ##' @export
@@ -151,7 +165,7 @@ idmModel <- function(scale.illtime=1/100,
 ##' @param x An \code{idmModel} object as obtained with
 ##' \code{idmModel}
 ##' @param n Number of observations
-##' @param illness.known.at.death
+##' @param illness.known.at.death Affects the value of variable seen.ill  
 ##' @param compliance Probability of missing an inspection time.
 ##' @param latent if TRUE keep the latent event times
 ##' @param keep.inspectiontimes if \code{TRUE} keep the inspection
@@ -228,7 +242,6 @@ sim.idmModel <- function(x,
                         out <- c(ctime,c(0,itimes)[c(1+hit,2+hit)],illness.known.at.death)
                 else
                     out <- c(ctime,c(0,itimes)[c(1+hit,2+hit)],1)
-                ## if (out[1]>out[2]) browser()
                 out
             }
             else{## when never ill, set both interval borders to lifetime  
@@ -251,4 +264,28 @@ sim.idmModel <- function(x,
     dat$observed.illtime[dat$illstatus==0] <- -9
     dat$illtime[dat$illstatus==0] <- -9
     dat
+}
+
+
+##' Function to simulate from a specific illness-death model 
+##'
+##' For the purpose of illustrating the help pages of the SmoothHazard package.
+##' @title Sample illness-death model data
+#' @export
+#' @param n number of observations
+simulateIDM <- function(n=100){
+    m <- idmModel(shape.waittime=2,
+                  scale.lifetime=1/2000,
+                  scale.waittime=1/30,
+                  scale.illtime=1/1000,
+                  scale.censtime=1/1000)
+    lava::distribution(m,"X1") <- lava::binomial.lvm(p=0.3)
+    lava::distribution(m,"X2") <- lava::normal.lvm(mean=120,sd=20)
+    lava::distribution(m,"X3") <- lava::normal.lvm(mean=50,sd=20)
+    lava::regression(m,to="latent.illtime",from="X1") <- 1.7
+    lava::regression(m,to="latent.illtime",from="X2") <- 0.07
+    lava::regression(m,to="latent.illtime",from="X3") <- -0.1
+    lava::regression(m,to="latent.waittime",from="X1") <- 1.8
+    lava::regression(m,to="latent.lifetime",from="X1") <- 0.7
+    lava::sim(m,n)
 }

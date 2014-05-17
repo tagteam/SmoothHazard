@@ -13,56 +13,62 @@
 #' (Marquardt, 1963) which is a combination between a Newton-Raphson algorithm
 #' and a steepest descent algorithm.
 #' 
-#' @param formula01 A formula specifying a regression model for the \code{0 -->
-#' 1} transition from the initial state to the transient state of the
-#' illness-death model.  The right hand side of the formula specifies the
-#' covariate terms, and the left hand side must be an event history object as
-#' returned by the function \code{Hist}.
-#' @param formula02 A formula specifying a regression model for the \code{0 -->
-#' 2} transition from the initial state to the absorbing state. The left hand
-#' side must be equal to the left hand side of \code{formula01}. If missing it
-#' is set to \code{formula01}.
-#' @param formula12 A formula specifying a regression model for the \code{1 -->
-#' 2} transition from the transient state to the absorbing state.  operator is
-#' not required. If missing it is set to \code{formula01}.
+#' @param formula01 A formula specifying a regression model for the
+#' \code{0 --> 1} transition from the initial state to the transient
+#' state of the illness-death model.  The right hand side of the
+#' formula specifies the covariate terms, and the left hand side must
+#' be an event history object as returned by the function \code{Hist}.
+#' @param formula02 A formula specifying a regression model for the
+#' \code{0 --> 2} transition from the initial state to the absorbing
+#' state. The left hand side must be equal to the left hand side of
+#' \code{formula01}. If missing it is set to \code{formula01}.
+#' @param formula12 A formula specifying a regression model for the
+#' \code{1 --> 2} transition from the transient state to the absorbing
+#' state.  operator is not required. If missing it is set to
+#' \code{formula01}.
 #' @param data A data frame in which to interpret the variables of
 #' \code{formula01}, \code{formula02} and \code{formula12}.
 #' @param maxiter Maximum number of iterations. The default is 200.
-#' @param eps A vector of 3 integers >0 used to define the power of three
-#' convergence criteria: 1. for the regression parameters, 2. for the
-#' likelihood, 3. for the second derivatives. The default is \code{c(5,5,3)}
-#' which is translated into convergence if the respective values change less
-#' then \eqn{10^{-5}} (for regression parameters and likelihood) and
-#' \eqn{10^{-3}} for the second derivatives between two iterations.
-#' @param n.knots For \code{method="Splines"} only, a vector of length 3
-#' specifing the number of knots, one for each transition, for the M-splines
-#' estimate of the baseline intensities in the order \code{0 --> 1}, \code{0
-#' --> 2}, \code{1 --> 2}.  The default is c(7,7,7).
-#' @param knots List of length 3 containing the placements (timepoints) of the
-#' knots for the M-spline of the three transitions.
-#' @param CV Binary variable equals to 1 when search (by approximated cross
-#' validation) of the smoothing parameters kappa and 0 otherwise. Argument for
-#' the penalized likelihood approach. The default is 0.
-#' @param kappa a vector of length 3.  If CV=FALSE, smoothing parameters for
-#' the transition 0 --> 1, 0 --> 2 and 1 --> 2. If CV=TRUE, initial values of
-#' the smoothing parameters for the cross validation search. Argument for the
-#' penalized likelihood approach.
-#' @param intensities type of estimation method: "Splines" for a penalized
-#' likelihood approach with approximation of the transition intensities by
-#' M-splines, "Weib" for a parametric approach with a Weibull distribution on
-#' the transition intensities. Default is "Weib".
-#' @param conf.int Boolean parameter. Equals to \code{TRUE} to calculate
-#' pointwise confidence intervals for the transition intensities curves,
-#' \code{FALSE} otherwise. Default is \code{TRUE}.
-#' @param print.iter boolean parameter. Equals to \code{TRUE} to print the
-#' likelihood during the iteration process, \code{FALSE} otherwise. Default is
-#' \code{FALSE}. This option is not running on Windows.
-#' @param subset expression indicating the subset of the rows of data to be
-#' used in the fit. All observaation are included by default.
-#' @param na.action how NAs are treated. The default is first, any na.action
-#' attribute of data, second a na.action setting of options, and third
-#' 'na.fail' if that is unset. The 'factory-fresh' default is na.omit. Another
-#' possible value is NULL.
+#' @param eps A vector of 3 integers >0 used to define the power of
+#' three convergence criteria: 1. for the regression parameters,
+#' 2. for the likelihood, 3. for the second derivatives. The default
+#' is \code{c(5,5,3)} which is translated into convergence if the
+#' respective values change less then \eqn{10^{-5}} (for regression
+#' parameters and likelihood) and \eqn{10^{-3}} for the second
+#' derivatives between two iterations.
+#' @param n.knots For \code{method="Splines"} only, a vector of length
+#' 3 specifing the number of knots, one for each transition, for the
+#' M-splines estimate of the baseline intensities in the order \code{0
+#' --> 1}, \code{0 --> 2}, \code{1 --> 2}.  The default is c(7,7,7).
+#' @param knots List of length 3 containing the placements
+#' (timepoints) of the knots for the M-spline of the three
+#' transitions.
+#' @param CV Binary variable equals to 1 when search (by approximated
+#' cross validation) of the smoothing parameters kappa and 0
+#' otherwise. Argument for the penalized likelihood approach. The
+#' default is 0.
+#' @param kappa a vector of length 3.  If CV=FALSE, smoothing
+#' parameters for the transition 0 --> 1, 0 --> 2 and 1 --> 2. If
+#' CV=TRUE, initial values of the smoothing parameters for the cross
+#' validation search. Argument for the penalized likelihood approach.
+#' @param method type of estimation method: "Splines" for a
+#' penalized likelihood approach with approximation of the transition
+#' intensities by M-splines, "Weib" for a parametric approach with a
+#' Weibull distribution on the transition intensities. Default is
+#' "Weib".
+#' @param conf.int Boolean parameter. Equals to \code{TRUE} to
+#' calculate pointwise confidence intervals for the transition
+#' intensities curves, \code{FALSE} otherwise. Default is \code{TRUE}.
+#' @param print.iter boolean parameter. Equals to \code{TRUE} to print
+#' the likelihood during the iteration process, \code{FALSE}
+#' otherwise. Default is \code{FALSE}. This option is not running on
+#' Windows.
+#' @param subset expression indicating the subset of the rows of data
+#' to be used in the fit. All observations are included by default.
+#' @param na.action how NAs are treated. The default is first, any
+#' na.action attribute of data, second a na.action setting of options,
+#' and third 'na.fail' if that is unset. The 'factory-fresh' default
+#' is na.omit. Another possible value is NULL.
 #' @return
 #' 
 #' \item{call}{the call that produced the result.} \item{coef}{regression
@@ -122,17 +128,20 @@
 #' @keywords ilness-death
 #' @examples
 #' library(lava)
-#' m <- idmModel()
-#' distribution(m,~X1) <- binomial.lvm()
-#' distribution(m,~X2) <- normal.lvm()
-#' regression(m,to="latent.illtime",from="X1") <- 0.7
-#' regression(m,to="latent.lifetime",from="X2") <- 0.7
-#' regression(m,to="latent.waittime",from="X2") <- 0.7
 #' set.seed(17)
-#' d <- sim(m,30,latent=FALSE)
-#' fit <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
+#' d <- simulateIDM(100)
+#' # right censored data
+#' fitRC <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
 #'     formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
-#'     formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,conf.int=FALSE)
+#'     formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
+#'     conf.int=FALSE)
+#' fitRC
+#' # interval censored data
+#' fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
+#'     formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
+#'     formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
+#'     conf.int=FALSE)
+#' fitIC
 #' 
 #' \dontrun{
 #' 
@@ -161,7 +170,10 @@
 #' ## to summary
 #' summary(fit.splines)
 #' }
-#' 
+#'
+#' @importFrom prodlim Hist
+#' @useDynLib SmoothHazard
+#' @export Hist
 #' @export idm
 idm <- function(formula01,
                 formula02,
@@ -194,7 +206,6 @@ idm <- function(formula01,
   if(class(data)!="data.frame")stop("Argument 'data' must be a data.frame")
   m <- match.call()
   m01 <- m02 <- m12 <- m[match(c("","data","subset","na.action"),names(m),nomatch=0)]
-  ## browser()
   m01$formula <- formula01
   m02$formula <- formula02
   m12$formula <- formula12
@@ -208,28 +219,27 @@ idm <- function(formula01,
   responseTrans <- model.response(m01)
   
   responseAbs <- model.response(m02)
+  # }}}
   # {{{ extract covariates
   ## formula01
   x01 <- model.matrix(formula01,data=m01)[, -1, drop = FALSE]
   NC01 <- NCOL(x01)
   if (NC01>0)
-      Xnames01 <- paste(colnames(x01),"01",sep="_")
+      Xnames01 <- colnames(x01)
   else 
       Xnames01 <- NULL
   ## formula02
   x02 <- model.matrix(formula02,data=m02)[, -1, drop = FALSE]
   NC02 <- NCOL(x02)
-  ## Xnames02 <- colnames(x02)
   if (NC01>0)
-      Xnames02 <- paste(colnames(x02),"02",sep="_")
+      Xnames02 <- colnames(x02)
   else
       Xnames02 <- NULL
   ## formula12
   x12 <- model.matrix(formula12,data=m12)[, -1, drop = FALSE]
   NC12 <- NCOL(x12)
-  ## Xnames12 <- colnames(x12)
   if (NC12>0)
-      Xnames12 <- paste(colnames(x12),"12",sep="_")
+      Xnames12 <- colnames(x12)
   else
       Xnames12 <- NULL
   # }}}
@@ -267,7 +277,6 @@ idm <- function(formula01,
   if (isIntervalCensored && any(Rtime<Ltime)) stop("Misspecified transitition times:\nSome left interval limits are greater than the corresponding right limits.")
   # }}}
   # {{{ call Fortran function weib and collect results
-  
   ## ===R provides===
   ## Variable name| Explanation|Dimension|Storage mode|Remark
   ## entrytime| truncation time|length N|double|if is_truncated = 0 then length 0
@@ -540,25 +549,25 @@ idm <- function(formula01,
   fit$upperIntensity12 <- ffit$a12_u
  
   if (sum(NC)>0){                       # if at least one covariate
-    betaCoef <- ffit$regpar
-    names(betaCoef) <- c(Xnames01,Xnames02,Xnames12)
-    fit$coef <- betaCoef
-    fit$HR <- exp(betaCoef)
-    V <- matrix(ffit$v,nrow=size1,ncol=size1,byrow=T) 
-    colnames(V) <- c(Xnames01,Xnames02,Xnames12)
-    rownames(V) <- c(Xnames01,Xnames02,Xnames12)
-    fit$V_cov <- V
-    fit$se <- sqrt(diag(fit$V))
+      betaCoef <- ffit$regpar
+      names(betaCoef) <- c(Xnames01,Xnames02,Xnames12)
+      fit$coef <- betaCoef
+      fit$HR <- exp(betaCoef)
+      V <- matrix(ffit$v,nrow=size1,ncol=size1,byrow=T) 
+      colnames(V) <- c(Xnames01,Xnames02,Xnames12)
+      rownames(V) <- c(Xnames01,Xnames02,Xnames12)
+      fit$V_cov <- V
+      fit$se <- sqrt(diag(fit$V))
   }  	
   V <- matrix(ffit$V_tot,nrow=size_V,ncol=size_V,byrow=T)
   if(method=="Weib"){
-    colnames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
-    rownames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
+      colnames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
+      rownames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
   }else{
-    theta_names <- cbind(c(rep("theta01",(nknots01+2)),rep("theta02",(nknots02+2)),rep("theta12",(nknots12+2))),c((1:(nknots01+2)),(1:(nknots02+2)),(1:(nknots12+2))))
-    theta_names <- as.vector(apply(theta_names,1,paste,collapse=" "))
-    colnames(V) <- c(theta_names,c(Xnames01,Xnames02,Xnames12))	
-    rownames(V) <- c(theta_names,c(Xnames01,Xnames02,Xnames12))	
+      theta_names <- cbind(c(rep("theta01",(nknots01+2)),rep("theta02",(nknots02+2)),rep("theta12",(nknots12+2))),c((1:(nknots01+2)),(1:(nknots02+2)),(1:(nknots12+2))))
+      theta_names <- as.vector(apply(theta_names,1,paste,collapse=" "))
+      colnames(V) <- c(theta_names,c(Xnames01,Xnames02,Xnames12))	
+      rownames(V) <- c(theta_names,c(Xnames01,Xnames02,Xnames12))	
   }
    
   fit$V <- V
@@ -587,7 +596,7 @@ idm <- function(formula01,
           fit$kappa <- kappa
       }
   }
-  fit$na.action <- na.action	
+  fit$na.action <- "na.fail"
   # }}}
   fit$method <- method
   class(fit) <- "idm"

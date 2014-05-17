@@ -11,39 +11,41 @@
 #' and a steepest descent algorithm.
 #' 
 #' @param formula a formula object with the response on the left of a
-#' \eqn{\texttildelow} operator, and the terms on the right. The response must
-#' be a survival object or Hist object as returned by the 'Surv' or 'Hist'
-#' function.
-#' @param data a data frame in which to interpret the variables named in the
-#' \code{formula}.
-#' @param eps a vector of length 3 for the convergence criteria (criterion for
-#' parameters, criterion for likelihood, criterion for second derivatives). The
-#' default is 'c(5,5,3)' and corresponds to criteria equals to \eqn{10^{-5}},
-#' \eqn{10^{-5}} and \eqn{10^{-3}}.
-#' @param nknots number of knots for the splines to use to approximate the
-#' hazard function. Argument for the penalized likelihood approach.  The
-#' default is 7.
-#' @param CV binary variable equals to 1 when search (by approximated cross
-#' validation) of the smoothing parameter kappa and 0 otherwise. Argument for
-#' the penalized likelihood approach. The default is 0.
-#' @param kappa if CV=FALSE, smoothing parameter; if CV=TRUE, initial value of
-#' the smoothing parameters for the cross validation search. Argument for the
-#' penalized likelihood approach.
+#' \eqn{\texttildelow} operator, and the terms on the right. The
+#' response must be a survival object or Hist object as returned by
+#' the 'Surv' or 'Hist' function.
+#' @param data a data frame in which to interpret the variables named
+#' in the \code{formula}.
+#' @param eps a vector of length 3 for the convergence criteria
+#' (criterion for parameters, criterion for likelihood, criterion for
+#' second derivatives). The default is 'c(5,5,3)' and corresponds to
+#' criteria equals to \eqn{10^{-5}}, \eqn{10^{-5}} and \eqn{10^{-3}}.
+#' @param nknots number of knots for the splines to use to approximate
+#' the hazard function. Argument for the penalized likelihood
+#' approach.  The default is 7.
+#' @param CV binary variable equals to 1 when search (by approximated
+#' cross validation) of the smoothing parameter kappa and 0
+#' otherwise. Argument for the penalized likelihood approach. The
+#' default is 0.
+#' @param kappa if CV=FALSE, smoothing parameter; if CV=TRUE, initial
+#' value of the smoothing parameters for the cross validation
+#' search. Argument for the penalized likelihood approach.
+#' @param conf.int Boolean parameter. Equals to \code{TRUE} to
+#' calculate pointwise confidence intervals for the survival or hazard
+#' curves, \code{FALSE} otherwise. Default is \code{TRUE}.
 #' @param maxiter maximum number of iterations. The default is 200.
-#' @param hazard type of estimation method: "Splines" for a penalized
-#' likelihood approach with approximation of the hazard function by M-splines,
-#' "Weib" for a parametric approach with a Weibull distribution on the hazard
-#' function. Default is "Weib".
-#' @param conf.int Boolean parameter. Equals to \code{TRUE} to calculate
-#' pointwise confidence intervals for the survival or hazard curves,
-#' \code{FALSE} otherwise. Default is \code{TRUE}.
-#' @param print.iter boolean parameter. Equals to \code{TRUE} to print the
-#' likelihood during the iteration process, \code{FALSE} otherwise. Default is
-#' \code{FALSE}. This option is not running on Windows.
-#' @param na.action how NAs are treated. The default is first, any na.action
-#' attribute of data, second a na.action setting of options, and third
-#' 'na.fail' if that is unset. The 'factory-fresh' default is na.omit. Another
-#' possible value is NULL.
+#' @param method type of estimation method: "Splines" for a penalized
+#' likelihood approach with approximation of the hazard function by
+#' M-splines, "Weib" for a parametric approach with a Weibull
+#' distribution on the hazard function. Default is "Weib".
+#' @param print.iter boolean parameter. Equals to \code{TRUE} to print
+#' the likelihood during the iteration process, \code{FALSE}
+#' otherwise. Default is \code{FALSE}. This option is not running on
+#' Windows.
+#' @param na.action how NAs are treated. The default is first, any
+#' na.action attribute of data, second a na.action setting of options,
+#' and third 'na.fail' if that is unset. The 'factory-fresh' default
+#' is na.omit. Another possible value is NULL.
 #' @return \item{call}{} \item{coef}{regression parameters.}
 #' \item{loglik}{vector containing the log-likelihood without and with
 #' covariate.} \item{modelPar}{Weibull parameters.} \item{N}{number of

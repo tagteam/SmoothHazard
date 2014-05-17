@@ -4,7 +4,7 @@
 #' likelihood approach.
 #' 
 #' 
-#' @param x a \code{shrSplines} object, i.e., the result of a call to the
+#' @param x a \code{shr} object, i.e., the result of a call to the
 #' \code{\link{shr}} function with \code{hazard}="Splines".
 #' @param conf.int confiance level.
 #' @param digits number of digits to print.
@@ -13,7 +13,7 @@
 #' @param \dots other unusued arguments.
 #' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> Fortran:
 #' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
-#' @seealso \code{\link{summary.shrSplines}}, \code{\link{plot.shrSplines}}
+#' @seealso \code{\link{summary.shr}}, \code{\link{plot.shr}}
 #' @keywords methods
 #' @examples
 #' 

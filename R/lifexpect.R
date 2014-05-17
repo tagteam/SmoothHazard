@@ -31,6 +31,12 @@
 #' @seealso \code{\link{idm}}
 #' @keywords methods
 #' @examples
+#'
+#' fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
+#'     formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
+#'     formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
+#'     conf.int=FALSE)
+#' lifexpect(fitIC,s=10)
 #' 
 #' \dontrun{
 #' data(Paq1000)
@@ -45,27 +51,27 @@
 #' @export lifexpect
 lifexpect <- function(x,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
     if (x$method=="Weib"){
-        nvar01 <- xx$NC[1]
-        nvar02 <- xx$NC[2]
-        nvar12 <- xx$NC[3]
+        nvar01 <- x$NC[1]
+        nvar02 <- x$NC[2]
+        nvar12 <- x$NC[3]
         if(missing(Z01) && nvar01>0) warning("value(s) used for covariate(s) on transition 01: 0 \n")
         if(missing(Z02) && nvar02>0) warning("value(s) used for covariate(s) on transition 02: 0 \n")
         if(missing(Z12) && nvar12>0) warning("value(s) used for covariate(s) on transition 12: 0 \n")
-        a01 <- xx$modelPar[1]
-        b01 <- xx$modelPar[2]
-        a02 <- xx$modelPar[3]
-        b02 <- xx$modelPar[4]
-        a12 <- xx$modelPar[5]
-        b12 <- xx$modelPar[6]
+        a01 <- x$modelPar[1]
+        b01 <- x$modelPar[2]
+        a02 <- x$modelPar[3]
+        b02 <- x$modelPar[4]
+        a12 <- x$modelPar[5]
+        b12 <- x$modelPar[6]
         if (!missing(Z01))  {
             if (length(Z01) != nvar01) {
                 stop("The length of the Z01 arguments must match the number of covariates on the ij transition.")
             }else{
-                beta01 <- xx$coef[1:nvar01]
+                beta01 <- x$coef[1:nvar01]
                 bZ01 <- t(beta01)%*%Z01
             }
         }else{
-            if (nvar01 != 0) { beta01 <- xx$coef[1:nvar01] }
+            if (nvar01 != 0) { beta01 <- x$coef[1:nvar01] }
             else { beta01 <- NULL }
             bZ01 <- 0
         }
@@ -73,11 +79,11 @@ lifexpect <- function(x,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
             if (length(Z02) != nvar02) {
                 stop("The length of the Z02 arguments must match the number of covariates on the ij transition.")
             }else{
-                beta02 <- xx$coef[(nvar01+1):(nvar01+nvar02)]
+                beta02 <- x$coef[(nvar01+1):(nvar01+nvar02)]
                 bZ02 <- t(beta02)%*%Z02
             }
         }else{
-            if (nvar02 != 0) { beta02 <- xx$coef[(nvar01+1):(nvar01+nvar02)] }
+            if (nvar02 != 0) { beta02 <- x$coef[(nvar01+1):(nvar01+nvar02)] }
             else { beta02 <- NULL }
             bZ02 <- 0
         }
@@ -85,11 +91,11 @@ lifexpect <- function(x,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
             if (length(Z12) != nvar12) {
                 stop("The length of the Z12 arguments must match the number of covariates on the ij transition.")
             }else{
-                beta12 <- xx$coef[(nvar01+nvar02+1):(nvar01+nvar02+nvar12)]
+                beta12 <- x$coef[(nvar01+nvar02+1):(nvar01+nvar02+nvar12)]
                 bZ12 <- t(beta12)%*%Z12
             }
         }else{
-            if (nvar12 != 0) { beta12 <- xx$coef[(nvar01+nvar02+1):(nvar01+nvar02+nvar12)] }
+            if (nvar12 != 0) { beta12 <- x$coef[(nvar01+nvar02+1):(nvar01+nvar02+nvar12)] }
             else { beta12 <- NULL }
             bZ12 <- 0
         }
@@ -97,7 +103,7 @@ lifexpect <- function(x,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
         if (CI==TRUE) {
             ### CI prediction by Monte-Carlo
             Vmean <- c(sqrt(a01),sqrt(b01),sqrt(a02),sqrt(b02),sqrt(a12),sqrt(b12),beta01,beta02,beta12) # vector of parameters
-            Mcov = xx$V
+            Mcov = x$V
             # une simulation pour chaque element d'une liste
             Xa01 <- as.list(NULL)
             Xb01 <- as.list(NULL)
