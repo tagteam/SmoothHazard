@@ -66,13 +66,12 @@
 #' \item{na.action}{observations deleted if missing values.}
 #' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> Fortran:
 #' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
-#' @seealso \code{\link{shr}}, \code{\link{print.shrWeib}},
-#' \code{\link{summary.shrWeib}}, \code{\link{print.shrSplines}},
-#' \code{\link{summary.shrSplines}}
+#' @seealso \code{\link{shr}}, \code{\link{print.shr}},
+#' \code{\link{summary.shr}}, \code{\link{print.shr}},
 #' @references D. Marquardt (1963). An algorithm for least-squares estimation
 #' of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 #' 431-441.
-#' @keywords methods shrSplines shrWeib
+#' @keywords methods 
 #' @examples
 #' 
 #' # Weibull survival model 

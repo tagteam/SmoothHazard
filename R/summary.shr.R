@@ -32,7 +32,6 @@
 summary.shr <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...){
     if (!inherits(object,"shr")) stop("Object must be of class 'shr'")
     if (object$method=="Weib"){
-        ## if (!inherits(object,"shrWeib")) stop("Object must be of class 'shrWeib'")
         x <- object
         if (x$converged == 1){
             cat("Suvival model using a parametrical Weibull hazard function.\n")

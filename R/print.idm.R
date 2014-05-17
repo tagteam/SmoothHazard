@@ -1,6 +1,6 @@
-#' Print method for \code{idmWeib} objects
+#' Print method for \code{idm} objects
 #' 
-#' Print a summary of a fitted illness-death model using the Weibull approach.
+#' Print a summary of a fitted illness-death model 
 #' 
 #' 
 #' @param x Class \code{idm} object, i.e. the result of a call to the
@@ -10,8 +10,8 @@
 #' @param pvalDigits Number of digits to print for p-values.
 #' @param eps Passed to \code{format.pval}.
 #' @param \dots Not used.
-#' @author Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> 
-#' @seealso \code{\link{summary.idmWeib}}, \code{\link{plot.idmWeib}}
+#' @author Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr>, Thomas A. Gerds <tag@@biostat.ku.dk> 
+#' @seealso \code{\link{summary.idm}}, \code{\link{plot.idm}}
 #' @keywords methods
 #' @examples
 #' 

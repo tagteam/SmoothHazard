@@ -162,6 +162,7 @@ idmModel <- function(scale.illtime=1/100,
 ##' example(idmModel)
 ##' help(idmModel)
 ##' @author Thomas Alexander Gerds
+##' @importFrom lava sim
 ##' @S3method sim idmModel
 sim.idmModel <- function(x,
                          n,

@@ -114,8 +114,8 @@
 #' deleted if missing values.}
 #' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> Fortran:
 #' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
-#' @seealso \code{\link{print.idmWeib}}, \code{\link{print.idmSplines}},
-#' \code{\link{summary.idmWeib}}, \code{\link{summary.idmSplines}}
+#' @seealso \code{\link{print.idm}}
+#' \code{\link{summary.idm}}
 #' @references D. Marquardt (1963). An algorithm for least-squares estimation
 #' of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 #' 431-441.

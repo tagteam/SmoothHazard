@@ -1,7 +1,7 @@
-#' Plot method for an illness-death model using a Weibull approach.
+#' Plot method for an illness-death model 
 #' 
 #' Plot estimated baseline transition intensities from an object of class
-#' \code{idmWeib}. Confidence limits are available.
+#' \code{idm} optionally with confidence limits.
 #' 
 #' 
 #' @param x a \code{idmWeib} class object (output from calling \code{idm} with
@@ -11,7 +11,8 @@
 #' @return Print a plot of the baseline transition intensities of an
 #' illness-death model estimated using a Weibull approach.
 #' @seealso
-#' \code{\link{print.idmWeib}},\code{\link{summary.idmWeib}},\code{\link{idm}},
+#' \code{\link{print.idm}},\code{\link{summary.idm}},\code{\link{idm}},
+#' @seealso \code{\link{idm}}
 #' @keywords methods
 #' @examples
 #'
@@ -34,7 +35,7 @@
 #' }
 #'  
 #'
-#' @S3method plot shr
+#' @S3method plot idm
 plot.idm <- function(x,
                      conf.int=FALSE,
                      citype="shadow",
@@ -68,7 +69,6 @@ plot.idm <- function(x,
     nlines <- length(Y)
     # }}}
     # {{{ setting default arguments for plot, axes, legend, confint 
-
     if (missing(ylab)) ylab <- "Transition intensity"
     if (missing(xlab)) xlab <- "Time"
     if (missing(xlim)) xlim <- c(0, max(X))
@@ -85,9 +85,7 @@ plot.idm <- function(x,
     plot.DefaultArgs <- list(x=0,y=0,type = "n",ylim = ylim,xlim = xlim,xlab = xlab,ylab = ylab)
     legend.DefaultArgs <- list(legend=paste("Transition",names(Y)),lwd=lwd,col=col,lty=lty,cex=1.5,bty="n",y.intersp=1.3,x="topleft")
     confint.DefaultArgs <- list(x=x,citype="shadow",times=X,density=55,col=col[1:nlines],lwd=rep(2,nlines),lty=rep(3,nlines))
-
     # }}}
-
     control <- prodlim::SmartControl(call=  list(...),
                             keys=c("plot","lines","legend","confint","axis1","axis2"),
                             ignore=c("x","transition","add","col","lty","lwd","ylim","xlim","xlab","ylab","legend","conf.int","axes"),
@@ -102,7 +100,6 @@ plot.idm <- function(x,
     }
     # }}}
     # {{{  axes
-
     if (!add) {
         if (axes){
             do.call("axis",control$axis1)
@@ -111,7 +108,6 @@ plot.idm <- function(x,
             do.call("axis",control$axis2[-match("percent",names(control$axis2),nomatch=0)])
         }
     }
-
     # }}}
     # {{{confidence intervals
     nix <- lapply(1:nlines,function(i){
@@ -149,7 +145,6 @@ plot.idm <- function(x,
         time <- switch(s, "1"= X01,"2"=X02,"3"=X12)
         lines(x = time,y = Y[[s]],type = lines.type,col = col[s],lty = lty[s],lwd = lwd[s])
     })
-
     # {{{  legend
     if(legend==TRUE && !add && !is.null(names(Y))){
         if (is.null(control$legend$title)){
@@ -163,7 +158,6 @@ plot.idm <- function(x,
         do.call("legend",control$legend)
         par(xpd=save.xpd)
     }
-
     # }}}
     invisible(x)
 }
