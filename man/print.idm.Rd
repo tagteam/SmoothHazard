@@ -1,0 +1,47 @@
+\name{print.idm}
+\alias{print.idm}
+\title{Print method for \code{idm} objects}
+\usage{
+\method{print}{idm}(x, conf.int = 0.95, digits = 4, pvalDigits = 4,
+  eps = 0.0001, ...)
+}
+\arguments{
+  \item{x}{Class \code{idm} object, i.e. the result of a
+  call to the \code{\link{idm}} function with
+  \code{intensities}="Weib".}
+
+  \item{conf.int}{Confidence level.}
+
+  \item{digits}{Number of digits to print.}
+
+  \item{pvalDigits}{Number of digits to print for
+  p-values.}
+
+  \item{eps}{Passed to \code{format.pval}.}
+
+  \item{\dots}{Not used.}
+}
+\description{
+Print a summary of a fitted illness-death model
+}
+\examples{
+\dontrun{
+data(Paq1000)
+fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=t0)~certif,
+		formula01=Hist(time=list(l,r),event=dementia)~certif,
+                formula12=~1,
+                method="Splines",
+		data=Paq1000)
+print(fit.splines)
+
+}
+}
+\author{
+Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>,
+Thomas A. Gerds <tag@biostat.ku.dk>
+}
+\seealso{
+\code{\link{summary.idm}}, \code{\link{plot.idm}}
+}
+\keyword{methods}
+
