@@ -1,3 +1,47 @@
+#' Plot method for a survival model.
+#' 
+#' Plot estimated baseline survival function from an object of class
+#' \code{shr}. Pointwise confidence limits are available.
+#' 
+#' 
+#' @param x a \code{shrWeib} or a \code{shrSplines} class object (output from
+#' calling \code{\link{shr}} function).
+#' @param type type of function to plot. The default is "shr".
+#' @param add boolean.
+#' @param newdata newdata.
+#' @param cause cause.
+#' @param col col.
+#' @param lty lty.
+#' @param lwd lwd.
+#' @param ylim ylim.
+#' @param xlim xlim.
+#' @param xlab xlab.
+#' @param ylab ylab.
+#' @param legend legend.
+#' @param confint confint.
+#' @param timeOrigin timeOrigin.
+#' @param axes axes.
+#' @param percent percent.
+#' @param \dots other graphical parameters.
+#' @return Print a plot of a suvival model.
+#' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> Fortran:
+#' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
+#' @seealso \code{\link{plot.shr}}
+#' @keywords methods
+#' @examples
+#' 
+#' # Weibull survival model 
+#' data(testdata)
+#' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata) 
+#' 
+#' # pointwise confidence limits
+#' plot(fit.su)
+#' 
+#' # no pointwise confidence limits
+#' plot(fit.su,confint=FALSE)
+#' 
+#'
+##' @S3method plot shr
 plot.shr <- function(x,type="shr",add = FALSE,newdata=NULL,cause=NULL,col,lty,lwd,
 	ylim,xlim,xlab="Time",ylab,legend=TRUE,confint=TRUE,timeOrigin=0,
 	axes=TRUE,percent=TRUE,...){

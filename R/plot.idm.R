@@ -1,18 +1,55 @@
-plot.idmWeib <- plot.idmPl <- plot.idm <- function(x,
-                                                   conf.int=FALSE,
-                                                   citype="shadow",
-                                                   add=FALSE,
-                                                   axes=TRUE,
-                                                   col,
-                                                   lwd,
-                                                   lty,
-                                                   xlim,
-                                                   ylim,
-                                                   xlab,
-                                                   ylab,
-                                                   legend=TRUE,
-                                                   transition=c("01","02","12"),
-                                                   ...){ 
+#' Plot method for an illness-death model using a Weibull approach.
+#' 
+#' Plot estimated baseline transition intensities from an object of class
+#' \code{idmWeib}. Confidence limits are available.
+#' 
+#' 
+#' @param x a \code{idmWeib} class object (output from calling \code{idm} with
+#' the (default) option \code{intensities}="Weib".
+#' @param \dots other graphical parameters like those in
+#' \code{\link{plot.idm}}.
+#' @return Print a plot of the baseline transition intensities of an
+#' illness-death model estimated using a Weibull approach.
+#' @seealso
+#' \code{\link{print.idmWeib}},\code{\link{summary.idmWeib}},\code{\link{idm}},
+#' @keywords methods
+#' @examples
+#'
+#' library(lava)
+#' m <- idmModel(scale.lifetime=1/10,scale.illtime=1/8)
+#' distribution(m,"X") <- binomial.lvm()
+#' regression(m,latent.lifetime~X) <- 0.7
+#' set.seed(30)
+#' d <- sim(m,100)
+#' fit.weib <- idm(formula02=Hist(observed.lifetime,event=seen.exit)~1,
+#' formula01=Hist(time=list(L,R),event=seen.ill)~1,data=d,conf.int=FALSE)
+#' plot(fit.weib)
+#'
+#' \dontrun{
+#' ## FIXME: the limits for the 01 transition are a bit wide!?
+#' ## with bootstrap confidence limits
+#' fit.weib <- idm(formula02=Hist(observed.lifetime,event=seen.exit)~1,
+#' formula01=Hist(time=list(L,R),event=seen.ill)~1,data=d,conf.int=TRUE)
+#' plot(fit.weib)
+#' }
+#'  
+#'
+#' @S3method plot shr
+plot.idm <- function(x,
+                     conf.int=FALSE,
+                     citype="shadow",
+                     add=FALSE,
+                     axes=TRUE,
+                     col,
+                     lwd,
+                     lty,
+                     xlim,
+                     ylim,
+                     xlab,
+                     ylab,
+                     legend=TRUE,
+                     transition=c("01","02","12"),
+                     ...){ 
 
     # {{{ collecting the (X, Y)-values of the lines
     if ((NCOL(x$time))>1){
@@ -116,10 +153,10 @@ plot.idmWeib <- plot.idmPl <- plot.idm <- function(x,
     # {{{  legend
     if(legend==TRUE && !add && !is.null(names(Y))){
         if (is.null(control$legend$title)){
-                if (class(x)=="idmSplines")
-            control$legend$title <- "M-spline intensity model"
+            if (x$method=="Splines")
+                control$legend$title <- "M-spline intensity model"
             else
-            control$legend$title <- "Weibull model"
+                control$legend$title <- "Weibull model"
         }
         save.xpd <- par()$xpd
         par(xpd=TRUE)

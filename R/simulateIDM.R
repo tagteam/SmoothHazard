@@ -30,7 +30,7 @@
 ##' # based on the uncensored exact event times
 ##' # and the uncensored illstatus.
 ##' set.seed(18)
-##' d <- sim(m,1000,latent=TRUE)
+##' d <- sim(m,10,latent=TRUE)
 ##' d$uncensored.status <- 1
 ##' f <- idm(formula01=Hist(time=illtime,event=illstatus)~1,
 ##'     formula02=Hist(time=lifetime,event=uncensored.status)~1,data=d,conf.int=FALSE)
@@ -43,6 +43,7 @@
 ##' set.seed(18)
 ##' d <- sim(m,100,latent=TRUE)
 ##' d$uncensored.status <- 1
+##' 
 ##' f <- idm(formula01=Hist(time=observed.illtime,event=illstatus)~1,
 ##'     formula02=Hist(time=observed.lifetime,event=uncensored.status)~1,data=d,conf.int=FALSE)
 ##' print(f)
@@ -59,7 +60,7 @@
 ##' 
 ##' # Estimation of covariate effects:
 ##' # diabetes, systolic bloodpressure, good cholesterol (hdl)
-##' m <- idmModel(scale.lifetime=1/2000,scale.waittime=1/30,scale.illtime=1/1000,scale.censtime=1/1000)
+##' m <- idmModel(shape.waittime=2,scale.lifetime=1/2000,scale.waittime=1/30,scale.illtime=1/1000,scale.censtime=1/1000)
 ##' distribution(m,"diabetes") <- binomial.lvm(p=0.3)
 ##' distribution(m,"sbp") <- normal.lvm(mean=120,sd=20)
 ##' distribution(m,"hdl") <- normal.lvm(mean=50,sd=20)
@@ -67,8 +68,8 @@
 ##' regression(m,to="latent.illtime",from="sbp") <- 0.07
 ##' regression(m,to="latent.illtime",from="hdl") <- -0.1
 ##' regression(m,to="latent.waittime",from="diabetes") <- 1.8
-##' regression(m,to="latent.lifetime",from="diabetes") <- -1
-##' set.seed(18)
+##' regression(m,to="latent.lifetime",from="diabetes") <- 0.7
+##' set.seed(21)
 ##' d <- sim(m,500,latent=TRUE)
 ##' head(d)
 ##'
@@ -91,7 +92,7 @@
 ##'     formula02=Hist(time=observed.lifetime,event=seen.exit)~diabetes+sbp+hdl,
 ##'     data=d,conf.int=FALSE)
 ##' print(F3)
-##' cbind(F1$coef,F2$coef,F3$coef)
+##' cbind(uncensored=F1$coef,right.censore=F2$coef,interval.censored=F3$coef)
 ##' 
 ##' @return A latent variable model object \code{lvm}
 ##' @author Thomas Alexander Gerds
@@ -161,7 +162,7 @@ idmModel <- function(scale.illtime=1/100,
 ##' example(idmModel)
 ##' help(idmModel)
 ##' @author Thomas Alexander Gerds
-##' @export
+##' @S3method sim idmModel
 sim.idmModel <- function(x,
                          n,
                          illness.known.at.death=TRUE,
@@ -241,8 +242,12 @@ sim.idmModel <- function(x,
         if (keep.inspectiontimes)
             dat$inspectiontimes <- iframe
     }
-    dat$seen.exit <- 1*(dat$lifetime<dat$censtime) 
+    dat$seen.exit <- 1*(dat$lifetime<dat$censtime)
     dat$observed.lifetime <- pmin(dat$lifetime,dat$censtime)
     dat$observed.illtime <- pmin(dat$illtime,dat$censtime)
+    dat$L <- pmin(dat$L,dat$censtime)
+    dat$R <- pmin(dat$R,dat$censtime)
+    dat$observed.illtime[dat$illstatus==0] <- -9
+    dat$illtime[dat$illstatus==0] <- -9
     dat
 }

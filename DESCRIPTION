@@ -21,26 +21,3 @@ Imports:
 Maintainer: Thomas Alexander Gerds <tag@biostat.ku.dk>
 License: GPL (>= 2)
 Packaged: Wed May 6 15:36:28 2010; tag
-Collate:
-    'idm.R'
-    'lifexpect.idmSplines.R'
-    'lifexpect.idmWeib.R'
-    'lifexpect.R'
-    'plot.idm.R'
-    'plot.idmWeib.idmSplines.R'
-    'plot.shr.R'
-    'plot.shrSplines.R'
-    'plot.shrWeib.R'
-    'predict.idmSplines.R'
-    'predict.idmWeib.R'
-    'print.idmSplines.R'
-    'print.idmWeib.R'
-    'print.shrSplines.R'
-    'print.shrWeib.R'
-    'private_idmSplines.R'
-    'shr.R'
-    'simulateIDM.R'
-    'summary.idmSplines.R'
-    'summary.idmWeib.R'
-    'summary.shrSplines.R'
-    'summary.shrWeib.R'
