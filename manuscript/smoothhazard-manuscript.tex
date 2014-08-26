@@ -1,4 +1,4 @@
-% Created 2014-08-26 mar. 09:59
+% Created 2014-08-26 mar. 10:26
 \documentclass[article]{jss}
 \usepackage{amsmath,amsfonts}
 \usepackage{float}
@@ -653,7 +653,7 @@ transition \(1 \rightarrow 2\) different from those impacting transition
 
 The main function \code{idm} computes estimates for the three baseline
 transition intensities and for the regression parameters of an
-illness-death model.  The \code{intensities} argument by specifying
+illness-death model.  The \code{method} argument by specifying
 the form of the transition intensities allows to select either the
 parametric or a semi-parametric estimation method :
 
@@ -764,7 +764,7 @@ plot(fit.weib,conf.int=TRUE,lwd=3,citype="shadow",xlim=c(65,100), axis2.las=2,ax
 
 The other estimation option in the function \code{idm} permits to
 relax the strict parametric assumptions of the Weibull regression
-models. With the option \code{intensities="Splines"}, 
+models. With the option \code{method="Splines"}, 
 linear combinations of M-splines are
 used to approximate the three baseline transition
 intensities. Although this option implies a considerable amount of
@@ -847,7 +847,7 @@ plot(fit.splines,conf.int=TRUE,lwd=3,citype="shadow",xlim=c(65,100), axis2.las=2
 \label{sec-5-3-1}
 
 Some optional arguments are specific to the semi-parametric approach
-(when using the option \code{intensities="Splines"}):
+(when using the option \code{method="Splines"}):
 
 \begin{itemize}
 \item \code{n.knots} contains a vector (by default \code{c(7,7,7)})

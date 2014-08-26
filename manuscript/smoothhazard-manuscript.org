@@ -698,7 +698,7 @@ $0 \rightarrow 2$.
 
 The main function \code{idm} computes estimates for the three baseline
 transition intensities and for the regression parameters of an
-illness-death model.  The \code{intensities} argument by specifying
+illness-death model.  The \code{method} argument by specifying
 the form of the transition intensities allows to select either the
 parametric or a semi-parametric estimation method :
 
@@ -798,7 +798,7 @@ file:transition-intensities-paq-weib.pdf
 
 The other estimation option in the function \code{idm} permits to
 relax the strict parametric assumptions of the Weibull regression
-models. With the option \code{intensities="Splines"}, 
+models. With the option \code{method="Splines"}, 
 linear combinations of M-splines are
 used to approximate the three baseline transition
 intensities. Although this option implies a considerable amount of
@@ -840,7 +840,7 @@ file:transition-intensities-paq-splines.pdf
 *** Semi-parametric estimation method: choice of smoothing parameters
 
 Some optional arguments are specific to the semi-parametric approach
-(when using the option \code{intensities="Splines"}):
+(when using the option \code{method="Splines"}):
 
 - \code{n.knots} contains a vector (by default \code{c(7,7,7)})
   specifying the number of knots on the $0 \rightarrow 1$, $0
