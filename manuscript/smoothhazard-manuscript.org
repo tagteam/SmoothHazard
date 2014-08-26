@@ -10,7 +10,7 @@ $\alpha_{02}$, and $\alpha_{02}$ are positive functions of time which
 can also depend on covariates.
 
 #+source: idm1
-#+BEGIN_SRC R :results graphics :exports none :file "fig1.pdf" :cache yes 
+#+BEGIN_SRC R :results graphics :exports none :file "fig1.pdf" :cache no 
 library(prodlim)
 plotIllnessDeathModel(stateLabels=c("0: Healthy","1: Diseased","2: Dead"),arrowLabelSymbol="alpha")
 #+END_SRC
@@ -45,7 +45,7 @@ The \pkg{SmoothHazard} package provides estimates of the baseline transition
 intensities and of covariate effects when the data fall into one of
 the 6 cases that are displayed in Figure \ref{fig:0}.
 #+source: obspattern
-#+BEGIN_SRC ditaa :file obs-patterns.png :exports none :cache yes
+#+BEGIN_SRC ditaa :file obs-patterns.png :exports none :cache no
 1. Right censored alive, not diseased until
    time L, disease status at C unknown
 
@@ -729,7 +729,7 @@ on the transition from dementia to death. Note that in case of missing \code{for
 argument the covariates on the $1 \rightarrow 2$ transition are the same as 
 the ones specified in the  \code{formula02} argument.
 
-#+BEGIN_SRC R :exports both :results output :cache yes
+#+BEGIN_SRC R :exports both :results output :cache no
 fit.weib <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=e)~certif+gender,
                 formula02=Hist(time=t,event=death,entry=e)~gender,
                 formula12= ~ 1,
@@ -805,11 +805,11 @@ intensities. Although this option implies a considerable amount of
 extra computations (see Section \ref{sec:semi-para}), the call and the printed output are
 very similar to the Weibull model:
 
-#+BEGIN_SRC R :exports both :results output :cache yes
+#+BEGIN_SRC R :exports both :results output :cache no
 fit.splines <- idm(formula01=Hist(time=list(l,r),event=dementia,entry=e)~certif+gender,
                    formula02=Hist(time=t,event=death,entry=e)~gender,
                    formula12= ~ 1,
-                   intensities="Splines",data=Paq1000)
+                   method="Splines",data=Paq1000)
 fit.splines
 #+END_SRC
 
@@ -913,7 +913,7 @@ For example, the following call give predictions regarding
 a 70 years-old male subject who have primary school diploma, 
 over a 10 years horizon: 
 
-#+BEGIN_SRC R :exports both :results output :cache yes 
+#+BEGIN_SRC R :exports both :results output :cache no 
 pred <- predict(fit.weib,s=70,t=80,Z01=c(1,1),Z02=1)
 x<-round(do.call("rbind",pred),2)
 colnames(x) <- c("Probability","Lower","Upper")
@@ -944,7 +944,7 @@ The following calls give life expectancies regarding
 a 80 years-old female subject who have primary school diploma based on the 
 transition intensities estimates from respectively the parametric approach 
 and the semi-parametric approach:
-#+BEGIN_SRC R :exports both :results output :cache yes
+#+BEGIN_SRC R :exports both :results output :cache no
 LE.weib <- lifexpect(fit.weib,s=80,Z01=c(1,0),Z02=0)
 x<-round(do.call("rbind",LE.weib),2)
 colnames(x) <- c("LE","Lower","Upper")
@@ -958,7 +958,7 @@ x
 : Error in colnames(x) <- c("LE", "Lower", "Upper") : object 'x' not found
 : Error: object 'x' not found
 
-#+BEGIN_SRC R :exports both :results output :cache yes
+#+BEGIN_SRC R :exports both :results output :cache no
  LE.splines <- lifexpect(fit.splines,s=80,Z01=c(1,0),Z02=0,CI=FALSE)
 x<-round(do.call("rbind",LE.splines),2)
 colnames(x) <- c("LE")

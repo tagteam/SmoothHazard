@@ -66,9 +66,9 @@
 #'
 #' @S3method predict idm
 predict.idm <- function(object,s,t,Z01,Z02,Z12,nsim=2000,CI=TRUE,...) {
-    if (object$method=="Splines"){
+    x <- object
+    if (x$method=="Splines"){
         # if covariates: cov=c(cov1,cov2,cov3,...)
-        x <- object
         if (inherits(x,"idmSplines")) {
             nvar01 <- x$NC[1]
             nvar02 <- x$NC[2]
