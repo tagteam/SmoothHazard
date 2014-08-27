@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ##' Function to generate an illness-death model for simulation.
 ##'
 ##' Based on the functionality of the lava PACKAGE the function generates
@@ -123,6 +124,15 @@ idmModel <- function(scale.illtime=1/100,
                      schedule=10,
                      punctuality=5){
 
+=======
+idmModel <- function(scale=1/100,
+                     cens="interval",
+                     K=5,
+                     schedule=1/scale,
+                     punctuality=10*scale){
+    require(lava)
+    ## ===============================================
+>>>>>>> saves before pulling Celia's changes
     ## illness-death-model
     ##
     ## model waiting time in state 0
@@ -158,6 +168,7 @@ idmModel <- function(scale.illtime=1/100,
     ## class(idm) <- c("lvm")
     idm
 }
+<<<<<<< HEAD
 ##' Function to simulate illness-death model data
 ##'
 ##' Based on the functionality of the lava PACKAGE 
@@ -213,6 +224,35 @@ sim.idmModel <- function(x,
             ## remove inspections where compliance is
             ## sampled as zero
             if (compliance<1 & compliance>0){
+=======
+sim.idmModel <- function(x,
+                         n=100,
+                         compliance=1,
+                         p=NULL,
+                         normal=FALSE,
+                         cond=FALSE,
+                         sigma = 1,
+                         rho=0.5,
+                         X,
+                         unlink=FALSE,
+                         ...){
+    # simulate latent data
+    class(x) <- "lvm"
+    dat <- sim(x,n=n,...)
+    # construct lifetime for ill subjects
+    ill <- dat$event==1
+    dat$lifetime[ill] <- dat$illtime[ill]+dat$waittime[ill]
+    # reset illtime for subjects that were never ill 
+    dat$illtime[!ill] <- dat$lifetime[!ill]
+    cens <- attr(x,"cens")
+    if (cens=="interval") {
+        ipos <- grep("inspection[0-9]+",names(dat))
+        interval <- do.call("rbind",lapply(1:n,function(i){
+            ## cumulate times between inspections
+            itimes <- unique(cumsum(c(0,pmax(0,dat[i,ipos,drop=TRUE]))))
+            itimes <- c(itimes[itimes<dat$lifetime[i]],dat[i,"lifetime"])
+            if (compliance!=1){
+>>>>>>> saves before pulling Celia's changes
                 comp <- rbinom(length(itimes),1,compliance)
                 itimes <- itimes[comp==1]
             }
@@ -248,6 +288,7 @@ sim.idmModel <- function(x,
                 c(ctime,rep(max(itimes),2),0)
             }
         }))
+<<<<<<< HEAD
         colnames(interval) <- c("censtime","L","R","seen.ill")
         dat <- dat[,-c(ipos,match("censtime",names(dat)))]
         dat <- cbind(dat,interval)
@@ -263,6 +304,16 @@ sim.idmModel <- function(x,
     dat$R <- pmin(dat$R,dat$censtime)
     dat$observed.illtime[dat$illstatus==0] <- -9
     dat$illtime[dat$illstatus==0] <- -9
+=======
+        colnames(interval) <- c("L","R","ill")
+        dat <- cbind(dat[,-c(ipos,match(c("time","waittime"),names(dat)))],interval)
+        ## right censored?
+        dat$censtime <- pmax(dat$censtime,dat$R)
+    }
+    dat$status <- 1*(dat$lifetime<dat$censtime) 
+    dat$lifetime <- pmin(dat$lifetime,dat$censtime)
+    ## dat <- dat[,-match(c("censtime","illtime"),names(dat))]
+>>>>>>> saves before pulling Celia's changes
     dat
 }
 

@@ -184,8 +184,13 @@ idm <- function(formula01,
                 n.knots=c(7,7,7),
                 knots="equidistant",
                 CV=FALSE,
+<<<<<<< HEAD
                 kappa=c(1000000,500000,20000),
                 method="Weib",
+=======
+                kappa=c(800000,200000,50000),
+                intensities="Weib",
+>>>>>>> saves before pulling Celia's changes
 		conf.int=TRUE,
                 print.iter=FALSE,
                 subset=NULL,
@@ -298,6 +303,7 @@ idm <- function(formula01,
   ## eps|convergence criteria: 1:likelihood,2:parameter est,3:gradient parameter est |length 3|integer|example eps=c(7,4,5) then use 10^-7,10^-4,10^-5. Defaults to c(5,5,3)
   ## maxiter| maximum number of iteration | length 1 | integer | > 0 default to 200
   
+<<<<<<< HEAD
   if (method == "Weib"){
       #	cat("------ Program Weibull ------ \n")
       size1 <- NC01 + NC02 + NC12
@@ -344,6 +350,54 @@ idm <- function(formula01,
                        as.integer(print.iter),
                        V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                        PACKAGE="SmoothHazard")
+=======
+  if (intensities == "Weib"){
+    #	cat("------ Program Weibull ------ \n")
+    size1 <- NC01 + NC02 + NC12
+    size2 <- size1^2
+    size_V <- size1 + 6
+    ffit <- .Fortran("idmWeib",
+                     ## input
+                     as.double(entrytime),               #
+                     as.double(Ltime),                   #l=
+                     as.double(Rtime),                   #r=
+                     as.double(abstime),                 #d=
+                     as.integer(idm),                    #idm=}
+                     as.integer(idd),                    #idd=
+                     as.double(x01),                     #x01=
+                     as.double(x02),                     #x02=
+                     as.double(x12),                     #x12=
+                     as.integer(N),                      #N=
+                     as.integer(NC01),                   #P01= 
+                     as.integer(NC02),                   #P02= 
+                     as.integer(NC12),                   #P12= 
+                     as.integer(truncated),              #truncated=
+                     ## interval=as.integer(isIntervalCensored),
+                     as.integer(eps),   #eps=
+                     as.integer(maxiter),
+                     ## output
+                     loglik=as.double(rep(0,2)),
+                     basepar=as.double(rep(0,6)),
+                     regpar=as.double(rep(0,size1)),
+                     v=as.double(rep(0,size2)),
+                     converged=as.integer(0),
+                     cv=as.double(rep(0,3)),
+                     niter=as.integer(0),
+                     t=as.double(rep(0,99)),
+                     a01=as.double(rep(0,99)),
+                     a01_l=as.double(rep(0,99)),
+                     a01_u=as.double(rep(0,99)),
+                     a02=as.double(rep(0,99)),
+                     a02_l=as.double(rep(0,99)),
+                     a02_u=as.double(rep(0,99)),
+                     a12=as.double(rep(0,99)),
+                     a12_l=as.double(rep(0,99)),
+                     a12_u=as.double(rep(0,99)),
+		     as.integer(conf.int),
+                     as.integer(print.iter),
+                     V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
+                     package="SmoothHazard")
+>>>>>>> saves before pulling Celia's changes
     
     ## ===Fortran delivers===
     ## Variable name| Explanation|Dimension|Storage mode|Remark
