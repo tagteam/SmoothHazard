@@ -122,7 +122,7 @@ idmModel <- function(scale.illtime=1/100,
                      K=5,
                      schedule=10,
                      punctuality=5){
-    
+
     ## illness-death-model
     ##
     ## model waiting time in state 0
