@@ -8,10 +8,21 @@ simulateIDM(n = 100)
   \item{n}{number of observations}
 }
 \description{
-Function to simulate from a specific illness-death model
+Simulate data from an illness-death model with interval
+censored event times and covariates
 }
 \details{
-For the purpose of illustrating the help pages of the
-SmoothHazard package.
+Simulate data from an illness-death model with interval
+censored event times and covariates for the purpose of
+illustrating the help pages of the SmoothHazard package.
+See the body of the function for details, i.e., evaluate
+simulateIDM
+}
+\examples{
+simulateIDM
+simulateIDM(100)
+}
+\seealso{
+idmModel sim.idmModel
 }
 

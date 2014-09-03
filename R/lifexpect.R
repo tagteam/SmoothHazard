@@ -30,24 +30,31 @@
 #' @author C. Touraine
 #' @seealso \code{\link{idm}}
 #' @keywords methods
-#' @examples
-#'
-#' fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
-#'     formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
-#'     formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
-#'     conf.int=FALSE)
-#' lifexpect(fitIC,s=10)
-#' 
-#' \dontrun{
-#' data(Paq1000)
-#' 
-#' fit <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
-#' formula01=Hist(time=list(l,r),event=dementia)~certif,method="Splines",data=Paq1000) 
-#' 
-#' pred <- lifexpect(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
-#' 
-#' }
-#' 
+##' @examples
+##' library(lava)
+##' library(prodlim)
+##' set.seed(17)
+##' d <- simulateIDM(100)
+##' table(d$seen.ill,d$seen.exit)
+##' fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
+##'              formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
+##'              formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
+##'              conf.int=FALSE)
+##' try(lifexpect(fitIC,s=10),silent=TRUE)
+##' 
+##' \dontrun{
+##'     data(Paq1000)
+##' 
+##'     fit <- idm(formula02=prodlim::Hist(time=t,event=death,entry=e)~certif,
+##'                formula01=prodlim::Hist(time=list(l,r),event=dementia)~certif,
+##'                method="Splines",
+##'                data=Paq1000,
+##'                conf.int=FALSE) 
+##' 
+##'     pred <- lifexpect(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
+##' 
+##' }
+ 
 #' @export lifexpect
 lifexpect <- function(x,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
     if (x$method=="Weib"){
@@ -275,34 +282,35 @@ lifexpect <- function(x,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
 }
 
 lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
-	ET12 = integrate(
-		f=function(x) {
-               	S.weib(s,x,a12,b12,bZ12)
-               	},s,Inf)
-	ET0. = integrate(f=function(x) {
-		S.weib(s,x,a01,b01,bZ01)*S.weib(s,x,a02,b02,bZ02)
-		},s,Inf)
-	ET01 = integrate(f=function(x) {
-		sapply(x,function(x) {integrate(f=function(y)
-		{
-		 S.weib(s,y,a01,b01,bZ01)*S.weib(s,y,a02,b02,bZ02)*iweibull(y,a01,b01,bZ01)*S.weib(y,x,a12,b12,bZ12)
-		}
-		,lower=s,upper=x)$value})
-               },s,Inf)
-return(list(life.in.0.expectancy=ET0.$value,life.expectancy.nondis=ET01$value+ET0.$value,life.expectancy.dis=ET12$value))
+    ## print("lifexpect0.idmWeib")
+    ET12 = integrate(
+        f=function(x) {
+            S.weib(s,x,a12,b12,bZ12)
+        },s,Inf)
+    ET0. = integrate(f=function(x) {
+        S.weib(s,x,a01,b01,bZ01)*S.weib(s,x,a02,b02,bZ02)
+    },s,Inf)
+    ET01 = integrate(f=function(x) {
+        sapply(x,function(x) {integrate(f=function(y)
+                                        {
+                                            S.weib(s,y,a01,b01,bZ01)*S.weib(s,y,a02,b02,bZ02)*iweibull(y,a01,b01,bZ01)*S.weib(y,x,a12,b12,bZ12)
+                                        }
+                                        ,lower=s,upper=x)$value})
+    },s,Inf)
+    return(list(life.in.0.expectancy=ET0.$value,life.expectancy.nondis=ET01$value+ET0.$value,life.expectancy.dis=ET12$value))
 
 }
 
 lifexpect0 <- function(s,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01=0,bZ12=0,bZ02=0) {
-	ET12 = integrate(f=function(x) {
-               Predict0.idmPl(s,x,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01,bZ12,bZ02)$p11
-               },s,zi12[nz12+6])
-  	ET0. = integrate(f=function(x) {
-               Predict0.idmPl(s,x,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01,bZ12,bZ02)$p00
-               },s,zi02[nz02+6])
-	ET01 = integrate(f=function(x) {
-               Predict0.idmPl(s,x,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01,bZ12,bZ02)$p01
-               },s,zi01[nz01+6])
-return(list(life.in.0.expectancy=ET0.$value,life.expectancy.nondis=ET01$value+ET0.$value,life.expectancy.dis=ET12$value))
+    ET12 = integrate(f=function(x) {
+        Predict0.idmPl(s,x,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01,bZ12,bZ02)$p11
+    },s,zi12[nz12+6])
+    ET0. = integrate(f=function(x) {
+        Predict0.idmPl(s,x,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01,bZ12,bZ02)$p00
+    },s,zi02[nz02+6])
+    ET01 = integrate(f=function(x) {
+        Predict0.idmPl(s,x,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01,bZ12,bZ02)$p01
+    },s,zi01[nz01+6])
+    return(list(life.in.0.expectancy=ET0.$value,life.expectancy.nondis=ET01$value+ET0.$value,life.expectancy.dis=ET12$value))
 
 }

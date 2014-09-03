@@ -76,7 +76,8 @@
 #' @keywords methods 
 #' @examples
 #' 
-#' # Weibull survival model 
+#' # Weibull survival model
+#' library(prodlim)
 #' data(testdata)
 #' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,) 
 #' 

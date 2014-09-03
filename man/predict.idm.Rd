@@ -59,7 +59,7 @@ with confidence intervals are calculated.
 \examples{
 \dontrun{
 data(Paq1000)
-
+library(prodlim)
 fit <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000)
 

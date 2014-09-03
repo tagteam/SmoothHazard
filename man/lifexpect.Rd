@@ -46,13 +46,27 @@ Predict life expectancies from an object of class
 Z02, Z12. Confidence intervals are calculated.
 }
 \examples{
+library(lava)
+library(prodlim)
+set.seed(17)
+d <- simulateIDM(100)
+table(d$seen.ill,d$seen.exit)
+fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
+             formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
+             formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
+             conf.int=FALSE)
+try(lifexpect(fitIC,s=10),silent=TRUE)
+
 \dontrun{
-data(Paq1000)
+    data(Paq1000)
 
-fit <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
-formula01=Hist(time=list(l,r),event=dementia)~certif,method="Splines",data=Paq1000)
+    fit <- idm(formula02=prodlim::Hist(time=t,event=death,entry=e)~certif,
+               formula01=prodlim::Hist(time=list(l,r),event=dementia)~certif,
+               method="Splines",
+               data=Paq1000,
+               conf.int=FALSE)
 
-pred <- lifexpect(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
+    pred <- lifexpect(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
 
 }
 }

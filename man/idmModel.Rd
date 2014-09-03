@@ -4,8 +4,8 @@
 \usage{
 idmModel(scale.illtime = 1/100, shape.illtime = 1, scale.lifetime = 1/100,
   shape.lifetime = 1, scale.waittime = 1/100, shape.waittime = 1,
-  scale.censtime = 1/100, shape.censtime = 1, K = 5, schedule = 10,
-  punctuality = 5)
+  scale.censtime = 1/100, shape.censtime = 1, n.inspections = 5,
+  schedule = 10, punctuality = 5)
 }
 \arguments{
   \item{scale.illtime}{Weilbull scale for latent illness
@@ -30,7 +30,7 @@ idmModel(scale.illtime = 1/100, shape.illtime = 1, scale.lifetime = 1/100,
 
   \item{shape.censtime}{Weilbull shape for censoring time}
 
-  \item{K}{Number of intervals}
+  \item{n.inspections}{Number of inspection times}
 
   \item{schedule}{Mean of the waiting time between adjacent
   inspections.}
@@ -56,16 +56,22 @@ times.
 }
 \examples{
 library(lava)
+library(prodlim)
 # generate illness-death model based on exponentially
 # distributed times
-m <- idmModel()
-sim(m,6)
+m <- idmModel(scale.illtime=1/70,
+              shape.illtime=1.8,
+              scale.lifetime=1/50,
+              shape.lifetime=0.7,
+              scale.waittime=1/30,
+              shape.waittime=0.7)
+round(sim(m,6),1)
 
 # Estimate the parameters of the Weibull models
 # based on the uncensored exact event times
 # and the uncensored illstatus.
 set.seed(18)
-d <- sim(m,10,latent=TRUE)
+d <- sim(m,100,latent=FALSE)
 d$uncensored.status <- 1
 f <- idm(formula01=Hist(time=illtime,event=illstatus)~1,
          formula02=Hist(time=lifetime,event=uncensored.status)~1,
@@ -73,15 +79,15 @@ f <- idm(formula01=Hist(time=illtime,event=illstatus)~1,
          conf.int=FALSE)
 print(f)
 
-# Lower the rate of the 0->2 and 0->1 transitions
-# increase the rate of the 1->2 transition
+# Change the rate of the 0->2 and 0->1 transitions
+# also the rate of the 1->2 transition
 # and also lower the censoring rate
 m <- idmModel(scale.lifetime=1/2000,
               scale.waittime=1/30,
               scale.illtime=1/1000,
               scale.censtime=1/1000)
 set.seed(18)
-d <- sim(m,100,latent=TRUE)
+d <- sim(m,50,latent=TRUE)
 d$uncensored.status <- 1
 
 f <- idm(formula01=Hist(time=observed.illtime,event=illstatus)~1,
@@ -108,9 +114,9 @@ print(fi)
 # X1, X2, X3
 m <- idmModel(shape.waittime=2,
               scale.lifetime=1/2000,
-              scale.waittime=1/30,
-              scale.illtime=1/1000,
-              scale.censtime=1/1000)
+              scale.waittime=1/300,
+              scale.illtime=1/10000,
+              scale.censtime=1/10000)
 distribution(m,"X1") <- binomial.lvm(p=0.3)
 distribution(m,"X2") <- normal.lvm(mean=120,sd=20)
 distribution(m,"X3") <- normal.lvm(mean=50,sd=20)
@@ -119,9 +125,10 @@ regression(m,to="latent.illtime",from="X2") <- 0.07
 regression(m,to="latent.illtime",from="X3") <- -0.1
 regression(m,to="latent.waittime",from="X1") <- 1.8
 regression(m,to="latent.lifetime",from="X1") <- 0.7
-set.seed(21)
-d <- sim(m,00,latent=TRUE)
+set.seed(28)
+d <- sim(m,100,latent=TRUE)
 head(d)
+table(ill=d$seen.ill,death=d$seen.exit)
 
 # Estimation based on uncensored data
 d$uncensored.status <- 1

@@ -29,6 +29,7 @@
 #' @examples
 #'
 #' library(lava)
+#' library(prodlim)
 #' m <- idmModel(scale.lifetime=1/10,scale.illtime=1/8)
 #' distribution(m,"X") <- binomial.lvm()
 #' regression(m,latent.lifetime~X) <- 0.7

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ##' Function to generate an illness-death model for simulation.
 ##'
 ##' Based on the functionality of the lava PACKAGE the function generates
@@ -17,21 +16,29 @@
 ##' @param shape.waittime Weilbull shape for latent life time
 ##' @param scale.censtime Weilbull scale for censoring time
 ##' @param shape.censtime Weilbull shape for censoring time
-##' @param K Number of intervals
-##' @param schedule Mean of the waiting time between adjacent inspections.
-##' @param punctuality Standard deviation of waiting time between inspections.
+##' @param n.inspections Number of inspection times
+##' @param schedule Mean of the waiting time between adjacent
+##' inspections.
+##' @param punctuality Standard deviation of waiting time between
+##' inspections.
 ##' @examples
 ##' library(lava)
+##' library(prodlim)
 ##' # generate illness-death model based on exponentially
 ##' # distributed times
-##' m <- idmModel()
-##' sim(m,6)
+##' m <- idmModel(scale.illtime=1/70,
+##'               shape.illtime=1.8,
+##'               scale.lifetime=1/50,
+##'               shape.lifetime=0.7,
+##'               scale.waittime=1/30,
+##'               shape.waittime=0.7)
+##' round(sim(m,6),1)
 ##' 
 ##' # Estimate the parameters of the Weibull models
 ##' # based on the uncensored exact event times
 ##' # and the uncensored illstatus.
 ##' set.seed(18)
-##' d <- sim(m,10,latent=TRUE)
+##' d <- sim(m,100,latent=FALSE)
 ##' d$uncensored.status <- 1
 ##' f <- idm(formula01=Hist(time=illtime,event=illstatus)~1,
 ##'          formula02=Hist(time=lifetime,event=uncensored.status)~1,
@@ -39,15 +46,15 @@
 ##'          conf.int=FALSE)
 ##' print(f)
 ##' 
-##' # Lower the rate of the 0->2 and 0->1 transitions
-##' # increase the rate of the 1->2 transition
+##' # Change the rate of the 0->2 and 0->1 transitions
+##' # also the rate of the 1->2 transition
 ##' # and also lower the censoring rate
 ##' m <- idmModel(scale.lifetime=1/2000,
 ##'               scale.waittime=1/30,
 ##'               scale.illtime=1/1000,
 ##'               scale.censtime=1/1000)
 ##' set.seed(18)
-##' d <- sim(m,100,latent=TRUE)
+##' d <- sim(m,50,latent=TRUE)
 ##' d$uncensored.status <- 1
 ##' 
 ##' f <- idm(formula01=Hist(time=observed.illtime,event=illstatus)~1,
@@ -74,9 +81,9 @@
 ##' # X1, X2, X3
 ##' m <- idmModel(shape.waittime=2,
 ##'               scale.lifetime=1/2000,
-##'               scale.waittime=1/30,
-##'               scale.illtime=1/1000,
-##'               scale.censtime=1/1000)
+##'               scale.waittime=1/300,
+##'               scale.illtime=1/10000,
+##'               scale.censtime=1/10000)
 ##' distribution(m,"X1") <- binomial.lvm(p=0.3)
 ##' distribution(m,"X2") <- normal.lvm(mean=120,sd=20)
 ##' distribution(m,"X3") <- normal.lvm(mean=50,sd=20)
@@ -85,9 +92,10 @@
 ##' regression(m,to="latent.illtime",from="X3") <- -0.1
 ##' regression(m,to="latent.waittime",from="X1") <- 1.8
 ##' regression(m,to="latent.lifetime",from="X1") <- 0.7
-##' set.seed(21)
-##' d <- sim(m,00,latent=TRUE)
+##' set.seed(28)
+##' d <- sim(m,100,latent=TRUE)
 ##' head(d)
+##' table(ill=d$seen.ill,death=d$seen.exit)
 ##' 
 ##' # Estimation based on uncensored data
 ##' d$uncensored.status <- 1
@@ -120,19 +128,10 @@ idmModel <- function(scale.illtime=1/100,
                      shape.waittime=1,
                      scale.censtime=1/100,
                      shape.censtime=1,
-                     K=5,
+                     n.inspections=5,
                      schedule=10,
                      punctuality=5){
 
-=======
-idmModel <- function(scale=1/100,
-                     cens="interval",
-                     K=5,
-                     schedule=1/scale,
-                     punctuality=10*scale){
-    require(lava)
-    ## ===============================================
->>>>>>> saves before pulling Celia's changes
     ## illness-death-model
     ##
     ## model waiting time in state 0
@@ -159,8 +158,8 @@ idmModel <- function(scale=1/100,
     ## ===============================================
     lava::distribution(idm,"censtime") <- lava::coxWeibull.lvm(shape=shape.censtime,
                                                                scale=scale.censtime)
-    if (K>0)
-        for (k in 1:K){
+    if (n.inspections>0)
+        for (k in 1:n.inspections){
             lava::distribution(idm,paste("inspection",k,sep="")) <- lava::normal.lvm(mean=schedule,sd=punctuality)
         }
     ## }
@@ -168,7 +167,6 @@ idmModel <- function(scale=1/100,
     ## class(idm) <- c("lvm")
     idm
 }
-<<<<<<< HEAD
 ##' Function to simulate illness-death model data
 ##'
 ##' Based on the functionality of the lava PACKAGE 
@@ -176,7 +174,8 @@ idmModel <- function(scale=1/100,
 ##' @param x An \code{idmModel} object as obtained with
 ##' \code{idmModel}
 ##' @param n Number of observations
-##' @param illness.known.at.death Affects the value of variable seen.ill  
+##' @param illness.known.at.death Affects the value of variable
+##' seen.ill
 ##' @param compliance Probability of missing an inspection time.
 ##' @param latent if TRUE keep the latent event times
 ##' @param keep.inspectiontimes if \code{TRUE} keep the inspection
@@ -215,6 +214,7 @@ sim.idmModel <- function(x,
         # make sure all inspection times are in the future
         # of the previous inspection time
         iframe <- dat[,ipos]
+        dat <- dat[,-ipos]
         iframe <- do.call("rbind",lapply(1:n,function(i){
             cumsum(pmax(unlist(iframe[i,]),0))
         }))
@@ -224,119 +224,101 @@ sim.idmModel <- function(x,
             ## remove inspections where compliance is
             ## sampled as zero
             if (compliance<1 & compliance>0){
-=======
-sim.idmModel <- function(x,
-                         n=100,
-                         compliance=1,
-                         p=NULL,
-                         normal=FALSE,
-                         cond=FALSE,
-                         sigma = 1,
-                         rho=0.5,
-                         X,
-                         unlink=FALSE,
-                         ...){
-    # simulate latent data
-    class(x) <- "lvm"
-    dat <- sim(x,n=n,...)
-    # construct lifetime for ill subjects
-    ill <- dat$event==1
-    dat$lifetime[ill] <- dat$illtime[ill]+dat$waittime[ill]
-    # reset illtime for subjects that were never ill 
-    dat$illtime[!ill] <- dat$lifetime[!ill]
-    cens <- attr(x,"cens")
-    if (cens=="interval") {
-        ipos <- grep("inspection[0-9]+",names(dat))
-        interval <- do.call("rbind",lapply(1:n,function(i){
-            ## cumulate times between inspections
-            itimes <- unique(cumsum(c(0,pmax(0,dat[i,ipos,drop=TRUE]))))
-            itimes <- c(itimes[itimes<dat$lifetime[i]],dat[i,"lifetime"])
-            if (compliance!=1){
->>>>>>> saves before pulling Celia's changes
                 comp <- rbinom(length(itimes),1,compliance)
                 itimes <- itimes[comp==1]
             }
             ## remove inspection times that are 
             ## larger than the individual lifetime
-            ltime <- dat$lifetime[i]
-            itimes <- itimes[itimes<ltime]
-            ## set censoring time to the maximum of the
-            ## random censoring time and the largest
-            ## inspection time which is smaller than
-            ## the lifetime
-            ctime <- max(dat$censtime[i],itimes[length(itimes)])
-            ## and add the individual lifetime as the largest
-            ## inspection time
-            itimes <- c(itimes,ltime)
-            ## find interval where illness happens.
-            ## if illness happens between last inspection time
-            ## and lifetime set illness status to zero if the
-            ## subject is right censored after last inspection time 
-            ## and otherwise to user option illness.known.at.death
+            itimes <- itimes[itimes<dat$lifetime[i]]
+            ## and those larger than the right censoring time
+            itimes <- itimes[itimes<dat$censtime[i]]
+            ## if all inspection times are censored
+            ## set a single one at 0
+            if (length(itimes)==0) itimes <- 0
+            ## mark the last inspection time 
+            last.inspection <- itimes[length(itimes)]
+            ## find the interval where illness happens
             if (dat$illstatus[i]){
-                hit <- prodlim::sindex(eval.times=dat[i,"illtime"],jump.times=itimes,strict=TRUE)
-                if (hit == (length(itimes)-1))
-                    if (dat$censtime[i]<=itimes[length(itimes)])
-                        out <- c(ctime,c(0,itimes)[c(1+hit,2+hit)],0)
-                    else
-                        out <- c(ctime,c(0,itimes)[c(1+hit,2+hit)],illness.known.at.death)
-                else
-                    out <- c(ctime,c(0,itimes)[c(1+hit,2+hit)],1)
-                out
-            }
-            else{## when never ill, set both interval borders to lifetime  
-                c(ctime,rep(max(itimes),2),0)
+                ## subject was ill
+                if (dat$illtime[i] > last.inspection){
+                    ## no illness observed at last inspection
+                    if (dat$censtime[i]<dat$lifetime[i]){
+                        ## right censored: no illness observed
+                        c(last.inspection,dat$censtime[i],0)
+                    }else{
+                        ## user option decides if illness is recorded at death
+                        c(last.inspection,dat$lifetime[i],illness.known.at.death)
+                    }
+                }else{ ## illtime is smaller or equal to last inspection time
+                    if (length(itimes)==1){
+                        c(0,itimes,1)
+                    } else{
+                        hit <- prodlim::sindex(eval.times=dat$illtime[i],
+                                               jump.times=itimes,
+                                               strict=TRUE)
+                        c(c(0,itimes)[c(1+hit,2+hit)],1)
+                    }
+                }
+            } else {
+                ## subject was never ill
+                if (dat$censtime[i]<dat$lifetime[i]){
+                    ## right censored: no illness observed
+                    ## until last inspection
+                    c(last.inspection,dat$censtime[i],0)
+                } else{
+                    ## no illness observed until death
+                    if(illness.known.at.death==1){
+                        c(dat$lifetime[i],dat$lifetime[i],0)
+                    }else{
+                        ## no illness observed
+                        ## until last inspection
+                        ## provide [L=last insp.; R=lifetime]
+                        c(last.inspection,dat$lifetime[i],0)
+                    }
+                }
             }
         }))
-<<<<<<< HEAD
-        colnames(interval) <- c("censtime","L","R","seen.ill")
-        dat <- dat[,-c(ipos,match("censtime",names(dat)))]
+        colnames(interval) <- c("L","R","seen.ill")
         dat <- cbind(dat,interval)
         if (latent==FALSE)
             dat <- dat[,-grep("latent\\.",names(dat))]
-        if (keep.inspectiontimes)
-            dat$inspectiontimes <- iframe
+        if (keep.inspectiontimes) dat <- cbind(dat,iframe)
     }
     dat$seen.exit <- 1*(dat$lifetime<dat$censtime)
     dat$observed.lifetime <- pmin(dat$lifetime,dat$censtime)
     dat$observed.illtime <- pmin(dat$illtime,dat$censtime)
-    dat$L <- pmin(dat$L,dat$censtime)
-    dat$R <- pmin(dat$R,dat$censtime)
     dat$observed.illtime[dat$illstatus==0] <- -9
     dat$illtime[dat$illstatus==0] <- -9
-=======
-        colnames(interval) <- c("L","R","ill")
-        dat <- cbind(dat[,-c(ipos,match(c("time","waittime"),names(dat)))],interval)
-        ## right censored?
-        dat$censtime <- pmax(dat$censtime,dat$R)
-    }
-    dat$status <- 1*(dat$lifetime<dat$censtime) 
-    dat$lifetime <- pmin(dat$lifetime,dat$censtime)
-    ## dat <- dat[,-match(c("censtime","illtime"),names(dat))]
->>>>>>> saves before pulling Celia's changes
     dat
 }
 
 
-##' Function to simulate from a specific illness-death model 
+##' Simulate data from an illness-death model with interval censored event times and covariates 
 ##'
-##' For the purpose of illustrating the help pages of the SmoothHazard package.
+##' Simulate data from an illness-death model with interval censored event times
+##' and covariates for the purpose of illustrating the help pages of the SmoothHazard package.
+##' See the body of the function for details, i.e., evaluate simulateIDM
+##' @seealso idmModel sim.idmModel
 ##' @title Sample illness-death model data
+##' @examples
+##' simulateIDM
+##' simulateIDM(100)
 #' @export
 #' @param n number of observations
 simulateIDM <- function(n=100){
     m <- idmModel(shape.waittime=2,
                   scale.lifetime=1/2000,
-                  scale.waittime=1/30,
-                  scale.illtime=1/1000,
-                  scale.censtime=1/1000)
+                  scale.waittime=1/3000,
+                  scale.illtime=1/7000,
+                  scale.censtime=1/1000,
+                  n.inspections=5,schedule=10,punctuality=5)
     lava::distribution(m,"X1") <- lava::binomial.lvm(p=0.3)
     lava::distribution(m,"X2") <- lava::normal.lvm(mean=120,sd=20)
     lava::distribution(m,"X3") <- lava::normal.lvm(mean=50,sd=20)
-    lava::regression(m,to="latent.illtime",from="X1") <- 1.7
+    lava::regression(m,to="latent.illtime",from="X1") <- 0.7
     lava::regression(m,to="latent.illtime",from="X2") <- 0.07
     lava::regression(m,to="latent.illtime",from="X3") <- -0.1
-    lava::regression(m,to="latent.waittime",from="X1") <- 1.8
+    lava::regression(m,to="latent.waittime",from="X1") <- 0.8
     lava::regression(m,to="latent.lifetime",from="X1") <- 0.7
     lava::sim(m,n)
 }

@@ -20,6 +20,7 @@
 #' \dontrun{
 #' # a penalized survival model 
 #' data(testdata)
+#' library(prodlim)
 #' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="Splines") 
 #' summary(fit.su)
 #'
