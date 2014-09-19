@@ -46,6 +46,7 @@ Predict life expectancies from an object of class
 Z02, Z12. Confidence intervals are calculated.
 }
 \examples{
+\dontrun{
 library(lava)
 library(prodlim)
 set.seed(17)
@@ -57,7 +58,7 @@ fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
              conf.int=FALSE)
 try(lifexpect(fitIC,s=10),silent=TRUE)
 
-\dontrun{
+
     data(Paq1000)
 
     fit <- idm(formula02=prodlim::Hist(time=t,event=death,entry=e)~certif,

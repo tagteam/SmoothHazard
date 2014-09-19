@@ -28,8 +28,6 @@
         use parameters
         use optim
         use commun
-
-        
         implicit none
         
         integer::npar,nvat,j,k,ii,i,ic,ier,interval,irep,truncated,maxiter0,nva

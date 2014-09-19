@@ -55,6 +55,7 @@ right censored lifetimes and interval censored illness
 times.
 }
 \examples{
+\dontrun{
 library(lava)
 library(prodlim)
 # generate illness-death model based on exponentially
@@ -150,6 +151,7 @@ F3 <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2+X3,
           data=d,conf.int=FALSE)
 print(F3)
 cbind(uncensored=F1$coef,right.censored=F2$coef,interval.censored=F3$coef)
+}
 }
 \author{
 Thomas Alexander Gerds

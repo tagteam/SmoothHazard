@@ -31,6 +31,7 @@
 #' @seealso \code{\link{idm}}
 #' @keywords methods
 ##' @examples
+##' \dontrun{
 ##' library(lava)
 ##' library(prodlim)
 ##' set.seed(17)
@@ -42,7 +43,7 @@
 ##'              conf.int=FALSE)
 ##' try(lifexpect(fitIC,s=10),silent=TRUE)
 ##' 
-##' \dontrun{
+##' 
 ##'     data(Paq1000)
 ##' 
 ##'     fit <- idm(formula02=prodlim::Hist(time=t,event=death,entry=e)~certif,
