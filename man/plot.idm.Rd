@@ -64,10 +64,10 @@ formula01=Hist(time=list(L,R),event=seen.ill)~1,data=d,conf.int=FALSE)
 plot(fit.weib)
 
 \dontrun{
-## FIXME: the limits for the 01 transition are a bit wide!?
-## with bootstrap confidence limits
-fit.weib <- idm(formula02=Hist(observed.lifetime,event=seen.exit)~1,
-formula01=Hist(time=list(L,R),event=seen.ill)~1,data=d,conf.int=TRUE)
+data(Paq1000)
+fit.weib <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
+  	formula01=Hist(time=list(l,r),event=dementia)~certif,
+		data=Paq1000)
 plot(fit.weib)
 }
 }

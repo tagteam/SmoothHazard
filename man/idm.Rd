@@ -196,9 +196,6 @@ data(Paq1000)
 # Illness-death model with certif on the 3 transitions
 # Weibull parametrization and likelihood maximization
 fit.weib <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
-formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000)
-
-fit.weib <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 		formula01=Hist(time=list(l,r),event=dementia)~certif,
 		data=Paq1000)
 

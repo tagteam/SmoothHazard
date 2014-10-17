@@ -34,7 +34,7 @@ summary.shr <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...
     if (!inherits(object,"shr")) stop("Object must be of class 'shr'")
     if (object$method=="Weib"){
         x <- object
-        if (x$converged == 1){
+        if (x$converged[1] == 1){
             cat("Suvival model using a parametrical Weibull hazard function.\n")
             cat("\n")
             cat("number of subjects: ", x$N,"\n")
@@ -42,7 +42,7 @@ summary.shr <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...
             cat("number of covariates: ", x$NC,"\n")
             if(length(x$na.action))cat("observation deleted due to missing: ",length(x$na.action),"\n")
 
-		if(x$NC>0){
+		if((x$NC>0)&&(x$converged[2]==1)){
 			wald <- (x$coef/x$se)**2
 			z <- abs(qnorm((1 + conf.int)/2))
 	
@@ -58,14 +58,14 @@ summary.shr <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...
 
     	x <- object
 #	if (x$istop == 1){
-	if (x$converged == 1){
+	if (x$converged[1] == 1){
 		cat("Survival model using a Penalized Likelihood on the hazard function.\n")
 		cat("\n")
 		cat("number of subject: ", x$N,"\n")
 		cat("number of covariates: ", x$NC,"\n")
 		if(length(x$na.action))cat("observation deleted due to missing: ",length(x$na.action),"\n")
 
-		if(x$NC>0){
+		if((x$NC>0)&&(x$converged[2]==1)){
 			wald <- (x$coef/x$se)**2
 			z <- abs(qnorm((1 + conf.int)/2))
 	

@@ -56,7 +56,7 @@ fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
              formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
              formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
              conf.int=FALSE)
-try(lifexpect(fitIC,s=10),silent=TRUE)
+try(lifexpect(fitIC,s=10,Z01=c(1,1),Z02=c(1,1),Z12=c(1,1)),silent=TRUE)
 
 
     data(Paq1000)
@@ -67,7 +67,7 @@ try(lifexpect(fitIC,s=10),silent=TRUE)
                data=Paq1000,
                conf.int=FALSE)
 
-    pred <- lifexpect(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
+    LE <- lifexpect(fit,s=90,Z01=c(1),Z02=c(1),Z12=c(1),CI=FALSE)
 
 }
 }

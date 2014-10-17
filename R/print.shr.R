@@ -31,8 +31,9 @@ print.shr <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
     cat("Call:\n")
     dput(cl)
     cat("\n")
-    if (x$converged == 1){
-        if(x$NC >0){
+  
+    if (x$converged[1] == 1){
+        if((x$NC >0)&&(x$converged[2]==1)){
             wald <- (x$coef/x$se)**2
             z <- abs(qnorm((1 + conf.int)/2))
             tmp <- data.frame("coef"=format(round(x$coef,digits)),
