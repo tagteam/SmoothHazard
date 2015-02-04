@@ -69,7 +69,6 @@ predict.idm <- function(object,s,t,Z01,Z02,Z12,nsim=2000,CI=TRUE,...) {
     x <- object
     if (x$method=="Splines"){
         # if covariates: cov=c(cov1,cov2,cov3,...)
-        if (inherits(x,"idmSplines")) {
             nvar01 <- x$NC[1]
             nvar02 <- x$NC[2]
             nvar12 <- x$NC[3]
@@ -293,7 +292,6 @@ predict.idm <- function(object,s,t,Z01,Z02,Z12,nsim=2000,CI=TRUE,...) {
         }
         else 
             return(res)	
-    }
 }
 
 
