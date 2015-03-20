@@ -908,7 +908,7 @@ are too wiggly, the smoothing parameter may be increased.
 A object as returned by the \code{idm} function 
 can be used as argument of the \code{predict} function in
 order to obtain transition probabilities, cumulative probabilities of event and 
-life expectancies with confidence intervals. 
+life expectancy with confidence intervals. 
 For example, the following call give predictions regarding 
 a 70 years-old male subject who have primary school diploma, 
 over a 10 years horizon: 
@@ -921,12 +921,18 @@ x
 #+END_SRC
 
 #+RESULTS[<2014-05-16 15:02:18> c41a6b4d630deeba4ef62dfbd456c77afca5e96a]:
-: Error in predict(fit.weib, s = 70, t = 80, Z01 = c(1, 1), Z02 = 1) : 
-:   object 'fit.weib' not found
-: Error in do.call("rbind", pred) : object 'pred' not found
-: Error in colnames(x) <- c("Probability", "Lower", "Upper") : 
-:   object 'x' not found
-: Error: object 'x' not found
+#+begin_example
+      Probability Lower Upper
+p00          0.64  0.59  0.68
+p01          0.05  0.03  0.07
+p11          0.33  0.27  0.67
+p12          0.67  0.33  0.73
+p02_0        0.29  0.24  0.33
+p02_1        0.03  0.01  0.05
+p02          0.32  0.27  0.36
+F01          0.08  0.05  0.12
+F0.          0.36  0.32  0.41
+#+end_example
 
 The covariates values must be specified in the \code{Z01}, \code{Z02} and \code{Z12} 
 arguments in the same order as they were entered in the preceding \code{idm} call.

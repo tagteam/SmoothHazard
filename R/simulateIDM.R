@@ -190,7 +190,7 @@ idmModel <- function(scale.illtime=1/100,
 ##' help(idmModel)
 ##' @author Thomas Alexander Gerds
 ##' @importFrom lava sim
-##' @S3method sim idmModel
+##' @export sim idmModel
 sim.idmModel <- function(x,
                          n,
                          illness.known.at.death=TRUE,

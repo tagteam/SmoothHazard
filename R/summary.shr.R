@@ -29,7 +29,7 @@
 #' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata) 
 #' summary(fit.su) 
 #' }
-#' @S3method summary shr
+#' @export summary shr
 summary.shr <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...){
     if (!inherits(object,"shr")) stop("Object must be of class 'shr'")
     if (object$method=="Weib"){

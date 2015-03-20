@@ -217,7 +217,6 @@ idm <- function(formula01,
   # }}}
   # {{{ extract response
   responseTrans <- model.response(m01)
-  
   responseAbs <- model.response(m02)
   # }}}
   # {{{ extract covariates
@@ -247,7 +246,13 @@ idm <- function(formula01,
   isIntervalCensored <- attr(responseTrans,"cens.type")=="intervalCensored"
   truncated <- nchar(attr(responseAbs,"entry.type"))>1
   abstime <- as.double(responseAbs[,"time"])
+  ## It may happen that the illness time is observed exactly, in which case
+  ## the status is 1, thus we need two criteria to declare illness status:
+  ## 1. exact observations with illness status ==1
+  ## 2. interval censored with any illness status. FIXME: check the corresponding likelihood
   idm <- responseTrans[,"status"]==(as.integer(isIntervalCensored)+1)
+  idm[(responseTrans[,"status"]==1 & (responseTrans[,"L"]==responseTrans[,"R"]))] <- 1
+  ## exit status
   idd <- responseAbs[,"status"]==1
   N <- length(abstime)
   if (truncated==0){

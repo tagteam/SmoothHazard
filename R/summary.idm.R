@@ -27,7 +27,7 @@
 #' 		data=Paq1000)
 #' summary(fit.splines) 
 #' }
-#' @S3method summary idm
+#' @export summary idm
 summary.idm <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...){
     if (!inherits(object,"idm")) stop("Object must be of class 'idm'")
     if (object$converged[1] == 1){

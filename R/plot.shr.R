@@ -42,7 +42,7 @@
 #' plot(fit.su,confint=FALSE)
 #' 
 #'
-##' @S3method plot shr
+##' @export plot shr
 plot.shr <- function(x,type="shr",add = FALSE,newdata=NULL,cause=NULL,col,lty,lwd,
 	ylim,xlim,xlab="Time",ylab,legend=TRUE,confint=TRUE,timeOrigin=0,
 	axes=TRUE,percent=TRUE,...){

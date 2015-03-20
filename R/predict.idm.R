@@ -64,7 +64,7 @@
 #' 
 #' }
 #'
-#' @S3method predict idm
+#' @export predict idm
 predict.idm <- function(object,s,t,Z01,Z02,Z12,nsim=2000,CI=TRUE,...) {
     x <- object
     if (x$method=="Splines"){
