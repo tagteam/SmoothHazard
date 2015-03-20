@@ -48,7 +48,7 @@
 #' }
 #'  
 #'
-#' @S3method plot idm
+#' @export plot idm
 plot.idm <- function(x,
                      conf.int=FALSE,
                      citype="shadow",
