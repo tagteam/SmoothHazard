@@ -174,7 +174,7 @@
 #'
 #' @importFrom prodlim Hist
 #' @useDynLib SmoothHazard
-#' @export idm
+#' @export
 idm <- function(formula01,
                 formula02,
                 formula12,
@@ -251,7 +251,8 @@ idm <- function(formula01,
   ## 1. exact observations with illness status ==1
   ## 2. interval censored with any illness status. FIXME: check the corresponding likelihood
   idm <- responseTrans[,"status"]==(as.integer(isIntervalCensored)+1)
-  idm[(responseTrans[,"status"]==1 & (responseTrans[,"L"]==responseTrans[,"R"]))] <- 1
+  if (isIntervalCensored)
+      idm[(responseTrans[,"status"]==1 & (responseTrans[,"L"]==responseTrans[,"R"]))] <- 1
   ## exit status
   idd <- responseAbs[,"status"]==1
   N <- length(abstime)

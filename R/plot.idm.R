@@ -48,7 +48,7 @@
 #' }
 #'  
 #'
-#' @export plot idm
+#' @export
 plot.idm <- function(x,
                      conf.int=FALSE,
                      citype="shadow",

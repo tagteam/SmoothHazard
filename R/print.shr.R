@@ -24,7 +24,7 @@
 #' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="Splines") 
 #' print(fit.su) 
 #' }
-#' @export print shr
+#' @export
 print.shr <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
     if (!inherits(x,"shr")) stop("Object must be of class 'shr'")
     cl <- x$call

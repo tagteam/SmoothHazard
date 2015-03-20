@@ -87,7 +87,7 @@
 #' ## summary
 #' summary(fit.su)
 #' 
-#' @export shr
+#' @export
 shr <- function(formula,
                  data,
                  eps=c(5,5,3),

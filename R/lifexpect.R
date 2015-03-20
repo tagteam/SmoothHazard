@@ -55,8 +55,7 @@
 ##'     pred <- lifexpect(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
 ##' 
 ##' }
- 
-#' @export lifexpect
+#' @export
 lifexpect <- function(x,s,Z01,Z02,Z12,nsim=1000,CI=TRUE,...) {
     if (x$method=="Weib"){
         nvar01 <- x$NC[1]
