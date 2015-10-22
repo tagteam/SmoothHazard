@@ -18,6 +18,11 @@
 #' subject: age at the latest news} \item{certif}{primary school
 #' certificate:\code{0=with certificate}, \code{1=without certificate}}
 #' \item{gender}{gender: \code{0=female}, \code{1=male}} }
+#' @importFrom lava sim regression
+#' @importFrom grDevices col2rgb
+#' @importFrom graphics lines par polygon rect segments
+#' @importFrom stats integrate model.matrix na.fail na.omit pchisq pweibull qnorm quantile rbinom
+#' @importFrom utils flush.console
 #' @keywords datasets
 #' @examples
 #' 
@@ -50,4 +55,3 @@ NULL
 NULL
 
 
-#' @importFrom lava sim regression

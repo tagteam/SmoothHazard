@@ -74,19 +74,19 @@
 #' of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 #' 431-441.
 #' @keywords methods 
-#' @examples
-#' 
-#' # Weibull survival model
-#' library(prodlim)
-#' data(testdata)
-#' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,) 
-#' 
-#' ## to print
-#' fit.su
-#' 
-#' ## summary
-#' summary(fit.su)
-#' 
+##' @examples
+##' 
+##' # Weibull survival model
+##' library(prodlim)
+##' data(testdata)
+##' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,) 
+##' 
+##' ## to print
+##' fit.su
+##' 
+##' ## summary
+##' summary(fit.su)
+##' 
 #' @export
 shr <- function(formula,
                  data,
@@ -124,7 +124,7 @@ shr <- function(formula,
   m[[1]] <- as.name("model.frame")	
   m <- eval(m,sys.parent())
   na.action <- attr(m,"na.action")
-  response <- model.response(m)
+  response <- stats::model.response(m)
 
   #  FIX for people who use `Surv' instead of `Hist' 
   

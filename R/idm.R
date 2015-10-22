@@ -126,52 +126,51 @@
 #' of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 #' 431-441.
 #' @keywords ilness-death
-#' @examples
-#' library(lava)
-#' library(prodlim)
-#' set.seed(17)
-#' d <- simulateIDM(100)
-#' # right censored data
-#' fitRC <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
-#'     formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
-#'     formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
-#'     conf.int=FALSE)
-#' fitRC
-#' # interval censored data
-#' fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
-#'     formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
-#'     formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
-#'     conf.int=FALSE)
-#' fitIC
 #' 
-#' \dontrun{
-#' 
-#' data(Paq1000)
-#' 
-#' # Illness-death model with certif on the 3 transitions
-#' # Weibull parametrization and likelihood maximization
-#' fit.weib <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
-#' formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000) 
-#' 
-#' fit.weib <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
-#' 		formula01=Hist(time=list(l,r),event=dementia)~certif,
-#' 		data=Paq1000)
-#' 
-#' # Illness-death model with certif on transitions 01 and 02
-#' # Splines parametrization and penalized likelihood maximization
-#' fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
-#' 		formula01=Hist(time=list(l,r),event=dementia)~certif,
-#'                 formula12=~1,
-#'                 method="Splines",
-#' 		data=Paq1000)
-#' 
-#' ## to print
-#' fit.weib
-#' 
-#' ## to summary
-#' summary(fit.splines)
-#' }
-#'
+##' @examples
+##' library(lava)
+##' library(prodlim)
+##' set.seed(17)
+##' d <- simulateIDM(100)
+##' # right censored data
+##' fitRC <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
+##'              formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
+##'              formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
+##'              conf.int=FALSE)
+##' fitRC
+##' # interval censored data
+##' fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
+##'              formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
+##'              formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
+##'              conf.int=FALSE)
+##' fitIC
+##' 
+##' \dontrun{
+##' 
+##'     data(Paq1000)
+##' 
+##'     # Illness-death model with certif on the 3 transitions
+##'     # Weibull parametrization and likelihood maximization
+##' 
+##'     fit.weib <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
+##'                     formula01=Hist(time=list(l,r),event=dementia)~certif,
+##'                     data=Paq1000)
+##' 
+##'     # Illness-death model with certif on transitions 01 and 02
+##'     # Splines parametrization and penalized likelihood maximization
+##'     fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
+##'                         formula01=Hist(time=list(l,r),event=dementia)~certif,
+##'                         formula12=~1,
+##'                         method="Splines",
+##'                         data=Paq1000)
+##' 
+##'     ## to print
+##'     fit.weib
+##' 
+##'     ## to summary
+##'     summary(fit.splines)
+##' }
+##' 
 #' @importFrom prodlim Hist
 #' @useDynLib SmoothHazard
 #' @export
@@ -216,8 +215,8 @@ idm <- function(formula01,
   m12 <- eval(m12,parent.frame())
   # }}}
   # {{{ extract response
-  responseTrans <- model.response(m01)
-  responseAbs <- model.response(m02)
+  responseTrans <- stats::model.response(m01)
+  responseAbs <- stats::model.response(m02)
   # }}}
   # {{{ extract covariates
   ## formula01
@@ -351,29 +350,29 @@ idm <- function(formula01,
                        V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                        PACKAGE="SmoothHazard")
     
-    ## ===Fortran delivers===
-    ## Variable name| Explanation|Dimension|Storage mode|Remark
-    ## loglik|log-likelihood without and with covariate|length 2|double|
-    ## basepar|Weibull parameters|length 2|double|
-    ## regpar|Regression coefficients|length P01+P02+P12|double| 0--->1 then 0--->2 then 1--->2
-    ## v|covariance matrix|length (P01+P02+P12)*(P01+P02+P12)|double|
-    ## converged|1=converged,2=iter > maxiter ,3=no|length 1|integer|
-    ## cv | value of convergence criteria 1:likelihood, 2:parameter est, 3: gradient |length 3 | double |
-    ## niter | number of iterations used to converge | lenght 1 | integer |
-    ## t|time to plot alpha(t) |length 100|double|
-    ## a01|transition intensity function for 0--->1|length 100|double|
-    ## a01_l|lower confidence band for a01|length 100|double|
-    ## a01_u|upper confidence band for a01|length 100|double|
-    ## a02|transition intensity function for 0--->2|length 100|double|
-    ## a02_l|lower confidence band for a02|length 100|double|
-    ## a02_u|upper confidence band for a02|length 100|double|
-    ## a12|transition intensity function for 1--->2|length 100|double|
-    ## a12_l|lower confidence band for a12|length 100|double|
-    ## a12_u|upper confidence band for a12|length 100|double|
-}else{
-    #  	cat("------ Program Splines ------ \n")
-    if (length(entrytime)>0){
-        alltimes <- sort(unique(c(Ltime, Rtime,entrytime,abstime)))
+      ## ===Fortran delivers===
+      ## Variable name| Explanation|Dimension|Storage mode|Remark
+      ## loglik|log-likelihood without and with covariate|length 2|double|
+      ## basepar|Weibull parameters|length 2|double|
+      ## regpar|Regression coefficients|length P01+P02+P12|double| 0--->1 then 0--->2 then 1--->2
+      ## v|covariance matrix|length (P01+P02+P12)*(P01+P02+P12)|double|
+      ## converged|1=converged,2=iter > maxiter ,3=no|length 1|integer|
+      ## cv | value of convergence criteria 1:likelihood, 2:parameter est, 3: gradient |length 3 | double |
+      ## niter | number of iterations used to converge | lenght 1 | integer |
+      ## t|time to plot alpha(t) |length 100|double|
+      ## a01|transition intensity function for 0--->1|length 100|double|
+      ## a01_l|lower confidence band for a01|length 100|double|
+      ## a01_u|upper confidence band for a01|length 100|double|
+      ## a02|transition intensity function for 0--->2|length 100|double|
+      ## a02_l|lower confidence band for a02|length 100|double|
+      ## a02_u|upper confidence band for a02|length 100|double|
+      ## a12|transition intensity function for 1--->2|length 100|double|
+      ## a12_l|lower confidence band for a12|length 100|double|
+      ## a12_u|upper confidence band for a12|length 100|double|
+  }else{
+       #  	cat("------ Program Splines ------ \n")
+       if (length(entrytime)>0){
+           alltimes <- sort(unique(c(Ltime, Rtime,entrytime,abstime)))
 
 	amax <- max(alltimes)
         amin <- min(alltimes)
@@ -434,7 +433,6 @@ idm <- function(formula01,
     size1 <- NC01 + NC02 + NC12
     size_V <- size1 + nknots01+nknots02+nknots12 + 6
     size2 <- size1**2
-    
     ffit <- .Fortran("idmPl",
                      ## input
                      as.double(entrytime),               #entrytime=

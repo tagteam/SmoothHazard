@@ -1,9 +1,6 @@
 # 0 : health state
 # 1 : illness state
 # 2 : death state
-
-##### Fonction qui calcule les predictions avec leurs intervalles de confiance entre les temps s et t
-
 #' Predictions for an illness-death model using either a penalized likelihood
 #' approach or a Weibull parametrization.
 #' 
@@ -170,9 +167,15 @@ predict.idm <- function(object,s,t,Z01,Z02,Z12,nsim=2000,CI=TRUE,...) {
                 isup <- ceiling(isup)*delta + floor(isup)*(1-delta)
             }
             Xres4 <- cbind(Xres3[,iinf],Xres3[,isup]) # 1ere colonne = bornes inf pour chaque valeur ; 2eme colonne = borne sup pour chaque valeur
-            return(list(p00=c(res$p00,Xres4[1,]),p01=c(res$p01,Xres4[2,]),p11=c(res$p11,Xres4[3,]),
-                        p12=c(res$p12,Xres4[4,]),p02_0=c(res$p02_0,Xres4[5,]),p02_1=c(res$p02_1,Xres4[6,]),
-                        p02=c(res$p02,Xres4[7,]),F01=c(res$F01,Xres4[8,]),F0.=c(res$F0.,Xres4[9,])))	
+            return(list(p00=c(res$p00,Xres4[1,]),
+                        p01=c(res$p01,Xres4[2,]),
+                        p11=c(res$p11,Xres4[3,]),
+                        p12=c(res$p12,Xres4[4,]),
+                        p02_0=c(res$p02_0,Xres4[5,]),
+                        p02_1=c(res$p02_1,Xres4[6,]),
+                        p02=c(res$p02,Xres4[7,]),
+                        F01=c(res$F01,Xres4[8,]),
+                        F0.=c(res$F0.,Xres4[9,])))	
         }
         else 
             return(res)	
@@ -349,10 +352,8 @@ return(list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=
 }
 
 
-### fonction d'intensité de transition
 # a = shape parameter
 # b = scale parameter
-# bz = (vecteur des coeffs de régression)^T * (vecteur des variables) 
 iweibull <- function(x,a,b,bZ=0) {
   res = (a/b) * (x/b)**(a-1) * exp(bZ)
   return(res) 
@@ -361,7 +362,6 @@ iweibull <- function(x,a,b,bZ=0) {
 #############################################
 
 
-### fonction de survie entre 2 temps s et t
 # S(s,t) = S(t)/S(s)
 # if S(s)=0, S(s,t)=0
 S.weib <- function(s,t,a,b,bZ=0) {	
@@ -461,7 +461,7 @@ A <- function(s,t,zi,nz,the,bZ=0) {
     return(res)
 }
 
-### fonction de survie entre 2 temps s et t
+### Survival function with two time s, t
 # S(s,t) = S(t)/S(s)
 #        = exp(-A(s,t))
 S.pl <- function(s,t,zi,nz,the,bZ=0) {
