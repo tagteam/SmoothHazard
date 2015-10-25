@@ -64,7 +64,7 @@ intensities by M-splines, "Weib" for a parametric approach with a
 Weibull distribution on the transition intensities. Default is
 "Weib".}
 
-\item{conf.int}{Boolean parameter. Equals to \code{TRUE} to
+\item{conf.int}{Logical. If \code{TRUE}
 calculate pointwise confidence intervals for the transition
 intensities curves, \code{FALSE} otherwise. Default is \code{TRUE}.}
 

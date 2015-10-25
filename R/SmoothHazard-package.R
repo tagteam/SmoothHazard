@@ -21,8 +21,9 @@
 #' @importFrom lava sim regression
 #' @importFrom grDevices col2rgb
 #' @importFrom graphics lines par polygon rect segments
-#' @importFrom stats integrate model.matrix na.fail na.omit pchisq pweibull qnorm quantile rbinom
+#' @importFrom stats integrate model.matrix na.fail na.omit pchisq pweibull qnorm quantile rbinom formula model.frame terms update.formula
 #' @importFrom utils flush.console
+#'   
 #' @keywords datasets
 #' @examples
 #' 

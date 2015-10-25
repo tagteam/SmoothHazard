@@ -5,36 +5,35 @@
 \title{Predictions for an illness-death model using either a penalized likelihood
 approach or a Weibull parametrization.}
 \usage{
-\method{predict}{idm}(object, s, t, Z01, Z02, Z12, nsim = 2000, CI = TRUE,
-  ...)
+\method{predict}{idm}(object, s, t, newdata, nsim = 200, seed = 21,
+  conf.int = TRUE, level = 0.95, lifeExpect = FALSE, ...)
 }
 \arguments{
 \item{object}{an \code{idm} class objects returned by a call to the
 \code{\link{idm}} function}
 
-\item{s}{time at prediction.}
+\item{s}{time point at which prediction is made.}
 
-\item{t}{time for prediction.}
+\item{t}{time horizon for prediction.}
 
-\item{Z01}{vector for the values of the covariates on the transition 0 --> 1
-(in the same order as the covariates within the call. The default values are
-all 0.}
+\item{newdata}{A data frame with covariate values for prediction.}
 
-\item{Z02}{vector for the values of the covariates on the transition 0 --> 2
-(in the same order as the covariates within the call. The default values are
-all 0.}
+\item{nsim}{number of simulations for the confidence intervals
+calculations.  The default is 200.}
 
-\item{Z12}{vector for the values of the covariates on the transition 1 --> 2
-(in the same order as the covariates within the call. The default values are
-all 0.}
+\item{seed}{Seed passed to \code{set.seed} for Monte Carlo
+simulation of confidence intervals.}
 
-\item{nsim}{number of simulations for the confidence intervals calculations.
-The default is 2000.}
+\item{conf.int}{Logical: with (\code{TRUE}) or without
+(\code{FALSE}) confidence intervals for the predicted values. The
+default is \code{TRUE}.}
 
-\item{CI}{boolean: with (\code{TRUE}) or without (\code{WRONG}) confidence
-intervals for the predicted values. The default is \code{TRUE}.}
+\item{level}{Value between 0 and 1, the level of confidence. Default is .95.}
 
-\item{\dots}{other parameters.}
+\item{lifeExpect}{Logical. If \code{TRUE} compute life
+expectancies, i.e., \code{t=Inf}.}
+
+\item{...}{other parameters.}
 }
 \value{
 a list containing the following predictions with pointwise
@@ -54,13 +53,20 @@ of class \code{idmSplines} with confidence intervals are calculated.
 }
 \examples{
 \dontrun{
+d=simulateIDM(n = 100)
+fit <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2+X3,
+               formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2+X3,
+               data=d,conf.int=FALSE)
+predict(fit,s=0,t=80,nsim=3,conf.int=FALSE,lifeExpect=F)
+
+
 data(Paq1000)
 library(prodlim)
 fit <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000)
 
-pred <- predict(fit,s=70,t=80,Z01=c(1),Z02=c(1),Z12=c(1))
-pred
+predict(fit,s=70,t=80,newdata=data.frame(certif=1))
+predict(fit,s=70,lifeExpect=TRUE,t=80,newdata=data.frame(certif=1))
 
 fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 		formula01=Hist(time=list(l,r),event=dementia)~certif,
@@ -74,7 +80,7 @@ pred
 }
 }
 \author{
-R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
+R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> and Thomas Alexander Gerds <tag@biostat.ku.dk> Fortran:
 Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 }
 \seealso{

@@ -10,7 +10,7 @@ lifexpect(x, s, Z01, Z02, Z12, nsim = 1000, CI = TRUE, ...)
 \item{x}{an object as returned by a call to the \code{\link{idm}}
 function.}
 
-\item{s}{time at prediction.}
+\item{s}{time at which the prediction of lifetime risks}
 
 \item{Z01}{vector for the values of the covariates on the transition 0 --> 1
 (in the same order as the covariates within the call. The default values are
