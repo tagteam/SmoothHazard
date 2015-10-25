@@ -1,5 +1,5 @@
 Package: SmoothHazard
-Title: Smooth models for interval-censored data with applications to survival and illness-death models
+Title: Smooth Hazard Models for Interval-Censored Data with Applications to Survival and Illness-Death Models
 Version: 1.2.7
 Author: Celia Touraine, Pierre Joly, Thomas A. Gerds
 Description: SmoothHazard is a package for fitting illness-death (and survival)
