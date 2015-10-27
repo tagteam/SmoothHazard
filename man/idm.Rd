@@ -6,7 +6,7 @@
 \usage{
 idm(formula01, formula02, formula12, data, maxiter = 200, eps = c(5, 5, 3),
   n.knots = c(7, 7, 7), knots = "equidistant", CV = FALSE,
-  kappa = c(1000000, 500000, 20000), method = "Weib", conf.int = TRUE,
+  kappa = c(1e+06, 5e+05, 20000), method = "Weib", conf.int = TRUE,
   print.iter = FALSE, subset = NULL, na.action = na.fail)
 }
 \arguments{
