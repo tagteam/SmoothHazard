@@ -7,7 +7,7 @@
 idm(formula01, formula02, formula12, data, maxiter = 200, eps = c(5, 5, 3),
   n.knots = c(7, 7, 7), knots = "equidistant", CV = FALSE,
   kappa = c(1e+06, 5e+05, 20000), method = "Weib", conf.int = TRUE,
-  print.iter = FALSE, subset = NULL, na.action = na.fail)
+  level = 0.95, print.iter = FALSE, subset = NULL, na.action = na.fail)
 }
 \arguments{
 \item{formula01}{A formula specifying a regression model for the
@@ -67,6 +67,9 @@ Weibull distribution on the transition intensities. Default is
 \item{conf.int}{Logical. If \code{TRUE}
 calculate pointwise confidence intervals for the transition
 intensities curves, \code{FALSE} otherwise. Default is \code{TRUE}.}
+
+\item{level}{confidence level for the pointwise confidence intervals
+of the transition intensities curves. Default is 0.95.}
 
 \item{print.iter}{boolean parameter. Equals to \code{TRUE} to print
 the likelihood during the iteration process, \code{FALSE}

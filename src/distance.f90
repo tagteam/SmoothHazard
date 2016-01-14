@@ -13,7 +13,7 @@
         double precision::x1,x2,x3,h1,h2,h3,su,bsup,binf,lam,lbinf,lbsup,d
         double precision,dimension(np)::b
         double precision,dimension(np,np)::h,y
-         double precision,dimension(-2:(nz01-1))::the01
+        double precision,dimension(-2:(nz01-1))::the01
         double precision,dimension(-2:(nz12-1))::the12
         double precision,dimension(-2:(nz02-1))::the02
 
@@ -316,14 +316,15 @@
 !==========================  COSP  ====================================
         subroutine cosp(x,the,n,y,zi,binf,su,bsup,lbinf,lam,lbsup)
        
-	use commun,only:iconf
+	use commun,only:iconf,level
 
         implicit none
       
-        integer::k,j,n,i
+        integer::k,j,n,i,s
         double precision::x,ht,ht2,h2,som,lam,su, &
         binf,bsup,lbinf,lbsup,pm,htm,h2t,h3,h2n,hn,im,im1,im2,mm1,mm3, & 
-        ht3,hht,h4,h3m,hh3,hh2,mm,im3,mm2,h,gl,hh        
+        ht3,hht,h4,h3m,hh3,hh2,mm,im3,mm2,h,gl,hh, &
+	quantile,P,bound,m,sd        
         double precision,dimension(-2:n-3)::the
         double precision,dimension(-2:(n+1))::zi
         double precision,dimension(n,n)::y
@@ -395,14 +396,18 @@
             endif
 
         su  = dexp(-gl)
-
+	
    	if (iconf.eq.1) then
+		P = level + (1-level)/2
+		m = 0
+		sd = 1
+		call cdfnor(2, P, 1-P, quantile, m, sd, s, bound)
          	call conf(x,j,n,y,pm,zi)
-         	binf = dexp(-gl + 1.96d0*pm)
-         	bsup = dexp(-gl - 1.96d0*pm)
+         	binf = dexp(-gl + quantile*pm)
+         	bsup = dexp(-gl - quantile*pm)
          	call conf1(x,j,n,y,pm,zi)
-         	lbinf = lam - 1.96d0*pm
-         	lbsup = lam + 1.96d0*pm
+         	lbinf = lam - quantile*pm
+         	lbsup = lam + quantile*pm
 	else
 		binf=0
 		bsup=0

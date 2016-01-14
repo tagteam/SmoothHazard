@@ -27,7 +27,7 @@ module commun
 !-------------------  ve2 -------------------------------------------
         integer::nva01,nva12,nva02
 !-------------------  pe -------------------------------------------
-        double precision,save::pe
+        double precision,save::pe,level
 !-------------------  dace1new -------------------------------------------
         double precision,dimension(:),allocatable,save::t0,t1,t2,t3,t4
         integer,dimension(:),allocatable,save::c

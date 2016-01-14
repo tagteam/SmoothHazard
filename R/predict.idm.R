@@ -68,7 +68,8 @@
 #'
 #' @export
 predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=TRUE,level=.95,lifeExpect=FALSE,...) {
-    if (lifeExpect==TRUE) t <- Inf
+  browser()  
+  if (lifeExpect==TRUE) t <- Inf
     if (any(s>t)) {stop("You must respect the condition 's<t' to calculate p(s,t)")}
     x <- object
     Mvar = x$V # covariance matrix
@@ -99,13 +100,28 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=TRUE,level=
          Z01 <- rep(0,length(x$Xnames01))
          Z02 <- rep(0,length(x$Xnames02))
          Z12 <- rep(0,length(x$Xnames12))
-     }
-    beta01 <- x$coef[1:nvar01]
-    bZ01 <- Z01 %*% beta01
-    beta02 <- x$coef[(nvar01+1):(nvar01+nvar02)]
-    bZ02 <- Z02 %*% beta02
-    beta12 <- x$coef[(nvar01+nvar02+1):(nvar01+nvar02+nvar12)]
-    bZ12 <- Z12 %*% beta12
+    }
+    if(nvar01 > 0){
+      beta01 <- x$coef[1:nvar01]
+      bZ01 <- Z01 %*% beta01
+    }else{
+      bZ01 <- 0
+      beta01 <- NULL
+    }
+    if (nvar02 != 0) {
+      beta02 <- x$coef[(nvar01+1):(nvar01+nvar02)]
+      bZ02 <- Z02 %*% beta02
+    }else{
+      beta02 <- NULL
+      bZ02 <- 0
+    }
+    if (nvar12 != 0) {
+      beta12 <- ifelse(nvar12!=0, x$coef[(nvar01+nvar02+1):(nvar01+nvar02+nvar12)], NULL)
+      bZ12 <- Z12 %*% beta12
+    }else{
+      beta12 <- NULL
+      bZ12 <- 0
+    }
     ## Splines
     if (x$method=="Splines"){
         nz01 <- x$nknots01

@@ -6,8 +6,9 @@
 !            last              20/04/11
 !=============================================================================================
         subroutine idmWeib(entrytime,l,r,d,idm,idd,x01,x02,x12,N,P01,P02,P12,truncated,eps &
-                      ,maxiter0,loglik,basepar,regpar,v,converged,cv,niter,t&
-                      ,a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u,conf_bands,prt,hess_tot) 
+                      ,maxiter0,loglik,basepar,regpar,v,converged,cv,niter,t &
+                      ,a01,a01_l,a01_u,a02,a02_l,a02_u,a12,a12_l,a12_u,conf_bands &
+		      ,level_conf,prt,hess_tot) 
       
         use idmCommun  
         use parameters
@@ -15,8 +16,9 @@
         use commun,only:pl,iconf
                 
         implicit none
-!  variables entrants
+!  variables entrantes
         integer,intent(in)::n,p01,p02,p12,conf_bands,prt
+	double precision,intent(in)::level_conf
         double precision,dimension(n),intent(in)::l,r,d,entrytime
         integer,dimension(n),intent(in)::idm,idd
         double precision,dimension(n,p01),intent(in)::x01
@@ -24,7 +26,7 @@
         double precision,dimension(n,p12),intent(in)::x12
         integer,intent(in)::truncated,maxiter0
         integer,dimension(3),intent(in)::eps
-!  variables sortant
+!  variables sortantes
         integer,dimension(2),intent(out)::converged
         integer,intent(out)::niter
 ! istop 
@@ -35,7 +37,7 @@
         double precision,dimension(3),intent(out)::cv
         double precision,dimension((p01+p02+p12)*(p01+p02+p12)),intent(out)::v   
 !  variables locales           
-        double precision:: res,min,max,x1,x2
+        double precision:: res,min,max,x1,x2,alpha
         double precision,dimension((p01+p02+p12)+6)::xi,ut,bh
         double precision,dimension(2)::the01,the02,the12
         double precision,dimension(((p01+p02+p12)+6),(p01+p02+p12)+6)::vinf,vsup
@@ -300,6 +302,7 @@
 
 !---------------- bootstrap ------------------------------
 		if (iconf.eq.1)then
+		alpha = 1 - level_conf
                 x1 = 0.d0
                 x2 = 0.d0
                 do jj=1,2000
@@ -363,24 +366,24 @@
                         end do
                         
                         call tri(vect,2000,moyenne)
-                        a01_u(k) = vect(1950)
-                        a01_l(k) = vect(51)
+                        a01_u(k) = vect(nint(2000-alpha/2*2000))
+                        a01_l(k) = vect(nint(alpha/2*2000 + 1))
         
                         do jj = 1,2000
                                 vect(jj) = mate_ri02(jj,k)
                         end do
         
                         call tri(vect,2000,moyenne)
-                        a02_u(k) = vect(1950)
-                        a02_l(k) = vect(51)
+                        a02_u(k) = vect(nint(2000-alpha/2*2000))
+                        a02_l(k) = vect(nint(alpha/2*2000 + 1))
         
                         do jj = 1,2000
                         vect(jj) = mate_ri12(jj,k)
                         end do
         
                         call tri(vect,2000,moyenne)
-                        a12_u(k) = vect(1950)
-                        a12_l(k) = vect(51)
+                        a12_u(k) = vect(nint(2000-alpha/2*2000))
+                        a12_l(k) = vect(nint(alpha/2*2000 + 1))
                 end do  
 		else 
 			a01_l=0
