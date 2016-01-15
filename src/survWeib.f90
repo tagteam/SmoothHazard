@@ -4,7 +4,8 @@
 !                              20/05/10
 !            last              08/04/11
         subroutine survWeib(entrytime,l,r,status,x,n,p,truncated,interval,eps,maxiter0,&
-        loglik,basepar,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,conf_bands,prt,hess_tot)
+        loglik,basepar,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,conf_bands,&
+	level_conf,prt,hess_tot)
 !noVar
         use survCommun  
         use parameters
@@ -15,6 +16,7 @@
 
 !  variables entrants
         integer,intent(in)::n,p,prt,conf_bands
+	double precision,intent(in)::level_conf
         double precision,dimension(n),intent(in)::l,r,entrytime
         integer,dimension(n),intent(in)::status
         double precision,dimension(n,p),intent(in)::x
@@ -30,7 +32,7 @@
         double precision,dimension(3),intent(out)::cv
         double precision,dimension(p*p),intent(out)::v   
 !  variables locales             
-        double precision:: res,tx0,min,max,x1,x2
+        double precision:: res,tx0,min,max,x1,x2,alpha
         double precision,dimension(p+2)::xi,ut,bh
         double precision,dimension(2)::the
         double precision,dimension(p+2,p+2)::vinf
@@ -42,13 +44,10 @@
         double precision,dimension((p+2)*(p+2+3)/2)::v1
         double precision,dimension(p+2,p+2)::hes
         double precision::ca,cb,dd
-        integer::ier,npw,np,j,k,jj,i,kk,kkk,istop,noVar
+        integer::ier,npw,np,j,k,jj,i,kk,kkk,istop,noVar,icut
         double precision,external::survLikelihood   
         double precision::som,ts
         double precision,dimension(p+2,p+2),intent(out)::hess_tot
-!!! CT 26sept2012
-!        integer,intent(in)::noVar
-!!! fin CT 26sept2012
 
         if(p.gt.0)then
         noVar=0
@@ -313,6 +312,8 @@
 !---------------- bootstrap ------------------------------
 
 		if (iconf.eq.1)then
+		alpha = 1 - level_conf
+		icut = nint(alpha/2*2000 + 1)
                 do jj=1,2000
                         do i=1,np
                                 call bgos(1.d0,0,x1,x2,0.d0)
@@ -353,7 +354,7 @@
     
                 do k = 1,100
         
-                        do kk=1,51
+                        do kk=1,icut
                                 tab_su_i(kk)  = 10.d0
                                 tab_su_s(kk)  = 0.d0
                                 tab_ri_i(kk)  = 10.d0
@@ -362,10 +363,10 @@
         
                         do i=1,2000
         
-                                do kk=1,51
+                                do kk=1,icut
                                         if(mate_su(i,k).lt.tab_su_i(kk))then
-                                                if(kk.lt.51)then
-                                                        do kkk = 51,kk+1,-1
+                                                if(kk.lt.icut)then
+                                                        do kkk = icut,kk+1,-1
                                                                 tab_su_i(kkk) = tab_su_i(kkk-1)
                                                         end do   
                                                         tab_su_i(kk) = mate_su(i,k)
@@ -377,10 +378,10 @@
                                         endif 
                                 end do
  426    continue   
-                                do kk=1,51
+                                do kk=1,icut
                                         if(mate_ri(i,k).lt.tab_ri_i(kk))then
-                                                if(kk.lt.51)then
-                                                        do kkk = 51,kk+1,-1
+                                                if(kk.lt.icut)then
+                                                        do kkk = icut,kk+1,-1
                                                                 tab_ri_i(kkk) = tab_ri_i(kkk-1)
                                                         end do   
                                                         tab_ri_i(kk) = mate_ri(i,k)
@@ -392,7 +393,7 @@
                                         endif 
                                 end do
  430    continue
-                                do kk=51,1,-1
+                                do kk=icut,1,-1
                                         if(mate_su(i,k).gt.tab_su_s(kk))then
                                                 if(kk.gt.1)then
                                                         do kkk = 1,kk-1
@@ -408,7 +409,7 @@
                                 end do 
  436     continue
 
-                                do kk=51,1,-1
+                                do kk=icut,1,-1
                                         if(mate_ri(i,k).gt.tab_ri_s(kk))then
                                                 if(kk.gt.1)then
                                                         do kkk = 1,kk-1
@@ -426,9 +427,9 @@
         
                         end do
         
-                        S_l(k) = tab_su_i(51)
+                        S_l(k) = tab_su_i(icut)
                         S_u(k) = tab_su_s(1)
-                        h_l(k) = tab_ri_i(51)
+                        h_l(k) = tab_ri_i(icut)
                         h_u(k) = tab_ri_s(1)
 
                 end do  

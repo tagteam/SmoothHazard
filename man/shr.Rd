@@ -5,8 +5,8 @@
 \title{Fit a survival model}
 \usage{
 shr(formula, data, eps = c(5, 5, 3), nknots = 7, CV = FALSE,
-  kappa = 10000, conf.int = TRUE, maxiter = 200, method = "Weib",
-  print.iter = FALSE, na.action = na.omit)
+  kappa = 10000, conf.int = TRUE, level = 0.95, maxiter = 200,
+  method = "Weib", print.iter = FALSE, na.action = na.omit)
 }
 \arguments{
 \item{formula}{a formula object with the response on the left of a
@@ -38,6 +38,9 @@ search. Argument for the penalized likelihood approach.}
 \item{conf.int}{Boolean parameter. Equals to \code{TRUE} to
 calculate pointwise confidence intervals for the survival or hazard
 curves, \code{FALSE} otherwise. Default is \code{TRUE}.}
+
+\item{level}{confidence level for the pointwise confidence intervals
+of the curves. Default is 0.95.}
 
 \item{maxiter}{maximum number of iterations. The default is 200.}
 
