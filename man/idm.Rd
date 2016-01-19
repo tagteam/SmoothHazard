@@ -204,6 +204,7 @@ of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 \seealso{
 \code{\link{print.idm}}
 \code{\link{summary.idm}}
+\code{\link{predict.idm}}
 }
-\keyword{ilness-death}
+\keyword{illness-death}
 

@@ -97,7 +97,7 @@ and a steepest descent algorithm.
 # Weibull survival model
 library(prodlim)
 data(testdata)
-fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,)
+fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata)
 
 ## to print
 fit.su
