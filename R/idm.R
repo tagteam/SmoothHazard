@@ -304,6 +304,8 @@ idm <- function(formula01,
         size1 <- NC01 + NC02 + NC12
         size2 <- size1^2
         size_V <- size1 + 6
+        ## print(head(entrytime))
+        ## browser()
         ffit <- .Fortran("idmWeib",
                          ## input
                          as.double(entrytime),               #
