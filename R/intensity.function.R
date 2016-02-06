@@ -3,9 +3,9 @@
 ## author: Thomas Alexander Gerds
 ## created: Feb  6 2016 (08:47) 
 ## Version: 
-## last-updated: Feb  6 2016 (09:33) 
+## last-updated: Feb  6 2016 (09:54) 
 ##           By: Thomas Alexander Gerds
-##     Update #: 14
+##     Update #: 18
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -24,24 +24,34 @@
 ##' M-spline is called I-spline). The coefficients \code{theta} are the same for
 ##' the M-splines and I-splines.
 ##' 
-##' Important: the theta parameters returned by \code{idm} are in fact the square root of the splines coefficients.
-##' See examples.
+##' Important: the theta parameters returned by \code{idm} and \code{shr} are in fact
+##' the square root of the splines coefficients. See examples.
+##'
+##' This function is a R-translation of a corresponding Fortran function called \code{susp}. \code{susp} is
+##' used internally by \code{idm} and \code{shr}.
 ##' 
 ##' @title M-spline estimate of the transition intensity function
 ##' @param times Time points at which to estimate the intensity function
 ##' @param knots Knots for the M-spline
 ##' @param number.knots Number of knots for the M-splines (and I-splines see details)
 ##' @param theta The coefficients for the linear combination of M-splines (and I-splines see details)
-##' @param linear.predictor
+##' @param linear.predictor Linear predictor beta*Z. When it is non-zero, 
+##' transition and cumulative transition are multiplied by \code{exp(linear.predictor)}. Default is zero. 
 ##' @return
-##' - intensity : the transition intensity function evaluated at \code{times}
-##' - cumulative.intensity: the cumulative transition intensity function evaluated at \code{times}
-##' - survival: the survival function, i.e., exp(-cumulative.intensity)
+##' \item{times}{The time points at which the following estimates are evaluated.}
+##' \item{intensity}{The transition intensity function evaluated at \code{times}.}
+##' \item{cumulative.intensity}{The cumulative transition intensity function evaluated at \code{times}}
+##' \item{survival}{The survival function, i.e., exp(-cumulative.intensity)}
 ##' 
 ##' @seealso \code{\link{shr}}, \code{\link{idm}} 
-##' @examples 
+##' @examples
+##' data(testdata)
+##' fit.su <- shr(Hist(time=list(l,r),id)~cov, data=testdata, method="Splines", CV=TRUE)
+##' intensity.function(times=fit.su$time, knots=fit.su$knots,number.knots=fit.su$nknots, theta=fit.su$theta^2)
+##' 
 ##' @export 
-#' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> and Thomas Alexander Gerds <tag@@biostat.ku.dk> 
+#' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> and Thomas Alexander Gerds <tag@@biostat.ku.dk>
+#' Fortran: Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr> 
 intensity.function <- function(times,knots,number.knots,theta,linear.predictor=0) {
     cumulative.intensity=rep(0,length(times))   # risque cumule
     intensity=rep(0,length(times))  # risque
@@ -109,7 +119,7 @@ intensity.function <- function(times,knots,number.knots,theta,linear.predictor=0
     intensity=intensity*e
     cumulative.intensity=cumulative.intensity*e
     survival = exp(-cumulative.intensity)
-    return(list(intensity=intensity,cumulative.intensity=cumulative.intensity,survival=survival))
+    return(list(times=times,intensity=intensity,cumulative.intensity=cumulative.intensity,survival=survival))
 }
 
 #----------------------------------------------------------------------

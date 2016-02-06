@@ -1,6 +1,6 @@
 Package: SmoothHazard
 Title: Estimation of Smooth Hazard Models for Interval-Censored Data with Applications to Survival and Illness-Death Models
-Version: 1.2.7
+Version: 1.2.8
 Author: Celia Touraine, Pierre Joly, Thomas A. Gerds
 Description: Estimation of two-state (survival) models and irreversible illness-death 
     models with possibly interval-censored,left-truncated and right-censored data.

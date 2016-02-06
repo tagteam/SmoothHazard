@@ -5,7 +5,7 @@
 \title{Print method for \code{idm} objects}
 \usage{
 \method{print}{idm}(x, conf.int = 0.95, digits = 4, pvalDigits = 4,
-  eps = 1e-04, ...)
+  eps = 0.0001, ...)
 }
 \arguments{
 \item{x}{Class \code{idm} object, i.e. the result of a call to the
