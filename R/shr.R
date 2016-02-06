@@ -33,6 +33,8 @@
 #' @param conf.int Boolean parameter. Equals to \code{TRUE} to
 #' calculate pointwise confidence intervals for the survival or hazard
 #' curves, \code{FALSE} otherwise. Default is \code{TRUE}.
+#' @param level confidence level for the pointwise confidence intervals 
+#' of the curves. Default is 0.95.
 #' @param maxiter maximum number of iterations. The default is 200.
 #' @param method type of estimation method: "Splines" for a penalized
 #' likelihood approach with approximation of the hazard function by
@@ -79,7 +81,7 @@
 ##' # Weibull survival model
 ##' library(prodlim)
 ##' data(testdata)
-##' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,) 
+##' fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata) 
 ##' 
 ##' ## to print
 ##' fit.su
@@ -95,6 +97,7 @@ shr <- function(formula,
                  CV=FALSE,
                  kappa=10000,
                  conf.int=TRUE,
+                 level=.95,
                  maxiter=200,
                  method="Weib",
                  print.iter=FALSE,
@@ -223,7 +226,8 @@ shr <- function(formula,
                      h=as.double(rep(0,100)),
                      h_l=as.double(rep(0,100)),
                      h_u=as.double(rep(0,100)),
-		     as.integer(conf.int),
+		                 as.integer(conf.int),
+		                 as.double(level),
                      as.integer(print.iter),
                      V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                      PACKAGE="SmoothHazard")
@@ -261,6 +265,7 @@ shr <- function(formula,
                      as.double(kappa),
                      kappa=as.double(0),
                      as.integer(conf.int),
+                     as.double(level),
                      CVcrit=as.double(0),
                      mdf=as.double(0),
                      ti=as.double(rep(0,(nknots+6))),

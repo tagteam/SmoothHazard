@@ -19,7 +19,7 @@
 !add prt,noVar
         subroutine survPl(entrytime,l,r,id,x,N,nva,truncated,interval,eps &
         ,maxiter0,loglik,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,&
-        nknots,irec,kappa0,kappa,conf_bands,CVcrit,mdf,ti,theta,prt,hess_tot)
+        nknots,irec,kappa0,kappa,conf_bands,level_conf,CVcrit,mdf,ti,theta,prt,hess_tot)
 !!! CT 26sept2012
 ! noVar    
 !!! fin CT 26sept2012
@@ -37,7 +37,7 @@
         integer,intent(in)::conf_bands,N,nknots,irec
         integer,dimension(N)::id
         double precision,dimension(N)::entrytime,l,r
-        double precision,intent(in)::kappa0
+        double precision,intent(in)::kappa0,level_conf
         double precision,intent(out)::kappa
         integer,dimension(3),intent(in)::eps
         double precision,dimension(N,nva)::x
@@ -71,6 +71,7 @@
         ind_hess=0
         print_iter = prt
 	iconf = conf_bands
+	level = level_conf
 !end add
         npar = 0
         verSurv = 0

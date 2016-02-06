@@ -59,6 +59,8 @@
 #' @param conf.int Logical. If \code{TRUE} 
 #' calculate pointwise confidence intervals for the transition
 #' intensities curves, \code{FALSE} otherwise. Default is \code{TRUE}.
+#' @param level confidence level for the pointwise confidence intervals 
+#' of the transition intensities curves. Default is 0.95.
 #' @param print.iter boolean parameter. Equals to \code{TRUE} to print
 #' the likelihood during the iteration process, \code{FALSE}
 #' otherwise. Default is \code{FALSE}. This option is not running on
@@ -122,10 +124,11 @@
 #' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
 #' @seealso \code{\link{print.idm}}
 #' \code{\link{summary.idm}}
+#' \code{\link{predict.idm}}
 #' @references D. Marquardt (1963). An algorithm for least-squares estimation
 #' of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 #' 431-441.
-#' @keywords ilness-death
+#' @keywords illness-death
 #' 
 ##' @examples
 ##' library(lava)
@@ -185,7 +188,8 @@ idm <- function(formula01,
                 CV=FALSE,
                 kappa=c(1000000,500000,20000),
                 method="Weib",
-		conf.int=TRUE,
+                conf.int=TRUE,
+                level=.95,
                 print.iter=FALSE,
                 subset=NULL,
                 na.action = na.fail){
@@ -304,8 +308,6 @@ idm <- function(formula01,
         size1 <- NC01 + NC02 + NC12
         size2 <- size1^2
         size_V <- size1 + 6
-        ## print(head(entrytime))
-        ## browser()
         ffit <- .Fortran("idmWeib",
                          ## input
                          as.double(entrytime),               #
@@ -344,6 +346,7 @@ idm <- function(formula01,
                          a12_l=as.double(rep(0,99)),
                          a12_u=as.double(rep(0,99)),
                          as.integer(conf.int),
+                         as.double(level),
                          as.integer(print.iter),
                          V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                          PACKAGE="SmoothHazard")
@@ -474,6 +477,7 @@ idm <- function(formula01,
                           as.double(kappa),
                           kappa=as.double(rep(0,3)),
                           as.integer(conf.int),
+                          as.double(level),
                           CVcrit=as.double(0),
                           mdf=as.double(0),
                           theta01=as.double(rep(0,(nknots01+2))),
