@@ -46,10 +46,31 @@
 ##' @seealso \code{\link{shr}}, \code{\link{idm}} 
 ##' @examples
 ##' data(testdata)
-##' fit.su <- shr(Hist(time=list(l,r),id)~cov, data=testdata, method="Splines", CV=TRUE)
-##' intensity(times=fit.su$time, knots=fit.su$knots,number.knots=fit.su$nknots, theta=fit.su$theta^2)
+##' fit.su <- shr(Hist(time=list(l, r), id) ~ cov, data = testdata, method = "Splines", CV = TRUE)
+##' intensity(times = fit.su$time, knots = fit.su$knots, number.knots = fit.su$nknots, theta = fit.su$theta^2)
 ##' 
-##' @export 
+##' \dontrun{
+##'   data(Paq1000)
+##'   fit.idm <-  idm(formula02 = Hist(time = t, event = death, entry = e) ~ certif,
+##'                   formula01 = Hist(time = list(l,r), event = dementia) ~ certif,
+##'                   formula12 = ~ certif, method = "Splines", data = Paq1000)
+##'   # Probability of survival in state 0 at age 80 for a subject with no cep given that he is in state 0 at 70
+##'   su0 <- (intensity(times = 80, knots = fit.idm$knots01, 
+##'                    number.knots = fit.idm$nknots01, 
+##'                    theta = fit.idm$theta01^2)$survival
+##'          *intensity(times = 80, knots = fit.idm$knots02, 
+##'                    number.knots = fit.idm$nknots02, 
+##'                    theta = fit.idm$theta02^2)$survival)/
+##'         (intensity(times = 70, knots = fit.idm$knots01, 
+##'                    number.knots = fit.idm$nknots01, 
+##'                    theta = fit.idm$theta01^2)$survival
+##'         *intensity(times = 70, knots = fit.idm$knots02, 
+##'                    number.knots = fit.idm$nknots02, 
+##'                    theta = fit.idm$theta02^2)$survival)
+##'   # Same result as:  
+##'   predict(fit.idm, s = 70, t = 80, conf.int = FALSE) # see first element               
+##' }
+##' @export  
 #' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> and Thomas Alexander Gerds <tag@@biostat.ku.dk>
 #' Fortran: Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr> 
 intensity <- function(times,knots,number.knots,theta,linear.predictor=0) {

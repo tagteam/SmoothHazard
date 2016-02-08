@@ -255,6 +255,7 @@ print.predict.idm <- function(x,digits=2,...){
 Predict0.idmPl <- function(s,t,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01=0,bZ12=0,bZ02=0) {
     if (s>(min(zi01[nz01+6],zi02[nz02+6],zi12[nz12+6]))) {stop("argument s is off")}    
     if (any(t>zi12[nz12+6])) {stop("argument t is off")}
+    if (any(s<zi01[1])) {stop("argument s is off")}
     p11 <- S.pl(s,t,zi12,nz12,the12,bZ12)
     p12 <- 1-p11
     p00 <- S.pl(s,t,zi01,nz01,the01,bZ01)*S.pl(s,t,zi02,nz02,the02,bZ02)
