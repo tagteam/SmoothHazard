@@ -138,21 +138,21 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=TRUE,level=
             set.seed(seed)
             X <- mvtnorm::rmvnorm(nsim,Vmean,Mvar) 
             # 1 set of simulated parameters for each element of the list
-            Xtheta01=as.list(X[,1:(nz01+2)]^2)
-            Xtheta02=as.list(X[,(nz01+3):(nz01+nz02+4)]^2)
-            Xtheta12=as.list(X[,(nz01+nz02+5):(nz01+nz02+nz12+6)]^2)
+            Xtheta01=X[,1:(nz01+2)]^2
+            Xtheta02=X[,(nz01+3):(nz01+nz02+4)]^2
+            Xtheta12=X[,(nz01+nz02+5):(nz01+nz02+nz12+6)]^2
             XbZ01=X[,(nz01+nz02+nz12+7):(nz01+nz02+nz12+6+nvar01)] %*% t(Z01)
             XbZ02=X[,(nz01+nz02+nz12+6+nvar01+1):(nz01+nz02+nz12+6+nvar01+nvar02)] %*% t(Z02)
             XbZ12=X[,(nz01+nz02+nz12+6+nvar01+nvar02+1):(nz01+nz02+nz12+6+nvar01+nvar02+nvar12)] %*% t(Z12)
             if (lifeExpect==TRUE){
                 sim.param <- do.call("rbind",
                                      lapply(1:nsim,function(i){
-                                                lifexpect0.idmPl(s,zi01[[i]],nz01[[i]],Xtheta01[[i]],zi12[[i]],nz12[[i]],Xtheta12[[i]],zi02[[i]],nz02[[i]],Xtheta02[[i]],XbZ01[[i]],XbZ12[[i]],XbZ02[[i]])
+                                                lifexpect0.idmPl(s,zi01,nz01,Xtheta01[i,],zi12,nz12,Xtheta12[i,],zi02,nz02,Xtheta02[i,],XbZ01[i,],XbZ12[i,],XbZ02[i,])
                                             }))
             }else{
                  sim.param <- do.call("rbind",
                                       lapply(1:nsim,function(i){
-                                                 Predict0.idmPl(s,t,zi01[[i]],nz01[[i]],Xtheta01[[i]],zi12[[i]],nz12[[i]],Xtheta12[[i]],zi02[[i]],nz02[[i]],Xtheta02[[i]],XbZ01[[i]],XbZ12[[i]],XbZ02[[i]])
+                                                 Predict0.idmPl(s,t,zi01,nz01,Xtheta01[i,],zi12,nz12,Xtheta12[i,],zi02,nz02,Xtheta02[i,],XbZ01[i,],XbZ12[i,],XbZ02[i,])
                                              }))
              }
             q.lower <- (1-level)/2
@@ -176,27 +176,45 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=TRUE,level=
               # vector of parameter estimates
               Vmean <- c(sqrt(a01),sqrt(b01),sqrt(a02),sqrt(b02),sqrt(a12),sqrt(b12),beta01,beta02,beta12) 
               set.seed(seed)
-              X <- mvtnorm::rmvnorm(nsim,Vmean,Mvar) 
-              as.list(1/(X[,2]^2))
+              X <- mvtnorm::rmvnorm(nsim,Vmean,Mvar)
               # set of simulated parameters for each element of the list
-              Xa01=as.list(X[,1]^2)
-              Xb01=as.list(1/(X[,2]^2))
-              Xa02=as.list(X[,3]^2)
-              Xb02=as.list(1/(X[,4]^2))
-              Xa12=as.list(X[,5]^2)
-              Xb12=as.list(1/(X[,6]^2))
+              Xa01=X[,1]^2
+              Xb01=1/(X[,2]^2)
+              Xa02=X[,3]^2
+              Xb02=1/(X[,4]^2)
+              Xa12=X[,5]^2
+              Xb12=1/(X[,6]^2)
               XbZ01=X[,(7:(6+nvar01))] %*% t(Z01)
               XbZ02=X[,((6+nvar01+1):(6+nvar01+nvar02))] %*% t(Z02)
               XbZ12=X[,((6+nvar01+nvar02+1):(6+nvar01+nvar02+nvar12))] %*% t(Z12)
               if (lifeExpect==TRUE){
                   sim.param <- do.call("rbind",
                                        lapply(1:nsim,function(i){
-                                                  lifexpect0.idmWeib(s,a01=Xa01[[i]],b01=Xb01[[i]],a02=Xa02[[i]],b02=Xb02[[i]],a12=Xa12[[i]],b12=Xb12[[i]],bZ01=XbZ01[[i]],bZ02=XbZ02[[i]],bZ12=XbZ12[[i]])
+                                                  lifexpect0.idmWeib(s,
+                                                                     a01=Xa01[i,],
+                                                                     b01=Xb01[i,],
+                                                                     a02=Xa02[i,],
+                                                                     b02=Xb02[i,],
+                                                                     a12=Xa12[i,],
+                                                                     b12=Xb12[i,],
+                                                                     bZ01=XbZ01[i,],
+                                                                     bZ02=XbZ02[i,],
+                                                                     bZ12=XbZ12[i,])
                                               }))
               }else{
                    sim.param <- do.call("rbind",
                                         lapply(1:nsim,function(i){
-                                                   Predict0.idmWeib(s,t,a01=Xa01[[i]],b01=Xb01[[i]],a02=Xa02[[i]],b02=Xb02[[i]],a12=Xa12[[i]],b12=Xb12[[i]],bZ01=XbZ01[[i]],bZ02=XbZ02[[i]],bZ12=XbZ12[[i]])
+                                                   Predict0.idmWeib(s,
+                                                                    t,
+                                                                    a01=Xa01[i,],
+                                                                    b01=Xb01[i,],
+                                                                    a02=Xa02[i,],
+                                                                    b02=Xb02[i,],
+                                                                    a12=Xa12[i,],
+                                                                    b12=Xb12[i,],
+                                                                    bZ01=XbZ01[i,],
+                                                                    bZ02=XbZ02[i,],
+                                                                    bZ12=XbZ12[i,])
                                                }))
                }
               q.lower <- (1-level)/2
@@ -259,8 +277,8 @@ Predict0.idmPl <- function(s,t,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,b
     p11 <- S.pl(s,t,zi12,nz12,the12,bZ12)
     p12 <- 1-p11
     p00 <- S.pl(s,t,zi01,nz01,the01,bZ01)*S.pl(s,t,zi02,nz02,the02,bZ02)
-    p02_0 <- sapply(t,function(t) {integrate(f=function(x){S.pl(s,x,zi01,nz01,the01,bZ01)*S.pl(s,x,zi02,nz02,the02,bZ02)*susp(x,zi02,nz02,the02,bZ02)$intensity},lower=s,upper=t)$value})
-    p01 <- sapply(t,function(t) {integrate(f=function(x){S.pl(s,x,zi01,nz01,the01,bZ01)*S.pl(s,x,zi02,nz02,the02,bZ02)*susp(x,zi01,nz01,the01,bZ01)$intensity*S.pl(x,t,zi12,nz12,the12,bZ12)},lower=s,upper=t)$value})
+    p02_0 <- sapply(t,function(t) {integrate(f=function(x){S.pl(s,x,zi01,nz01,the01,bZ01)*S.pl(s,x,zi02,nz02,the02,bZ02)*intensity(times=x,knots=zi02,number.knots=nz02,theta=the02,linear.predictor=bZ02)$intensity},lower=s,upper=t)$value})
+    p01 <- sapply(t,function(t) {integrate(f=function(x){S.pl(s,x,zi01,nz01,the01,bZ01)*S.pl(s,x,zi02,nz02,the02,bZ02)*intensity(times=x,knots=zi01,number.knots=nz01,theta=the01,linear.predictor=bZ01)$intensity*S.pl(x,t,zi12,nz12,the12,bZ12)},lower=s,upper=t)$value})
     p02_1 <- 1-p00-p02_0-p01
     p02 <- p02_0+p02_1
     c(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1)
@@ -317,10 +335,10 @@ A <- function(s,t,zi,nz,the,bZ=0) {
     res=rep(0,length(t))
     TF = (t>=zi[length(zi)])
     ind = which(TF)
-    if (sum(TF)!=0) {res[ind]=susp((zi[nz+6]-10^-5),zi,nz,the,bZ)$cumul.intensity-susp(s,zi,nz,the,bZ)$cumul.intensity}
+    if (sum(TF)!=0) {res[ind]=intensity((zi[nz+6]-10^-5),zi,nz,the,bZ)$cumul.intensity-intensity(s,zi,nz,the,bZ)$cumul.intensity}
     TF = (t<zi[length(zi)])
     ind = which(TF)
-    if (sum(TF)!=0) {res[ind]=susp(t[ind],zi,nz,the,bZ)$cumul.intensity-susp(s,zi,nz,the,bZ)$cumul.intensity}
+    if (sum(TF)!=0) {res[ind]=intensity(t[ind],zi,nz,the,bZ)$cumul.intensity-intensity(s,zi,nz,the,bZ)$cumul.intensity}
     return(res)
 }
 
@@ -328,20 +346,20 @@ A <- function(s,t,zi,nz,the,bZ=0) {
 # S(s,t) = S(t)/S(s)
 #        = exp(-A(s,t))
 S.pl <- function(s,t,zi,nz,the,bZ=0) {
-	if (length(t)>=length(s)){
-		res=rep(0,length(t))
-		TF = (t>zi[length(zi)])
-		ind = which(TF)
-		if (sum(TF)!=0) {res[ind]=0}
-		TF = (t<=zi[length(zi)])
-		ind = which(TF)
-		if (sum(TF)!=0) {res[ind]=susp(t[ind],zi,nz,the,bZ)$survival/susp(s,zi,nz,the,bZ)$survival}
-	}else{		
-		res=rep(0,length(s))
-		if (t>zi[length(zi)]) {res=0}
-		else {res=susp(t,zi,nz,the,bZ)$survival/susp(s,zi,nz,the,bZ)$survival}
-	}
-	return(res)
+    if (length(t)>=length(s)){
+        res=rep(0,length(t))
+        TF = (t>zi[length(zi)])
+        ind = which(TF)
+        if (sum(TF)!=0) {res[ind]=0}
+        TF = (t<=zi[length(zi)])
+        ind = which(TF)
+        if (sum(TF)!=0) {res[ind]=intensity(t[ind],zi,nz,the,bZ)$survival/intensity(s,zi,nz,the,bZ)$survival}
+    }else{		
+         res=rep(0,length(s))
+         if (t>zi[length(zi)]) {res=0}
+         else {res=intensity(t,zi,nz,the,bZ)$survival/intensity(s,zi,nz,the,bZ)$survival}
+     }
+    return(res)
 }
 
 

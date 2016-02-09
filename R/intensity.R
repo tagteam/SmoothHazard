@@ -3,9 +3,9 @@
 ## author: Thomas Alexander Gerds
 ## created: Feb  6 2016 (08:47) 
 ## Version: 
-## last-updated: Feb  8 2016 (08:50) 
+## last-updated: Feb  9 2016 (09:45) 
 ##           By: Thomas Alexander Gerds
-##     Update #: 19
+##     Update #: 26
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -74,6 +74,12 @@
 #' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> and Thomas Alexander Gerds <tag@@biostat.ku.dk>
 #' Fortran: Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr> 
 intensity <- function(times,knots,number.knots,theta,linear.predictor=0) {
+    if (length(theta)!= number.knots+2) stop(paste0("For ",
+                  number.knots,
+                  " knots we need ",
+                  number.knots+2,
+                  " coefficients. But, length of argument theta as provided is ",
+                  length(theta)))
     cumulative.intensity=rep(0,length(times))   # risque cumule
     intensity=rep(0,length(times))  # risque
     survival=rep(0,length(times))   # survie
@@ -121,6 +127,7 @@ intensity <- function(times,knots,number.knots,theta,linear.predictor=0) {
             im[ind] = ht*mm[ind]*0.25
             cumulative.intensity[ind] = som +(theta[j-3]*im3[ind])+(theta[j-2]*im2[ind])+(theta[j-1]*im1[ind])+(theta[j]*im[ind])
             intensity[ind] = (theta[j-3]*mm3[ind])+(theta[j-2]*mm2[ind])+(theta[j-1]*mm1[ind])+(theta[j]*mm[ind])
+            ## if (any(is.na(intensity))) browser()
         } # fin if (sum(TF) != 0)
     } # fin for
     TF = (times>=knots[number.knots+3])
