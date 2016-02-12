@@ -44,16 +44,17 @@
 #' fit <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2+X3,
 #'                formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2+X3,
 #'                data=d,conf.int=FALSE)
-#' predict(fit,s=0,t=80,nsim=3,conf.int=FALSE,lifeExpect=F)
-#' 
+#' predict(fit,s=0,t=80,nsim=3,conf.int=FALSE,lifeExpect=FALSE)
+#' predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=FALSE)
+#' ## ERROR?: predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=TRUE)
 #' 
 #' data(Paq1000)
 #' library(prodlim)
-#' fit <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
+#' fit.paq <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 #' formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000)
 #' 
-#' predict(fit,s=70,t=80,newdata=data.frame(certif=1))
-#' predict(fit,s=70,lifeExpect=TRUE,t=80,newdata=data.frame(certif=1))
+#' predict(fit.paq,s=70,t=80,newdata=data.frame(certif=1))
+#' predict(fit.paq,s=70,lifeExpect=TRUE,t=80,newdata=data.frame(certif=1))
 #' 
 #' fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 #' 		formula01=Hist(time=list(l,r),event=dementia)~certif,
@@ -61,8 +62,8 @@
 #'                 method="Splines",
 #' 		data=Paq1000)
 #' 
-#' pred <- predict(fit.splines,s=70,t=80,Z01=c(1),Z02=c(1))
-#' pred
+#' predict(fit.splines,s=70,t=80,newdata=data.frame(certif=1))
+#' predict(fit.splines,s=70,t=80,lifeExpect=TRUE,newdata=data.frame(certif=1),nsim=20)
 #' 
 #' }
 #'
@@ -70,156 +71,196 @@
 predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=TRUE,level=.95,lifeExpect=FALSE,...) {
     if (lifeExpect==TRUE) t <- Inf
     if (any(s>t)) {stop("You must respect the condition 's<t' to calculate p(s,t)")}
-    x <- object
-    Mvar = x$V # covariance matrix
     if (conf.int == TRUE){
         stopifnot(0<level && level<1)
         if (nsim < 2) stop("Need at least two simulations to construct confidence limits.")
-        XbZ01 <- vector(nsim,mode="list")
-        XbZ02 <- vector(nsim,mode="list")
-        XbZ12 <- vector(nsim,mode="list")
     }
     if (missing(t) && lifeExpect==FALSE) stop("Argument t is missing.")
     if (lifeExpect==TRUE) t <- Inf
     if (missing(s)) stop("Argument s is missing.")
     ## if (missing(t) || is.infinite(t)) lifeExpect <- TRUE
     # if covariates: cov=c(cov1,cov2,cov3,...)
-    nvar01 <- x$NC[1]
-    nvar02 <- x$NC[2]
-    nvar12 <- x$NC[3]
+    nvar01 <- object$NC[1]
+    nvar02 <- object$NC[2]
+    nvar12 <- object$NC[3]
     if (!missing(newdata)){
         if (NROW(newdata)>1) stop("Argument newdata has more than one row\n.Currently this function works only for one covariate constallation at a time.")
-        Z01 <- as.matrix(model.frame(formula=update.formula(formula(x$terms$Formula01),NULL~.),data=newdata))
-        Z02 <- as.matrix(model.frame(formula=update.formula(formula(x$terms$Formula02),NULL~.),data=newdata))
-        Z12 <- as.matrix(model.frame(formula=update.formula(formula(x$terms$Formula12),NULL~.),data=newdata))
+        Z01 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula01),NULL~.),data=newdata))
+        Z02 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula02),NULL~.),data=newdata))
+        Z12 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula12),NULL~.),data=newdata))
     }else{
-         vars <- unique(c(x$Xnames01,x$Xnames02,x$Xnames12))
+         vars <- unique(c(object$Xnames01,object$Xnames02,object$Xnames12))
          newdata <- data.frame(matrix(0,ncol=length(vars)))
          names(newdata) <- vars
-         Z01 <- rep(0,length(x$Xnames01))
-         Z02 <- rep(0,length(x$Xnames02))
-         Z12 <- rep(0,length(x$Xnames12))
+         Z01 <- rep(0,length(object$Xnames01))
+         Z02 <- rep(0,length(object$Xnames02))
+         Z12 <- rep(0,length(object$Xnames12))
      }
     if(nvar01 > 0){
-        beta01 <- x$coef[1:nvar01]
-        bZ01 <- Z01 %*% beta01
+        beta01 <- object$coef[1:nvar01]
+        names(beta01) <- paste0("beta01.",names(beta01))
+        bZ01 <- sum(Z01 * beta01)
     }else{
          bZ01 <- 0
          beta01 <- NULL
      }
     if (nvar02 != 0) {
-        beta02 <- x$coef[(nvar01+1):(nvar01+nvar02)]
-        bZ02 <- Z02 %*% beta02
+        beta02 <- object$coef[(nvar01+1):(nvar01+nvar02)]
+        names(beta02) <- paste0("beta02.",names(beta02))
+        bZ02 <- sum(Z02 * beta02)
     }else{
          beta02 <- NULL
          bZ02 <- 0
      }
     if (nvar12 != 0) {
-        beta12 <- ifelse(nvar12!=0, x$coef[(nvar01+nvar02+1):(nvar01+nvar02+nvar12)], NULL)
-        bZ12 <- Z12 %*% beta12
+        beta12 <- object$coef[(nvar01+nvar02+1):(nvar01+nvar02+nvar12)]
+        names(beta12) <- paste0("beta12.",names(beta12))
+        bZ12 <- sum(Z12 * beta12)
     }else{
          beta12 <- NULL
          bZ12 <- 0
      }
     ## Splines
-    if (x$method=="Splines"){
-        nz01 <- x$nknots01
-        nz02 <- x$nknots02
-        nz12 <- x$nknots12
-        zi01 <- x$knots01
-        zi02 <- x$knots02
-        zi12 <- x$knots12
-        the01 <- x$theta01
-        the02 <- x$theta02
-        the12 <- x$theta12
+    if (object$method=="Splines"){
+        nknots01 <- object$nknots01
+        nknots02 <- object$nknots02
+        nknots12 <- object$nknots12
+        knots01 <- object$knots01
+        knots02 <- object$knots02
+        knots12 <- object$knots12
+        the01 <- object$theta01
+        names(the01) <- paste0("the01.",1:length(the01))
+        the02 <- object$theta02
+        names(the02) <- paste0("the02.",1:length(the01))
+        the12 <- object$theta12
+        names(the12) <- paste0("the12.",1:length(the01))
         if (conf.int == TRUE){
             ### conf.int prediction by Monte-Carlo
             Vmean <- c(the01,the02,the12,beta01,beta02,beta12) # vector of estimates
             set.seed(seed)
-            X <- mvtnorm::rmvnorm(nsim,Vmean,Mvar) 
+            X <- mvtnorm::rmvnorm(nsim,Vmean,object$V)
+            colnames(X) <- names(Vmean)
             # 1 set of simulated parameters for each element of the list
-            Xtheta01=X[,1:(nz01+2)]^2
-            Xtheta02=X[,(nz01+3):(nz01+nz02+4)]^2
-            Xtheta12=X[,(nz01+nz02+5):(nz01+nz02+nz12+6)]^2
-            XbZ01=X[,(nz01+nz02+nz12+7):(nz01+nz02+nz12+6+nvar01)] %*% t(Z01)
-            XbZ02=X[,(nz01+nz02+nz12+6+nvar01+1):(nz01+nz02+nz12+6+nvar01+nvar02)] %*% t(Z02)
-            XbZ12=X[,(nz01+nz02+nz12+6+nvar01+nvar02+1):(nz01+nz02+nz12+6+nvar01+nvar02+nvar12)] %*% t(Z12)
+            Xtheta01=X[,names(the01)]^2
+            Xtheta02=X[,names(the02)]^2
+            Xtheta12=X[,names(the12)]^2
+            if (!is.null(beta01))
+                linPred01=X[,names(beta01),drop=FALSE] %*% Z01
+            else
+                linPred01=matrix(0,nrow=nsim,ncol=1)
+            if (!is.null(beta02))
+                linPred02=X[,names(beta02),drop=FALSE] %*% Z02
+            else
+                linPred02=matrix(0,nrow=nsim,ncol=1)
+            if (!is.null(beta12))
+                linPred12=X[,names(beta12),drop=FALSE] %*% Z12
+            else
+                linPred12=matrix(0,nrow=nsim,ncol=1)
             if (lifeExpect==TRUE){
-                sim.param <- do.call("rbind",
-                                     lapply(1:nsim,function(i){
-                                                lifexpect0.idmPl(s,zi01,nz01,Xtheta01[i,],zi12,nz12,Xtheta12[i,],zi02,nz02,Xtheta02[i,],XbZ01[i,],XbZ12[i,],XbZ02[i,])
-                                            }))
-            }else{
-                 sim.param <- do.call("rbind",
+                simResults <- do.call("rbind",
                                       lapply(1:nsim,function(i){
-                                                 Predict0.idmPl(s,t,zi01,nz01,Xtheta01[i,],zi12,nz12,Xtheta12[i,],zi02,nz02,Xtheta02[i,],XbZ01[i,],XbZ12[i,],XbZ02[i,])
+                                                 lifexpect0.idmPl(s,
+                                                                  knots01,
+                                                                  nknots01,
+                                                                  Xtheta01[i,],
+                                                                  knots12,
+                                                                  nknots12,
+                                                                  Xtheta12[i,],
+                                                                  knots02,
+                                                                  nknots02,
+                                                                  Xtheta02[i,],
+                                                                  linPred01[i,],
+                                                                  linPred12[i,],
+                                                                  linPred02[i,])
                                              }))
+            }else{
+                 simResults <- do.call("rbind",
+                                       lapply(1:nsim,function(i){
+                                                  Predict0.idmPl(s,t,knots01,nknots01,Xtheta01[i,],knots12,nknots12,Xtheta12[i,],knots02,nknots02,Xtheta02[i,],linPred01[i,],linPred12[i,],linPred02[i,])
+                                              }))
              }
             q.lower <- (1-level)/2
             q.upper <- 1-q.lower
-            ci <- apply(sim.param,2,quantile,c(q.lower,q.upper))
+            ci <- apply(simResults,2,function(x)quantile(unlist(x),c(q.lower,q.upper)))
         }
         if (lifeExpect==TRUE){
-            transprob <- lifexpect0.idmPl(s,zi01,nz01,the01^2,zi12,nz12,the12^2,zi02,nz02,the02^2,bZ01,bZ12,bZ02)
+            transprob <- lifexpect0.idmPl(s,knots01,nknots01,the01^2,knots12,nknots12,the12^2,knots02,nknots02,the02^2,bZ01,bZ12,bZ02)
         }else{
-             transprob <- Predict0.idmPl(s,t,zi01,nz01,the01^2,zi12,nz12,the12^2,zi02,nz02,the02^2,bZ01,bZ12,bZ02)
+             transprob <- Predict0.idmPl(s,t,knots01,nknots01,the01^2,knots12,nknots12,the12^2,knots02,nknots02,the02^2,bZ01,bZ12,bZ02)
          }
     } else {
-          a01 <- x$modelPar[1]
-          b01 <- x$modelPar[2]
-          a02 <- x$modelPar[3]
-          b02 <- x$modelPar[4]
-          a12 <- x$modelPar[5]
-          b12 <- x$modelPar[6]
+          a01 <- object$modelPar[1]
+          b01 <- object$modelPar[2]
+          a02 <- object$modelPar[3]
+          b02 <- object$modelPar[4]
+          a12 <- object$modelPar[5]
+          b12 <- object$modelPar[6]
           if (conf.int==TRUE) {
-              ### conf.int prediction by Monte-Carlo
-              # vector of parameter estimates
+              ## conf.int prediction by Monte-Carlo
+              ## vector of parameter estimates
               Vmean <- c(sqrt(a01),sqrt(b01),sqrt(a02),sqrt(b02),sqrt(a12),sqrt(b12),beta01,beta02,beta12) 
+              names(Vmean) <- c("a01",
+                                   "b01",
+                                   "a02",
+                                   "b02",
+                                   "a12",
+                                   "b12",
+                                   names(beta01),names(beta02),names(beta12))
               set.seed(seed)
-              X <- mvtnorm::rmvnorm(nsim,Vmean,Mvar)
+              X <- mvtnorm::rmvnorm(nsim,Vmean,object$V)
+              colnames(X) <- names(Vmean)
               # set of simulated parameters for each element of the list
-              Xa01=X[,1]^2
-              Xb01=1/(X[,2]^2)
-              Xa02=X[,3]^2
-              Xb02=1/(X[,4]^2)
-              Xa12=X[,5]^2
-              Xb12=1/(X[,6]^2)
-              XbZ01=X[,(7:(6+nvar01))] %*% t(Z01)
-              XbZ02=X[,((6+nvar01+1):(6+nvar01+nvar02))] %*% t(Z02)
-              XbZ12=X[,((6+nvar01+nvar02+1):(6+nvar01+nvar02+nvar12))] %*% t(Z12)
+              Xa01=X[,"a01"]^2
+              Xb01=1/(X[,"b02"]^2)
+              Xa02=X[,"a02"]^2
+              Xb02=1/(X[,"b02"]^2)
+              Xa12=X[,"a12"]^2
+              Xb12=1/(X[,"b12"]^2)
+              if (!is.null(beta01))
+                  linPred01=X[,names(beta01),drop=FALSE] %*% Z01
+              else
+                  linPred01=matrix(0,nrow=nsim,ncol=1)
+              if (!is.null(beta02))
+                  linPred02=X[,names(beta01),drop=FALSE] %*% Z02
+              else
+                  linPred02=matrix(0,nrow=nsim,ncol=1)
+              if (!is.null(beta12))
+                  linPred12=X[,names(beta12),drop=FALSE] %*% Z12
+              else
+                  linPred12=matrix(0,nrow=nsim,ncol=1)
               if (lifeExpect==TRUE){
-                  sim.param <- do.call("rbind",
-                                       lapply(1:nsim,function(i){
-                                                  lifexpect0.idmWeib(s,
-                                                                     a01=Xa01[i,],
-                                                                     b01=Xb01[i,],
-                                                                     a02=Xa02[i,],
-                                                                     b02=Xb02[i,],
-                                                                     a12=Xa12[i,],
-                                                                     b12=Xb12[i,],
-                                                                     bZ01=XbZ01[i,],
-                                                                     bZ02=XbZ02[i,],
-                                                                     bZ12=XbZ12[i,])
-                                              }))
-              }else{
-                   sim.param <- do.call("rbind",
+                  simResults <- do.call("rbind",
                                         lapply(1:nsim,function(i){
-                                                   Predict0.idmWeib(s,
-                                                                    t,
-                                                                    a01=Xa01[i,],
-                                                                    b01=Xb01[i,],
-                                                                    a02=Xa02[i,],
-                                                                    b02=Xb02[i,],
-                                                                    a12=Xa12[i,],
-                                                                    b12=Xb12[i,],
-                                                                    bZ01=XbZ01[i,],
-                                                                    bZ02=XbZ02[i,],
-                                                                    bZ12=XbZ12[i,])
+                                                   lifexpect0.idmWeib(s,
+                                                                      a01=Xa01[[i]],
+                                                                      b01=Xb01[[i]],
+                                                                      a02=Xa02[[i]],
+                                                                      b02=Xb02[[i]],
+                                                                      a12=Xa12[[i]],
+                                                                      b12=Xb12[[i]],
+                                                                      bZ01=linPred01[[i]],
+                                                                      bZ02=linPred02[[i]],
+                                                                      bZ12=linPred12[[i]])
                                                }))
+              }else{
+                   simResults <- do.call("rbind",
+                                         lapply(1:nsim,function(i){
+                                                    Predict0.idmWeib(s,
+                                                                     t,
+                                                                     a01=Xa01[[i]],
+                                                                     b01=Xb01[[i]],
+                                                                     a02=Xa02[[i]],
+                                                                     b02=Xb02[[i]],
+                                                                     a12=Xa12[[i]],
+                                                                     b12=Xb12[[i]],
+                                                                     bZ01=linPred01[[i]],
+                                                                     bZ02=linPred02[[i]],
+                                                                     bZ12=linPred12[[i]])
+                                                }))
                }
               q.lower <- (1-level)/2
               q.upper <- 1-q.lower
-              ci <- apply(sim.param,2,quantile,c(q.lower,q.upper))
+              ci <- apply(simResults,2,function(x)quantile(unlist(x),c(q.lower,q.upper)))
           }
           if (lifeExpect==TRUE){
               transprob <- lifexpect0.idmWeib(s,a01,1/b01,a02,1/b02,a12,1/b12,bZ01,bZ02,bZ12)
@@ -270,18 +311,18 @@ print.predict.idm <- function(x,digits=2,...){
     invisible(px)
 }
 
-Predict0.idmPl <- function(s,t,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01=0,bZ12=0,bZ02=0) {
-    if (s>(min(zi01[nz01+6],zi02[nz02+6],zi12[nz12+6]))) {stop("argument s is off")}    
-    if (any(t>zi12[nz12+6])) {stop("argument t is off")}
-    if (any(s<zi01[1])) {stop("argument s is off")}
-    p11 <- S.pl(s,t,zi12,nz12,the12,bZ12)
+Predict0.idmPl <- function(s,t,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01=0,bZ12=0,bZ02=0) {
+    if (s>(min(knots01[nknots01+6],knots02[nknots02+6],knots12[nknots12+6]))) {stop("argument s is off")}    
+    if (any(t>knots12[nknots12+6])) {stop("argument t is off")}
+    if (any(s<knots01[1])) {stop("argument s is off")}
+    p11 <- S.pl(s,t,knots12,nknots12,the12,bZ12)
     p12 <- 1-p11
-    p00 <- S.pl(s,t,zi01,nz01,the01,bZ01)*S.pl(s,t,zi02,nz02,the02,bZ02)
-    p02_0 <- sapply(t,function(t) {integrate(f=function(x){S.pl(s,x,zi01,nz01,the01,bZ01)*S.pl(s,x,zi02,nz02,the02,bZ02)*intensity(times=x,knots=zi02,number.knots=nz02,theta=the02,linear.predictor=bZ02)$intensity},lower=s,upper=t)$value})
-    p01 <- sapply(t,function(t) {integrate(f=function(x){S.pl(s,x,zi01,nz01,the01,bZ01)*S.pl(s,x,zi02,nz02,the02,bZ02)*intensity(times=x,knots=zi01,number.knots=nz01,theta=the01,linear.predictor=bZ01)$intensity*S.pl(x,t,zi12,nz12,the12,bZ12)},lower=s,upper=t)$value})
+    p00 <- S.pl(s,t,knots01,nknots01,the01,bZ01)*S.pl(s,t,knots02,nknots02,the02,bZ02)
+    p02_0 <- sapply(t,function(t) {integrate(f=function(x){S.pl(s,x,knots01,nknots01,the01,bZ01)*S.pl(s,x,knots02,nknots02,the02,bZ02)*intensity(times=x,knots=knots02,number.knots=nknots02,theta=the02,linear.predictor=bZ02)$intensity},lower=s,upper=t)$value})
+    p01 <- sapply(t,function(t) {integrate(f=function(x){S.pl(s,x,knots01,nknots01,the01,bZ01)*S.pl(s,x,knots02,nknots02,the02,bZ02)*intensity(times=x,knots=knots01,number.knots=nknots01,theta=the01,linear.predictor=bZ01)$intensity*S.pl(x,t,knots12,nknots12,the12,bZ12)},lower=s,upper=t)$value})
     p02_1 <- 1-p00-p02_0-p01
     p02 <- p02_0+p02_1
-    c(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1)
+    list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1)
 }
 
 Predict0.idmWeib <- function(s,t,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
@@ -293,15 +334,7 @@ Predict0.idmWeib <- function(s,t,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
     p02_1 = 1-p00-p02_0-p01
     p02 = p02_0+p02_1
     ## return(list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1))
-    c(p00=p00,
-      p01=p01,
-      p11=p11,
-      p12=p12,
-      p02_0=p02_0,
-      p02_1=p02_1,
-      p02=p02,
-      F01=p01+p02_1,
-      F0.=p02_0+p01+p02_1)
+    list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1)
 }
 
 # a = shape parameter
@@ -331,21 +364,21 @@ S.weib <- function(s,t,a,b,bZ=0) {
 
 
 
-A <- function(s,t,zi,nz,the,bZ=0) {
+A <- function(s,t,zi,nknots,the,bZ=0) {
     res=rep(0,length(t))
     TF = (t>=zi[length(zi)])
     ind = which(TF)
-    if (sum(TF)!=0) {res[ind]=intensity((zi[nz+6]-10^-5),zi,nz,the,bZ)$cumul.intensity-intensity(s,zi,nz,the,bZ)$cumul.intensity}
+    if (sum(TF)!=0) {res[ind]=intensity((zi[nknots+6]-10^-5),zi,nknots,the,bZ)$cumul.intensity-intensity(s,zi,nknots,the,bZ)$cumul.intensity}
     TF = (t<zi[length(zi)])
     ind = which(TF)
-    if (sum(TF)!=0) {res[ind]=intensity(t[ind],zi,nz,the,bZ)$cumul.intensity-intensity(s,zi,nz,the,bZ)$cumul.intensity}
+    if (sum(TF)!=0) {res[ind]=intensity(t[ind],zi,nknots,the,bZ)$cumul.intensity-intensity(s,zi,nknots,the,bZ)$cumul.intensity}
     return(res)
 }
 
 ### Survival function with two time s, t
 # S(s,t) = S(t)/S(s)
 #        = exp(-A(s,t))
-S.pl <- function(s,t,zi,nz,the,bZ=0) {
+S.pl <- function(s,t,zi,nknots,the,bZ=0) {
     if (length(t)>=length(s)){
         res=rep(0,length(t))
         TF = (t>zi[length(zi)])
@@ -353,11 +386,11 @@ S.pl <- function(s,t,zi,nz,the,bZ=0) {
         if (sum(TF)!=0) {res[ind]=0}
         TF = (t<=zi[length(zi)])
         ind = which(TF)
-        if (sum(TF)!=0) {res[ind]=intensity(t[ind],zi,nz,the,bZ)$survival/intensity(s,zi,nz,the,bZ)$survival}
+        if (sum(TF)!=0) {res[ind]=intensity(t[ind],zi,nknots,the,bZ)$survival/intensity(s,zi,nknots,the,bZ)$survival}
     }else{		
          res=rep(0,length(s))
          if (t>zi[length(zi)]) {res=0}
-         else {res=intensity(t,zi,nz,the,bZ)$survival/intensity(s,zi,nz,the,bZ)$survival}
+         else {res=intensity(t,zi,nknots,the,bZ)$survival/intensity(s,zi,nknots,the,bZ)$survival}
      }
     return(res)
 }
@@ -379,23 +412,23 @@ lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
                                                   S.weib(s,y,a01,b01,bZ01)*S.weib(s,y,a02,b02,bZ02)*iweibull(y,a01,b01,bZ01)*S.weib(y,x,a12,b12,bZ12)},
                                               lower=s,
                                               upper=x)$value})},s,Inf)
-    c(LE.0=ET0dot$value,
-      LE.nondiseased=ET01$value+ET0dot$value,
-      LE.diseased=ET12$value)
+    list(LE.0=ET0dot$value,
+         LE.nondiseased=ET01$value+ET0dot$value,
+         LE.diseased=ET12$value)
 
 }
 
-lifexpect0.idmPl <- function(s,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01=0,bZ12=0,bZ02=0) {
+lifexpect0.idmPl <- function(s,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01=0,bZ12=0,bZ02=0) {
     ET12 = integrate(f=function(x) {
-                         Predict0.idmPl(s,x,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01,bZ12,bZ02)$p11
-                     },s,zi12[nz12+6])
+                         Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p11"]]
+                     },s,knots12[nknots12+6])
     ET0dot = integrate(f=function(x) {
-                           Predict0.idmPl(s,x,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01,bZ12,bZ02)$p00
-                       },s,zi02[nz02+6])
+                           Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p00"]]
+                       },s,knots02[nknots02+6])
     ET01 = integrate(f=function(x) {
-                         Predict0.idmPl(s,x,zi01,nz01,the01,zi12,nz12,the12,zi02,nz02,the02,bZ01,bZ12,bZ02)$p01
-                     },s,zi01[nz01+6])
-    c(LE.0=ET0dot$value,
-      LE.nondiseased=ET01$value+ET0dot$value,
-      LE.diseased=ET12$value)
+                         Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p01"]]
+                     },s,knots01[nknots01+6])
+    list(LE.0=ET0dot$value,
+         LE.nondiseased=ET01$value+ET0dot$value,
+         LE.diseased=ET12$value)
 }
