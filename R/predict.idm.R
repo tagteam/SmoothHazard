@@ -46,7 +46,7 @@
 #'                data=d,conf.int=FALSE)
 #' predict(fit,s=0,t=80,nsim=3,conf.int=FALSE,lifeExpect=FALSE)
 #' predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=FALSE)
-#' ## ERROR?: predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=TRUE)
+#' ## predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=TRUE)
 #' 
 #' data(Paq1000)
 #' library(prodlim)

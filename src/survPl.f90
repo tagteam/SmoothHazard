@@ -19,7 +19,7 @@
 !add prt,noVar
         subroutine survPl(entrytime,l,r,id,x,N,nva,truncated,interval,eps &
         ,maxiter0,loglik,regpar,v,converged,cv,niter,t,S,S_l,S_u,h,h_l,h_u,&
-        nknots,irec,kappa0,kappa,conf_bands,level_conf,CVcrit,mdf,ti,theta,prt,hess_tot)
+        nknots,knots,irec,kappa0,kappa,conf_bands,level_conf,CVcrit,mdf,ti,theta,prt,hess_tot)
 !!! CT 26sept2012
 ! noVar    
 !!! fin CT 26sept2012
@@ -52,6 +52,7 @@
         double precision,external::survPlLikelihood
         double precision::golden
         double precision,intent(out)::CVcrit,mdf
+        double precision,dimension(nknots+6),intent(in)::knots
         double precision::ax,bx,cx,fa,fb,fc,xmin,ddl,auxi,crit,tol
         integer::ni,istop,noVar
         double precision,dimension(nknots+6),intent(out)::ti
@@ -171,20 +172,7 @@
 !       write(*,*)'taille de zi',size(zi)
 !-------------------------------------------------------------------
 
-        zi(-2) = min
-        zi(-1) = min
-        zi(0) = min
-        zi(1) = min
-
-        do i=2,nz-1
-                zi(i) =zi(i-1)+(max-min)/dble(nz-1)
-        end do   
-
-        zi(nz) = max
-        zi(nz+1)=max
-        zi(nz+2)=max
-        zi(nz+3)=max
-        
+        zi = knots
         ti = zi
 !        write(*,*)zi
 !---------- affectation des vecteurs de splines -----------------

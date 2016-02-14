@@ -39,18 +39,30 @@
 #' @param n.knots For \code{method="Splines"} only, a vector of length
 #' 3 specifing the number of knots, one for each transition, for the
 #' M-splines estimate of the baseline intensities in the order \code{0
-#' --> 1}, \code{0 --> 2}, \code{1 --> 2}.  The default is c(7,7,7).
-#' @param knots List of length 3 containing the placements
-#' (timepoints) of the knots for the M-spline of the three
-#' transitions.
+#' --> 1}, \code{0 --> 2}, \code{1 --> 2}. The default is c(7,7,7). When \code{knots}
+#' are specified as a list this argument is ignored.
+#' The algorithm needs least 5 knots and at most 20 knots.
+#' @param knots Argument only active for the penalized likelihood approach \code{method="splines"}.
+#' There are three ways to control the placement of the knots between the smallest and the largest
+#' of all time points:
+#' \itemize{
+#'  \item{\code{knots="equidistant"}}{Knots are placed with same distance on the time scale.}
+#'  \item{\code{knots="quantiles"}}{Knots are placed such that the number of observations is roughly the same between knots.}
+#' \item{knots=list()}{List of 1 or 2 or three vectors. The list elements are the actual placements
+#' (timepoints) of the knots for the M-spline. The list may contain 
+#' one vector of placements for each transition in the order \code{0 --> 1}, \code{0 --> 2}, \code{1 --> 2}.
+#' If only vector is specifified the knots are used for all transitions. If only 2 vectors are specifified, the
+#' knots for the \code{0 --> 1} transition are also used for the \code{1 --> 2} transition.}
+#' }
+#' The algorithm needs at least 5 knots and allows no more than 20 knots.
 #' @param CV Binary variable equals to 1 when search (by approximated
-#' cross validation) of the smoothing parameters kappa and 0
+#' cross validation) of the smoothing parameters \code{kappa} and 0
 #' otherwise. Argument for the penalized likelihood approach. The
 #' default is 0.
-#' @param kappa a vector of length 3.  If CV=FALSE, smoothing
-#' parameters for the transition 0 --> 1, 0 --> 2 and 1 --> 2. If
-#' CV=TRUE, initial values of the smoothing parameters for the cross
-#' validation search. Argument for the penalized likelihood approach.
+#' @param kappa Argument only active for the penalized likelihood approach \code{method="splines"}.
+#' A vector with 3 positive values (smoothing parameters), one for each transition, in the order 
+#' 0 --> 1, 0 --> 2 and 1 --> 2..
+#' If CV=1 these are used as starting values for a cross validation search to optimize kappa.
 #' @param method type of estimation method: "Splines" for a
 #' penalized likelihood approach with approximation of the transition
 #' intensities by M-splines, "Weib" for a parametric approach with a
@@ -141,6 +153,13 @@
 ##'              formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
 ##'              conf.int=FALSE)
 ##' fitRC
+##'
+##' \dontrun{
+##' fitRC.splines <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
+##'              formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
+##'              formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
+##'              conf.int=FALSE,method="splines")
+##' }
 ##' # interval censored data
 ##' fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
 ##'              formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
@@ -166,11 +185,7 @@
 ##'                         formula12=~1,
 ##'                         method="Splines",
 ##'                         data=Paq1000)
-##' 
-##'     ## to print
 ##'     fit.weib
-##' 
-##'     ## to summary
 ##'     summary(fit.splines)
 ##' }
 ##' 
@@ -215,6 +230,9 @@ idm <- function(formula01,
     m01 <- eval(m01,parent.frame())
     m02 <- eval(m02,parent.frame())
     m12 <- eval(m12,parent.frame())
+    # }}}
+    # {{{ check parameters
+    if (any(kappa<=0)) stop("Parameter kappa has to be positive.")
     # }}}
     # {{{ extract response
     responseTrans <- stats::model.response(m01)
@@ -276,7 +294,8 @@ idm <- function(formula01,
          Rtime[idm==0] <- abstime[idm==0]
      }
     ## print(head(cbind(Ltime,Rtime)))
-    if(!(method %in% c("Weib","Splines"))) stop("The method argument must be 'Weib' or 'Splines'")
+    method <- tolower(method)
+    if(!(method %in% c("weib","splines"))) stop("The method argument must be 'Weib' or 'Splines'")
     # }}}
     # {{{ check data for integrity
     if (attr(responseAbs,"cens.type")=="intervalCensored") stop("No method available when the transtion to the absorbing state is interval censored.")
@@ -303,7 +322,7 @@ idm <- function(formula01,
     ## is_truncated|0=no, 1=yes|length 1|integer|
     ## eps|convergence criteria: 1:likelihood,2:parameter est,3:gradient parameter est |length 3|integer|example eps=c(7,4,5) then use 10^-7,10^-4,10^-5. Defaults to c(5,5,3)
     ## maxiter| maximum number of iteration | length 1 | integer | > 0 default to 200
-    if (method == "Weib"){
+    if (method == "weib"){
         #	cat("------ Program Weibull ------ \n")
         size1 <- NC01 + NC02 + NC12
         size2 <- size1^2
@@ -350,27 +369,9 @@ idm <- function(formula01,
                          as.integer(print.iter),
                          V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                          PACKAGE="SmoothHazard")
-        ## ===Fortran delivers===
-        ## Variable name| Explanation|Dimension|Storage mode|Remark
-        ## loglik|log-likelihood without and with covariate|length 2|double|
-        ## basepar|Weibull parameters|length 2|double|
-        ## regpar|Regression coefficients|length P01+P02+P12|double| 0--->1 then 0--->2 then 1--->2
-        ## v|covariance matrix|length (P01+P02+P12)*(P01+P02+P12)|double|
-        ## converged|1=converged,2=iter > maxiter ,3=no|length 1|integer|
-        ## cv | value of convergence criteria 1:likelihood, 2:parameter est, 3: gradient |length 3 | double |
-        ## niter | number of iterations used to converge | lenght 1 | integer |
-        ## t|time to plot alpha(t) |length 100|double|
-        ## a01|transition intensity function for 0--->1|length 100|double|
-        ## a01_l|lower confidence band for a01|length 100|double|
-        ## a01_u|upper confidence band for a01|length 100|double|
-        ## a02|transition intensity function for 0--->2|length 100|double|
-        ## a02_l|lower confidence band for a02|length 100|double|
-        ## a02_u|upper confidence band for a02|length 100|double|
-        ## a12|transition intensity function for 1--->2|length 100|double|
-        ## a12_l|lower confidence band for a12|length 100|double|
-        ## a12_u|upper confidence band for a12|length 100|double|
     }else{
          #  	cat("------ Program Splines ------ \n")
+         ## check knots
          if (length(entrytime)>0){
              alltimes <- sort(unique(c(Ltime, Rtime,entrytime,abstime)))
              amax <- max(alltimes)
@@ -379,51 +380,58 @@ idm <- function(formula01,
          else{
              alltimes <- sort(unique(c(Ltime, Rtime,abstime)))
              amax <- max(alltimes)
-             amin <- 0
+             amin <- min(alltimes)
          }
-         if (knots=="equidistant"){
+         if (is.character(knots)){
+             if ((length(n.knots)>3) || (length(n.knots)<1)) stop("Argument n.knots has to be a vector of at least one positive integer and at most 3 positive integers.")
+             if (length(n.knots)==1) n.knots <- c(n.knots,n.knots,n.knots)
+             if (length(n.knots)==2) n.knots <- c(n.knots,n.knots[1])
              nknots01 <- n.knots[1]
              nknots02 <- n.knots[2]
              nknots12 <- n.knots[3]
-             knots01 <- seq(amin,amax,(amax-amin)/(nknots01-1))
-             knots02 <- seq(amin,amax,(amax-amin)/(nknots02-1))
-             knots12 <- seq(amin,amax,(amax-amin)/(nknots12-1))
-         }
-         else{
+             if((!is.numeric(n.knots) && !is.integer(n.knots)) || (any(n.knots < 5)) || (any(n.knots >20)))
+                 stop("Each element of n.knots has to be an integer between 5 and 20. See help(idm).")
              if (knots=="quantiles"){
-                 nknots01 <- n.knots[1]
-                 nknots02 <- n.knots[2]
-                 nknots12 <- n.knots[3]
                  approx.illtimes <- (Rtime[idm==1] + Ltime[idm==1])/2
                  knots01 <- quantile(approx.illtimes,seq(0,1,1/(nknots01-1)))
                  knots02 <- quantile(abstime,seq(0,1,1/(nknots02-1)))
                  knots12 <- quantile(abstime,seq(0,1,1/(nknots12-1)))
              }
-             else{## user specified knots
-                 knots01 <- sort(knots[[1]])
-                 knots02 <- sort(knots[[2]])
-                 knots12 <- sort(knots[[3]])
-                 nknots01 <- length(knots01)
-                 nknots02 <- length(knots02)
-                 nknots12 <- length(knots12)
-             }
+             if (knots!="equidistant")
+                 warning("Unknown specification of knots. Fall back to equidistant.")
+             knots01 <- seq(amin,amax,(amax-amin)/(nknots01-1))
+             knots02 <- seq(amin,amax,(amax-amin)/(nknots02-1))
+             knots12 <- seq(amin,amax,(amax-amin)/(nknots12-1))
+         } else{## user specified knots
+               if (!is.list(knots) || length(knots)==1)
+                   knots <- list(knots,knots,knots)
+               if (length(knots)==2) ## re-use knots from 0->1 for 1->2
+                   knots <- c(knots,knots[1])
+               if (!all(sapply(knots,is.numeric)))
+                   stop("Incorrect form of argument knots. See help(idm).")
+               knots01 <- sort(knots[[1]])
+               knots02 <- sort(knots[[2]])
+               knots12 <- sort(knots[[3]])
+               ## FIXME: check if knots within amin, amax
+               ## if (knots01[[1]] < amin) stop("Smallest knot ")
+               nknots01 <- length(knots01)
+               nknots02 <- length(knots02)
+               nknots12 <- length(knots12)
+           }
+         ## double check to avoid crash
+         if (any(c(nknots01,nknots02,nknots12)<5)) {
+             stop("Need at least 5 knots.")
          }
-         if (truncated){
-             if (min(knots01)>min(entrytime))
-                 stop("The first knot for the 0->1 transition has to be before or at the smallest entrytime")
-             if (min(knots02)>min(entrytime))
-                 stop("The first knot for the 0->2 transition has to be before or at the smallest entrytime")
-         } else{
-               if (min(knots01)>0)
-                   stop("The first knot for the 0->1 transition has to be zero")
-               if (min(knots02)>0)
-                   stop("The first knot for the 0->2 transition has to be zero")
-           } 
-         if (min(knots12)>min(Ltime))
-             stop("The first knot for the 1->2 transition has to be before or at the first time where someone may be in the ill-state.")
-         ## print(knots01)
-         ## print(knots02)
-         ## print(knots12)
+         if (any(c(nknots01,nknots02,nknots12)>20)){
+             stop("Cannot handle more than 20 knots.")
+         }
+         ## make sure min and max times are knots
+         if (min(knots01)>amin) knots01 <- c(amin,knots01)
+         ## warning("The first knot for the 0->1 transition has to be before or at the smallest entrytime")
+         if (min(knots02)>amin) knots02 <- c(amin,knots02)
+         ## stop("The first knot for the 0->2 transition has to be before or at the smallest entrytime")
+         if (min(knots12)>min(Ltime)) knots02 <- c(min(Ltime,knots02))
+         ## stop("The first knot for the 1->2 transition has to be before or at the first (in time) observation in the ill-state.")
          ## make fake knots needed for M-splines
          knots01 <- c(rep(knots01[1],3),knots01,rep(knots01[length(knots01)],3))
          knots02 <- c(rep(knots02[1],3),knots02,rep(knots02[length(knots02)],3))
@@ -487,28 +495,22 @@ idm <- function(formula01,
                           V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                           PACKAGE="SmoothHazard")
      }
-    if (ffit$converged[1] == 4){
-        warning("Problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
+    # ffit$converged[[1]]  without covariates
+    # ffit$converged[[2]]  with covariates
+    if (any(ffit$converged == 4)){
+        warning("Problem in the loglikelihood computation. The program stopped abnormally. Please check your dataset. \n")    
     }
-    if (ffit$converged[1] == 2){
-        warning("Model did not converge. You could change the 'maxit' parameter")
+    if (any(ffit$converged == 2)){
+        if (CV==0) 
+            warning("Model did not converge. You could try to increase the 'maxit' parameter and set 'CV=1'.")
+        else
+            warning("Model did not converge. You could try to increase the 'maxit' parameter and modify the start values for 'kappa'.")
     }
-    if (ffit$converged[1] == 3){
-        warning("Fisher information matrix non-positive definite.")
-    }
-    if (ffit$converged[2] != 0){
-        if (ffit$converged[2] == 4){
-            warning("With covariates, problem in the loglikelihood computation. The program stopped abnormally. Please verify your dataset. \n")    
-        }
-        if (ffit$converged[2] == 2){
-            warning("With covariates, model did not converge. You could change the 'maxit' parameter")
-        }
-        if (ffit$converged[2] == 3){
-            warning("With covariates, Fisher information matrix non-positive definite.")
-        }
+    if (any(ffit$converged == 3)){
+        warning("The Fisher information matrix is not positive definite.")
     }
     fit <- NULL
-    if(method=="Weib"){
+    if(method=="weib"){
         weibullParameter <- ffit$basepar
     }
     NC <- c(NC01,NC02,NC12)
@@ -520,7 +522,7 @@ idm <- function(formula01,
     fit$cv <- ffit$cv
     fit$niter <- ffit$niter
     fit$converged <- ffit$converged
-    if(method=="Weib"){
+    if(method=="weib"){
         fit$modelPar <- weibullParameter
     }
     fit$N <- N
@@ -529,7 +531,7 @@ idm <- function(formula01,
     fit$NC <- NC
     fit$responseAbs <- responseAbs
     fit$responseTrans <- responseTrans
-    if(method=="Splines"){
+    if(method=="splines"){
         fit$time <- matrix(ffit$t,ncol=3) 
     }else{
          fit$time <- ffit$t 
@@ -557,7 +559,7 @@ idm <- function(formula01,
         fit$se <- sqrt(diag(fit$V))
     }  	
     V <- matrix(ffit$V_tot,nrow=size_V,ncol=size_V,byrow=T)
-    if(method=="Weib"){
+    if(method=="weib"){
         colnames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
         rownames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
     }else{
@@ -570,7 +572,7 @@ idm <- function(formula01,
     if(NC01>0) fit$Xnames01 <- Xnames01
     if(NC02>0) fit$Xnames02 <- Xnames02
     if(NC12>0) fit$Xnames12 <- Xnames12
-    if(method=="Splines"){
+    if(method=="splines"){
         fit$knots01 <- knots01
         fit$knots02 <- knots02
         fit$knots12 <- knots12
@@ -592,7 +594,7 @@ idm <- function(formula01,
     }
     fit$na.action <- "na.fail"
     # }}}
-    fit$method <- method
+    if (method=="weib") fit$method <- "Weib" else fit$method <- "Splines"
     class(fit) <- "idm"
     fit$runtime <- proc.time()-ptm
     fit

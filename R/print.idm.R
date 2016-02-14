@@ -89,12 +89,12 @@ print.idm <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
         cat("\n")
         if(x$CV){
             cat("Smoothing parameters estimated by cross validation:\n")
-            print(splinepars,row.names=T)
+            print(splinepars,row.names=TRUE)
             cat("Cross validation criterion:",x$CVcrit,"\n")
             cat("DoF: ", formatC(-x$DoF, format="f",digits=2),"\n")
         }else{
             cat("Smoothing parameters:\n")
-            print(splinepars,row.names=T)
+            print(splinepars,row.names=TRUE)
         }
         # }}}
         # {{{ Weibull: baseline parameters
