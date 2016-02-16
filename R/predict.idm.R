@@ -85,9 +85,18 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=TRUE,level=
     nvar12 <- object$NC[3]
     if (!missing(newdata)){
         if (NROW(newdata)>1) stop("Argument newdata has more than one row\n.Currently this function works only for one covariate constallation at a time.")
-        Z01 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula01),NULL~.),data=newdata))
-        Z02 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula02),NULL~.),data=newdata))
-        Z12 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula12),NULL~.),data=newdata))
+        if (length(object$Xnames01)>0)
+            Z01 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula01),NULL~.),data=newdata))
+        else 
+            Z01 <- 0
+        if (length(object$Xnames02)>0)
+            Z02 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula02),NULL~.),data=newdata))
+        else
+            Z02 <- 0
+        if (length(object$Xnames12)>0)
+            Z12 <- as.matrix(model.frame(formula=update.formula(formula(object$terms$Formula12),NULL~.),data=newdata))
+        else
+            Z12 <- 0
     }else{
          vars <- unique(c(object$Xnames01,object$Xnames02,object$Xnames12))
          newdata <- data.frame(matrix(0,ncol=length(vars)))
@@ -176,7 +185,20 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=TRUE,level=
             }else{
                  simResults <- do.call("rbind",
                                        lapply(1:nsim,function(i){
-                                                  Predict0.idmPl(s,t,knots01,nknots01,Xtheta01[i,],knots12,nknots12,Xtheta12[i,],knots02,nknots02,Xtheta02[i,],linPred01[i,],linPred12[i,],linPred02[i,])
+                                                  Predict0.idmPl(s,
+                                                                 t,
+                                                                 knots01,
+                                                                 nknots01,
+                                                                 Xtheta01[i,],
+                                                                 knots12,
+                                                                 nknots12,
+                                                                 Xtheta12[i,],
+                                                                 knots02,
+                                                                 nknots02,
+                                                                 Xtheta02[i,],
+                                                                 linPred01[i,],
+                                                                 linPred12[i,],
+                                                                 linPred02[i,])
                                               }))
              }
             q.lower <- (1-level)/2
@@ -188,65 +210,44 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=TRUE,level=
         }else{
              transprob <- Predict0.idmPl(s,t,knots01,nknots01,the01^2,knots12,nknots12,the12^2,knots02,nknots02,the02^2,bZ01,bZ12,bZ02)
          }
-    } else {
-          a01 <- object$modelPar[1]
-          b01 <- object$modelPar[2]
-          a02 <- object$modelPar[3]
-          b02 <- object$modelPar[4]
-          a12 <- object$modelPar[5]
-          b12 <- object$modelPar[6]
-          if (conf.int==TRUE) {
-              ## conf.int prediction by Monte-Carlo
-              ## vector of parameter estimates
-              Vmean <- c(sqrt(a01),sqrt(b01),sqrt(a02),sqrt(b02),sqrt(a12),sqrt(b12),beta01,beta02,beta12) 
-              names(Vmean) <- c("a01",
-                                   "b01",
-                                   "a02",
-                                   "b02",
-                                   "a12",
-                                   "b12",
-                                   names(beta01),names(beta02),names(beta12))
-              set.seed(seed)
-              X <- mvtnorm::rmvnorm(nsim,Vmean,object$V)
-              colnames(X) <- names(Vmean)
-              # set of simulated parameters for each element of the list
-              Xa01=X[,"a01"]^2
-              Xb01=1/(X[,"b02"]^2)
-              Xa02=X[,"a02"]^2
-              Xb02=1/(X[,"b02"]^2)
-              Xa12=X[,"a12"]^2
-              Xb12=1/(X[,"b12"]^2)
-              if (!is.null(beta01))
-                  linPred01=X[,names(beta01),drop=FALSE] %*% Z01
-              else
-                  linPred01=matrix(0,nrow=nsim,ncol=1)
-              if (!is.null(beta02))
-                  linPred02=X[,names(beta01),drop=FALSE] %*% Z02
-              else
-                  linPred02=matrix(0,nrow=nsim,ncol=1)
-              if (!is.null(beta12))
-                  linPred12=X[,names(beta12),drop=FALSE] %*% Z12
-              else
-                  linPred12=matrix(0,nrow=nsim,ncol=1)
-              if (lifeExpect==TRUE){
-                  simResults <- do.call("rbind",
-                                        lapply(1:nsim,function(i){
-                                                   lifexpect0.idmWeib(s,
-                                                                      a01=Xa01[[i]],
-                                                                      b01=Xb01[[i]],
-                                                                      a02=Xa02[[i]],
-                                                                      b02=Xb02[[i]],
-                                                                      a12=Xa12[[i]],
-                                                                      b12=Xb12[[i]],
-                                                                      bZ01=linPred01[[i]],
-                                                                      bZ02=linPred02[[i]],
-                                                                      bZ12=linPred12[[i]])
-                                               }))
-              }else{
-                   simResults <- do.call("rbind",
-                                         lapply(1:nsim,function(i){
-                                                    Predict0.idmWeib(s,
-                                                                     t,
+    }else {
+         a01 <- object$modelPar[1]
+         b01 <- object$modelPar[2]
+         a02 <- object$modelPar[3]
+         b02 <- object$modelPar[4]
+         a12 <- object$modelPar[5]
+         b12 <- object$modelPar[6]
+         if (conf.int==TRUE) {
+             ## conf.int prediction by Monte-Carlo
+             ## vector of parameter estimates
+             Vmean <- c(sqrt(a01),sqrt(b01),sqrt(a02),sqrt(b02),sqrt(a12),sqrt(b12),beta01,beta02,beta12)
+             names(Vmean) <- c("a01","b01","a02","b02","a12","b12",names(beta01),names(beta02),names(beta12))
+             set.seed(seed)
+             X <- mvtnorm::rmvnorm(nsim,Vmean,object$V)
+             colnames(X) <- names(Vmean)
+             # set of simulated parameters for each element of the list
+             Xa01=X[,"a01"]^2
+             Xb01=1/(X[,"b01"]^2)
+             Xa02=X[,"a02"]^2
+             Xb02=1/(X[,"b02"]^2)
+             Xa12=X[,"a12"]^2
+             Xb12=1/(X[,"b12"]^2)
+             if (!is.null(beta01))
+                 linPred01=X[,names(beta01),drop=FALSE] %*% Z01
+             else
+                 linPred01=matrix(0,nrow=nsim,ncol=1)
+             if (!is.null(beta02))
+                 linPred02=X[,names(beta02),drop=FALSE] %*% Z02
+             else
+                 linPred02=matrix(0,nrow=nsim,ncol=1)
+             if (!is.null(beta12))
+                 linPred12=X[,names(beta12),drop=FALSE] %*% Z12
+             else
+                 linPred12=matrix(0,nrow=nsim,ncol=1)
+             if (lifeExpect==TRUE){
+                 simResults <- do.call("rbind",
+                                       lapply(1:nsim,function(i){
+                                                  lifexpect0.idmWeib(s,
                                                                      a01=Xa01[[i]],
                                                                      b01=Xb01[[i]],
                                                                      a02=Xa02[[i]],
@@ -256,18 +257,43 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=TRUE,level=
                                                                      bZ01=linPred01[[i]],
                                                                      bZ02=linPred02[[i]],
                                                                      bZ12=linPred12[[i]])
-                                                }))
-               }
-              q.lower <- (1-level)/2
-              q.upper <- 1-q.lower
-              ci <- apply(simResults,2,function(x)quantile(unlist(x),c(q.lower,q.upper)))
+                                              }))
+             }else{
+                  simResults <- do.call("rbind",
+                                        lapply(1:nsim,function(i){
+                                                   Predict0.idmWeib(s,
+                                                                    t,
+                                                                    a01=Xa01[[i]],
+                                                                    b01=Xb01[[i]],
+                                                                    a02=Xa02[[i]],
+                                                                    b02=Xb02[[i]],
+                                                                    a12=Xa12[[i]],
+                                                                    b12=Xb12[[i]],
+                                                                    bZ01=linPred01[[i]],
+                                                                    bZ02=linPred02[[i]],
+                                                                    bZ12=linPred12[[i]])
+                                               }))
+              }
+             q.lower <- (1-level)/2
+             q.upper <- 1-q.lower
+             ci <- apply(simResults,2,function(x)quantile(unlist(x),c(q.lower,q.upper)))
+         }
+         if (lifeExpect==TRUE){
+             transprob <- lifexpect0.idmWeib(s,a01,1/b01,a02,1/b02,a12,1/b12,bZ01,bZ02,bZ12)
+         }else{
+              transprob <- Predict0.idmWeib(s,
+                                            t,
+                                            a01,
+                                            1/b01,
+                                            a02,
+                                            1/b02,
+                                            a12,
+                                            1/b12,
+                                            bZ01,
+                                            bZ02,
+                                            bZ12)
           }
-          if (lifeExpect==TRUE){
-              transprob <- lifexpect0.idmWeib(s,a01,1/b01,a02,1/b02,a12,1/b12,bZ01,bZ02,bZ12)
-          }else{
-               transprob <- Predict0.idmWeib(s,t,a01,1/b01,a02,1/b02,a12,1/b12,bZ01,bZ02,bZ12)
-           }
-      }
+     }
     if (conf.int==TRUE){
         transprob <- lapply(data.frame(rbind(transprob,ci)),
                             function(x){x

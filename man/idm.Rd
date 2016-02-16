@@ -171,6 +171,13 @@ fitRC <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
              formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
              conf.int=FALSE)
 fitRC
+
+\dontrun{
+fitRC.splines <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
+             formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
+             formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
+             conf.int=FALSE,method="splines")
+}
 # interval censored data
 fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,
              formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
@@ -196,11 +203,7 @@ fitIC
                         formula12=~1,
                         method="Splines",
                         data=Paq1000)
-
-    ## to print
     fit.weib
-
-    ## to summary
     summary(fit.splines)
 }
 }

@@ -112,15 +112,17 @@ and a steepest descent algorithm.
 library(prodlim)
 data(testdata)
 fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata)
-
-## to print
 fit.su
-
-## summary
 summary(fit.su)
+\dontrun{
+shr.spline <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",n.knots=6)
+shr.spline
+shr.spline.q <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",n.knots=6,knots="quantiles")
+plot(shr.spline.q)
 
-shr.spline <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",n.knots=6,knots="equidistant")
-shr.spline <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",n.knots=6,knots="quantiles")
+## manual placement of knots
+shr.spline.man <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",knots=seq(0,7,1))
+}
 }
 \author{
 R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
