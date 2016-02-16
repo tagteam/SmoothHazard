@@ -412,6 +412,12 @@ idm <- function(formula01,
                knots01 <- sort(knots[[1]])
                knots02 <- sort(knots[[2]])
                knots12 <- sort(knots[[3]])
+               if (knots01[1]< amin - 0.05*amin) stop(paste("Transition 0->1: Smallest knot should not be smaller than the time point:",amin))
+               if (knots01[length(knots01)]> amax + 0.05*amax) stop(paste("Transition 0->1: Largest knot should not be larger than the time point:",amax))
+               if (knots02[1]< amin - 0.05*amin) stop(paste("Transition 0->2: Smallest knot should not be smaller than the time point:",amin))
+               if (knots02[length(knots02)]> amax + 0.05*amax) stop(paste("Transition 0->2: Largest knot should not be larger than the time point:",amax))
+               if (knots12[1]< amin - 0.05*amin) stop(paste("Transition 1->2: Smallest knot should not be smaller than the time point:",amin))
+               if (knots12[length(knots12)]> amax + 0.05*amax) stop(paste("Transition 1->2: Largest knot should not be larger than the time point:",amax))
                ## FIXME: check if knots within amin, amax
                ## if (knots01[[1]] < amin) stop("Smallest knot ")
                nknots01 <- length(knots01)

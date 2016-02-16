@@ -275,7 +275,8 @@ shr <- function(formula,
        } else{## user specified knots
              if (!is.numeric(knots))
                  stop("Incorrect form of argument knots. See help(shr).")
-             ## FIXME: check if knots within amin, amax
+             if (knots[1]< amin - 0.05*amin) stop(paste("Smallest knot should not be smaller than the time point:",amin))
+             if (knots[length(knots)]> amax + 0.05*amax) stop(paste("Largest knot should not be larger than the time point:",amax))
              knots <- sort(knots)
          }
        nknots <- length(knots)
