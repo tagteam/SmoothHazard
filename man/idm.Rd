@@ -6,7 +6,7 @@
 \usage{
 idm(formula01, formula02, formula12, data, maxiter = 200, eps = c(5, 5, 3),
   n.knots = c(7, 7, 7), knots = "equidistant", CV = FALSE,
-  kappa = c(1000000, 500000, 20000), method = "Weib", conf.int = TRUE,
+  kappa = c(1e+06, 5e+05, 20000), method = "Weib", conf.int = TRUE,
   level = 0.95, print.iter = FALSE, subset = NULL, na.action = na.fail)
 }
 \arguments{
@@ -46,7 +46,7 @@ M-splines estimate of the baseline intensities in the order \code{0
 are specified as a list this argument is ignored.
 The algorithm needs least 5 knots and at most 20 knots.}
 
-\item{knots}{Argument only active for the penalized likelihood approach \code{method="splines"}.
+\item{knots}{Argument only active for the penalized likelihood approach \code{method="Splines"}.
 There are three ways to control the placement of the knots between the smallest and the largest
 of all time points:
 \itemize{
@@ -65,7 +65,7 @@ cross validation) of the smoothing parameters \code{kappa} and 0
 otherwise. Argument for the penalized likelihood approach. The
 default is 0.}
 
-\item{kappa}{Argument only active for the penalized likelihood approach \code{method="splines"}.
+\item{kappa}{Argument only active for the penalized likelihood approach \code{method="Splines"}.
 A vector with 3 positive values (smoothing parameters), one for each transition, in the order
 0 --> 1, 0 --> 2 and 1 --> 2..
 If CV=1 these are used as starting values for a cross validation search to optimize kappa.}
@@ -124,7 +124,10 @@ the intensities for transition 1 --> 2.} \item{lowerIntensity12}{lower
 confidence intervals for the values of the intensities for transition 1 -->
 2.} \item{upperIntensity12}{upper confidence intervals for the values of the
 intensities for transition 1 --> 2.} \item{RR}{vector of relative risks.}
-\item{V}{variance-covariance matrix.} \item{se}{standart errors of the
+\item{V}{variance-covariance matrix derived from the Hessian of the log-likelihood
+if using method="Weib" or, from the Hessian of the penalized log-likelihood
+if using method="Splines".}
+\item{se}{standart errors of the
 regression parameters.} \item{Xnames01}{names of covariates on 0 --> 1.}
 \item{Xnames02}{names of covariates on 0 --> 2.} \item{Xnames12}{names of
 covariates on 1 --> 2.} \item{knots01}{knots to approximate by M-splines the
@@ -176,7 +179,7 @@ fitRC
 fitRC.splines <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
              formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
              formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
-             conf.int=FALSE,method="splines")
+             conf.int=FALSE,method="Splines")
 }
 # interval censored data
 fitIC <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2,

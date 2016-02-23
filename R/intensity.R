@@ -41,7 +41,7 @@
 ##' \item{times}{The time points at which the following estimates are evaluated.}
 ##' \item{intensity}{The transition intensity function evaluated at \code{times}.}
 ##' \item{cumulative.intensity}{The cumulative transition intensity function evaluated at \code{times}}
-##' \item{survival}{The survival function, i.e., exp(-cumulative.intensity)}
+##' \item{survival}{The "survival" function, i.e., exp(-cumulative.intensity)}
 ##' 
 ##' @seealso \code{\link{shr}}, \code{\link{idm}} 
 ##' @examples
