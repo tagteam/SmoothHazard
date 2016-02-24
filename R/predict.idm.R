@@ -233,15 +233,15 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=TRUE,level=
              Xa12=X[,"a12"]^2
              Xb12=1/(X[,"b12"]^2)
              if (!is.null(beta01))
-                 linPred01=X[,names(beta01),drop=FALSE] %*% Z01
+                 linPred01=X[,names(beta01),drop=FALSE] %*% t(Z01)
              else
                  linPred01=matrix(0,nrow=nsim,ncol=1)
              if (!is.null(beta02))
-                 linPred02=X[,names(beta02),drop=FALSE] %*% Z02
+                 linPred02=X[,names(beta02),drop=FALSE] %*% t(Z02)
              else
                  linPred02=matrix(0,nrow=nsim,ncol=1)
              if (!is.null(beta12))
-                 linPred12=X[,names(beta12),drop=FALSE] %*% Z12
+                 linPred12=X[,names(beta12),drop=FALSE] %*% t(Z12)
              else
                  linPred12=matrix(0,nrow=nsim,ncol=1)
              if (lifeExpect==TRUE){

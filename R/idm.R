@@ -155,9 +155,11 @@
 ##' fitRC
 ##'
 ##' \dontrun{
+##' set.seed(17)
+##' d <- simulateIDM(300)
 ##' fitRC.splines <- idm(formula01=Hist(time=observed.illtime,event=seen.ill)~X1+X2,
 ##'              formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,
-##'              formula12=Hist(time=observed.lifetime,event=seen.exit)~X1+X2,data=d,
+##'              formula12=Hist(time=observed.lifetime,event=seen.exit)~1,data=d,
 ##'              conf.int=FALSE,method="splines")
 ##' }
 ##' # interval censored data
