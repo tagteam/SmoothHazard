@@ -22,7 +22,7 @@ transition and cumulative transition are multiplied by \code{exp(linear.predicto
 \item{times}{The time points at which the following estimates are evaluated.}
 \item{intensity}{The transition intensity function evaluated at \code{times}.}
 \item{cumulative.intensity}{The cumulative transition intensity function evaluated at \code{times}}
-\item{survival}{The survival function, i.e., exp(-cumulative.intensity)}
+\item{survival}{The "survival" function, i.e., exp(-cumulative.intensity)}
 }
 \description{
 M-spline estimate of the transition intensity function
