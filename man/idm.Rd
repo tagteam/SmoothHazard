@@ -6,8 +6,8 @@
 \usage{
 idm(formula01, formula02, formula12, data, maxiter = 200, eps = c(5, 5, 3),
   n.knots = c(7, 7, 7), knots = "equidistant", CV = FALSE,
-  kappa = c(1000000, 500000, 20000), method = "Weib", conf.int = TRUE,
-  level = 0.95, print.iter = FALSE, subset = NULL, na.action = na.fail)
+  kappa = c(1000000, 500000, 20000), method = "Weib", conf.int = 0.95,
+  print.iter = FALSE, subset = NULL, na.action = na.fail)
 }
 \arguments{
 \item{formula01}{A formula specifying a regression model for the
@@ -76,12 +76,10 @@ intensities by M-splines, "Weib" for a parametric approach with a
 Weibull distribution on the transition intensities. Default is
 "Weib".}
 
-\item{conf.int}{Logical. If \code{TRUE} 
-calculate pointwise confidence intervals for the transition
-intensities curves, \code{FALSE} otherwise. Default is \code{TRUE}.}
-
-\item{level}{confidence level for the pointwise confidence intervals 
-of the transition intensities curves. Default is 0.95.}
+\item{conf.int}{Level of confidence pointwise confidence intervals of the transition intensities, i.e.,
+a value between 0 and 1, the default is \code{0.95}.
+The default is also used when \code{conf.int=TRUE}.
+To avoid computation of confidence intervals, set \code{conf.int} to FALSE or NULL.}
 
 \item{print.iter}{boolean parameter. Equals to \code{TRUE} to print
 the likelihood during the iteration process, \code{FALSE}

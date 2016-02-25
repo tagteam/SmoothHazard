@@ -42,11 +42,10 @@
 #' A positive number (smoothing parameter) 
 #' If CV=1 the value is used as a starting value 
 #' for a cross validation search to optimize \code{kappa}.
-#' @param conf.int Boolean parameter. Equals to \code{TRUE} to
-#' calculate pointwise confidence intervals for the survival or hazard
-#' curves, \code{FALSE} otherwise. Default is \code{TRUE}.
-#' @param level confidence level for the pointwise confidence intervals 
-#' of the curves. Default is 0.95.
+#' @param conf.int Level of confidence pointwise confidence intervals of the survival and hazard functions, i.e.,
+#' a value between 0 and 1, the default is \code{0.95}.
+#' The default is also used when \code{conf.int=TRUE}.
+#' To avoid computation of confidence intervals, set \code{conf.int} to FALSE or NULL.
 #' @param maxiter maximum number of iterations. The default is 200.
 #' @param method type of estimation method: "Splines" for a penalized
 #' likelihood approach with approximation of the hazard function by
@@ -113,8 +112,7 @@ shr <- function(formula,
                 knots="equidistant",
                 CV=FALSE,
                 kappa=10000,
-                conf.int=TRUE,
-                level=.95,
+                conf.int=.95,
                 maxiter=200,
                 method="Weib",
                 print.iter=FALSE,
@@ -124,28 +122,34 @@ shr <- function(formula,
   ## cat("\n")
   ## cat("Be patient. The program is computing ... \n") 
 	
-  flush.console()
-  ptm<-proc.time()
-  # {{{ process formula and data
-  # check if formula is a formula
-  method <- tolower(method)
-  if(!(method %in% c("weib","splines"))) stop("The method must be either 'Weib' or 'Splines'")
-  # --------------------------------------------------------------------
-  formula.names <- try(all.names(formula),silent=TRUE)
-  if (!(formula.names[1]=="~")||(match("$",formula.names,nomatch=0)+match("[",formula.names,nomatch=0)>0)){
-    stop("Invalid specification of formula. Perhaps forgotten right hand side?\nNote that any subsetting, ie data$var or data[,\"var\"], is invalid for this function.")
-  }else{
-    if (!(formula.names[2] %in% c("Surv","Hist"))) stop("formula is NOT a proper survival formula,\nwhich must have a `Surv' or `Hist' object as response.")
-  }
-	
-  call <- match.call()
-  m <- match.call()
-  position <- match(c("","formula","data","na.action"),names(m),0)
-  m <- m[position]
-  m[[1]] <- as.name("model.frame")	
-  m <- eval(m,sys.parent())
-  na.action <- attr(m,"na.action")
-  response <- stats::model.response(m)
+    flush.console()
+    ptm<-proc.time()
+    # {{{ process formula and data
+    # check if formula is a formula
+    method <- tolower(method)
+    if(!(method %in% c("weib","splines"))) stop("The method must be either 'Weib' or 'Splines'")
+    # --------------------------------------------------------------------
+    formula.names <- try(all.names(formula),silent=TRUE)
+    if (!(formula.names[1]=="~")||(match("$",formula.names,nomatch=0)+match("[",formula.names,nomatch=0)>0)){
+        stop("Invalid specification of formula. Perhaps forgotten right hand side?\nNote that any subsetting, ie data$var or data[,\"var\"], is invalid for this function.")
+    }else{
+        if (!(formula.names[2] %in% c("Surv","Hist"))) stop("formula is NOT a proper survival formula,\nwhich must have a `Surv' or `Hist' object as response.")
+    }
+    # {{{ parse confidence level
+    do.conf.int <- !is.null(conf.int) && !is.na(conf.int) && !conf.int==FALSE
+    if (is.logical(conf.int)) conf.int <- .95
+    if (do.conf.int == TRUE){
+        stopifnot(0<conf.int && conf.int<1)
+    }
+    # }}}	
+    call <- match.call()
+    m <- match.call()
+    position <- match(c("","formula","data","na.action"),names(m),0)
+    m <- m[position]
+    m[[1]] <- as.name("model.frame")	
+    m <- eval(m,sys.parent())
+    na.action <- attr(m,"na.action")
+    response <- stats::model.response(m)
 
   #  FIX for people who use `Surv' instead of `Hist' 
   
@@ -244,8 +248,8 @@ shr <- function(formula,
                        h=as.double(rep(0,100)),
                        h_l=as.double(rep(0,100)),
                        h_u=as.double(rep(0,100)),
-                       as.integer(conf.int),
-                       as.double(level),
+                       as.integer(do.conf.int),
+                       as.double(conf.int),
                        as.integer(print.iter),
                        V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                        PACKAGE="SmoothHazard")
@@ -321,8 +325,8 @@ shr <- function(formula,
                         as.integer(CV),
                         as.double(kappa),
                         kappa=as.double(0),
-                        as.integer(conf.int),
-                        as.double(level),
+                        as.integer(do.conf.int),
+                        as.double(conf.int),
                         CVcrit=as.double(0),
                         mdf=as.double(0),
                         ti=as.double(rep(0,(nknots+6))),

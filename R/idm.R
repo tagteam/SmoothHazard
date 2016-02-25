@@ -68,11 +68,10 @@
 #' intensities by M-splines, "Weib" for a parametric approach with a
 #' Weibull distribution on the transition intensities. Default is
 #' "Weib".
-#' @param conf.int Logical. If \code{TRUE} 
-#' calculate pointwise confidence intervals for the transition
-#' intensities curves, \code{FALSE} otherwise. Default is \code{TRUE}.
-#' @param level confidence level for the pointwise confidence intervals 
-#' of the transition intensities curves. Default is 0.95.
+#' @param conf.int Level of confidence pointwise confidence intervals of the transition intensities, i.e.,
+#' a value between 0 and 1, the default is \code{0.95}.
+#' The default is also used when \code{conf.int=TRUE}.
+#' To avoid computation of confidence intervals, set \code{conf.int} to FALSE or NULL.
 #' @param print.iter boolean parameter. Equals to \code{TRUE} to print
 #' the likelihood during the iteration process, \code{FALSE}
 #' otherwise. Default is \code{FALSE}. This option is not running on
@@ -208,8 +207,7 @@ idm <- function(formula01,
                 CV=FALSE,
                 kappa=c(1000000,500000,20000),
                 method="Weib",
-                conf.int=TRUE,
-                level=.95,
+                conf.int=.95,
                 print.iter=FALSE,
                 subset=NULL,
                 na.action = na.fail){
@@ -222,6 +220,13 @@ idm <- function(formula01,
     if(class(formula02)!="formula")stop("The argument formula02 must be a class 'formula'.")		
     ## if(missing(formula02)) formula02 <- formula01
     if(missing(formula12)) formula12 <- formula02
+    # }}}
+    # {{{ parse confidence level
+    do.conf.int <- !is.null(conf.int) && !is.na(conf.int) && !conf.int==FALSE
+    if (is.logical(conf.int)) conf.int <- .95
+    if (do.conf.int == TRUE){
+        stopifnot(0<conf.int && conf.int<1)
+    }
     # }}}
     # {{{ evaluate formula in data 
     if(missing(data)) stop("Need a data frame.")
@@ -283,8 +288,8 @@ idm <- function(formula01,
     if (truncated==0){
         entrytime <- as.double(NULL)
     }else{
-         entrytime <- as.double(responseAbs[,"entry"])
-     }
+        entrytime <- as.double(responseAbs[,"entry"])
+    }
     if (isIntervalCensored){
         Ltime <- as.double(responseTrans[,"L",drop=TRUE])
         Rtime <- as.double(responseTrans[,"R",drop=TRUE])
@@ -293,11 +298,11 @@ idm <- function(formula01,
         ## sum(Rtime<abstime & idm ==0),
         ## " cases where the ill status is not observed\n and the last inspection time (R) is smaller than the right censored time (T)\n the time R is set to T."))
     }else{# exactly observed transition times
-         Ltime <- as.double(responseTrans[,"time",drop=TRUE])
-         Rtime <- as.double(responseTrans[,"time",drop=TRUE])
-         Ltime[idm==0] <- abstime[idm==0]
-         Rtime[idm==0] <- abstime[idm==0]
-     }
+        Ltime <- as.double(responseTrans[,"time",drop=TRUE])
+        Rtime <- as.double(responseTrans[,"time",drop=TRUE])
+        Ltime[idm==0] <- abstime[idm==0]
+        Rtime[idm==0] <- abstime[idm==0]
+    }
     ## print(head(cbind(Ltime,Rtime)))
     method <- tolower(method)
     if(!(method %in% c("weib","splines"))) stop("The method argument must be 'Weib' or 'Splines'")
@@ -369,143 +374,143 @@ idm <- function(formula01,
                          a12=as.double(rep(0,99)),
                          a12_l=as.double(rep(0,99)),
                          a12_u=as.double(rep(0,99)),
-                         as.integer(conf.int),
-                         as.double(level),
+                         as.integer(do.conf.int),
+                         as.double(conf.int),
                          as.integer(print.iter),
                          V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
                          PACKAGE="SmoothHazard")
     }else{
-         #  	cat("------ Program Splines ------ \n")
-         ## check knots
-         if (length(entrytime)>0){
-             alltimes <- sort(unique(c(Ltime, Rtime,entrytime,abstime)))
-             amax <- max(alltimes)
-             amin <- min(alltimes)
-         }
-         else{
-             alltimes <- sort(unique(c(Ltime, Rtime,abstime)))
-             amax <- max(alltimes)
-             amin <- min(alltimes)
-         }
-         if (is.character(knots)){
-             if ((length(n.knots)>3) || (length(n.knots)<1)) stop("Argument n.knots has to be a vector of at least one positive integer and at most 3 positive integers.")
-             if (length(n.knots)==1) n.knots <- c(n.knots,n.knots,n.knots)
-             if (length(n.knots)==2) n.knots <- c(n.knots,n.knots[1])
-             nknots01 <- n.knots[1]
-             nknots02 <- n.knots[2]
-             nknots12 <- n.knots[3]
-             if((!is.numeric(n.knots) && !is.integer(n.knots)) || (any(n.knots < 5)) || (any(n.knots >20)))
-                 stop("Each element of n.knots has to be an integer between 5 and 20. See help(idm).")
-             if (knots=="quantiles"){
-                 approx.illtimes <- (Rtime[idm==1] + Ltime[idm==1])/2
-                 knots01 <- quantile(approx.illtimes,seq(0,1,1/(nknots01-1)))
-                 knots02 <- quantile(abstime,seq(0,1,1/(nknots02-1)))
-                 knots12 <- quantile(abstime,seq(0,1,1/(nknots12-1)))
-             }
-             if (knots!="equidistant")
-                 warning("Unknown specification of knots. Fall back to equidistant.")
-             knots01 <- seq(amin,amax,(amax-amin)/(nknots01-1))
-             knots02 <- seq(amin,amax,(amax-amin)/(nknots02-1))
-             knots12 <- seq(amin,amax,(amax-amin)/(nknots12-1))
-         } else{## user specified knots
-               if (!is.list(knots) || length(knots)==1)
-                   knots <- list(knots,knots,knots)
-               if (length(knots)==2) ## re-use knots from 0->1 for 1->2
-                   knots <- c(knots,knots[1])
-               if (!all(sapply(knots,is.numeric)))
-                   stop("Incorrect form of argument knots. See help(idm).")
-               knots01 <- sort(knots[[1]])
-               knots02 <- sort(knots[[2]])
-               knots12 <- sort(knots[[3]])
-               if (knots01[1]< amin - 0.05*amin) stop(paste("Transition 0->1: Smallest knot should not be smaller than the time point:",amin))
-               if (knots01[length(knots01)]> amax + 0.05*amax) stop(paste("Transition 0->1: Largest knot should not be larger than the time point:",amax))
-               if (knots02[1]< amin - 0.05*amin) stop(paste("Transition 0->2: Smallest knot should not be smaller than the time point:",amin))
-               if (knots02[length(knots02)]> amax + 0.05*amax) stop(paste("Transition 0->2: Largest knot should not be larger than the time point:",amax))
-               if (knots12[1]< amin - 0.05*amin) stop(paste("Transition 1->2: Smallest knot should not be smaller than the time point:",amin))
-               if (knots12[length(knots12)]> amax + 0.05*amax) stop(paste("Transition 1->2: Largest knot should not be larger than the time point:",amax))
-               ## FIXME: check if knots within amin, amax
-               ## if (knots01[[1]] < amin) stop("Smallest knot ")
-               nknots01 <- length(knots01)
-               nknots02 <- length(knots02)
-               nknots12 <- length(knots12)
-           }
-         ## double check to avoid crash
-         if (any(c(nknots01,nknots02,nknots12)<5)) {
-             stop("Need at least 5 knots.")
-         }
-         if (any(c(nknots01,nknots02,nknots12)>20)){
-             stop("Cannot handle more than 20 knots.")
-         }
-         ## make sure min and max times are knots
-         if (min(knots01)>amin) knots01 <- c(amin,knots01)
-         ## warning("The first knot for the 0->1 transition has to be before or at the smallest entrytime")
-         if (min(knots02)>amin) knots02 <- c(amin,knots02)
-         ## stop("The first knot for the 0->2 transition has to be before or at the smallest entrytime")
-         if (min(knots12)>min(Ltime)) knots02 <- c(min(Ltime,knots02))
-         ## stop("The first knot for the 1->2 transition has to be before or at the first (in time) observation in the ill-state.")
-         ## make fake knots needed for M-splines
-         knots01 <- c(rep(knots01[1],3),knots01,rep(knots01[length(knots01)],3))
-         knots02 <- c(rep(knots02[1],3),knots02,rep(knots02[length(knots02)],3))
-         knots12 <- c(rep(knots12[1],3),knots12,rep(knots12[length(knots12)],3))
-         size1 <- NC01 + NC02 + NC12
-         size_V <- size1 + nknots01+nknots02+nknots12 + 6
-         size2 <- size1**2
-         ffit <- .Fortran("idmPl",
-                          ## input
-                          as.double(entrytime),               #entrytime=
-                          as.double(Ltime),                   #l=
-                          as.double(Rtime),                   #r=
-                          as.double(abstime),                 #d=
-                          as.integer(idm),                    #idm=
-                          as.integer(idd),                    #idd=
-                          as.double(x01),                     #x01=
-                          as.double(x02),                     #x02=
-                          as.double(x12),                     #x12=
-                          as.integer(N),                      #N
-                          as.integer(NC01),                   #P01= 
-                          as.integer(NC02),                   #P02= 
-                          as.integer(NC12),                   #P12= 
-                          as.integer(truncated),              #truncated=
-                          ## interval=as.integer(isIntervalCensored),
-                          as.integer(eps),   #eps=
-                          as.integer(maxiter),
-                          ## output
-                          loglik=as.double(rep(0,2)),
-                          regpar=as.double(rep(0,size1)),
-                          v=as.double(rep(0,size2)),
-                          converged=as.integer(rep(0,2)),
-                          cv=as.double(rep(0,3)),
-                          niter=as.integer(0),
-                          t=as.double(matrix(0,nrow=99,ncol=3)),
-                          a01=as.double(rep(0,99)),
-                          a01_l=as.double(rep(0,99)),
-                          a01_u=as.double(rep(0,99)),
-                          a02=as.double(rep(0,99)),
-                          a02_l=as.double(rep(0,99)),
-                          a02_u=as.double(rep(0,99)),
-                          a12=as.double(rep(0,99)),
-                          a12_l=as.double(rep(0,99)),
-                          a12_u=as.double(rep(0,99)),	
-                          as.integer(nknots01),
-                          as.double(knots01),
-                          as.integer(nknots02),
-                          as.double(knots02),
-                          as.integer(nknots12),
-                          as.double(knots12),
-                          as.integer(CV),
-                          as.double(kappa),
-                          kappa=as.double(rep(0,3)),
-                          as.integer(conf.int),
-                          as.double(level),
-                          CVcrit=as.double(0),
-                          mdf=as.double(0),
-                          theta01=as.double(rep(0,(nknots01+2))),
-                          theta02=as.double(rep(0,(nknots02+2))),
-                          theta12=as.double(rep(0,(nknots12+2))),
-                          as.integer(print.iter),
-                          V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
-                          PACKAGE="SmoothHazard")
-     }
+        #  	cat("------ Program Splines ------ \n")
+        ## check knots
+        if (length(entrytime)>0){
+            alltimes <- sort(unique(c(Ltime, Rtime,entrytime,abstime)))
+            amax <- max(alltimes)
+            amin <- min(alltimes)
+        }
+        else{
+            alltimes <- sort(unique(c(Ltime, Rtime,abstime)))
+            amax <- max(alltimes)
+            amin <- min(alltimes)
+        }
+        if (is.character(knots)){
+            if ((length(n.knots)>3) || (length(n.knots)<1)) stop("Argument n.knots has to be a vector of at least one positive integer and at most 3 positive integers.")
+            if (length(n.knots)==1) n.knots <- c(n.knots,n.knots,n.knots)
+            if (length(n.knots)==2) n.knots <- c(n.knots,n.knots[1])
+            nknots01 <- n.knots[1]
+            nknots02 <- n.knots[2]
+            nknots12 <- n.knots[3]
+            if((!is.numeric(n.knots) && !is.integer(n.knots)) || (any(n.knots < 5)) || (any(n.knots >20)))
+                stop("Each element of n.knots has to be an integer between 5 and 20. See help(idm).")
+            if (knots=="quantiles"){
+                approx.illtimes <- (Rtime[idm==1] + Ltime[idm==1])/2
+                knots01 <- quantile(approx.illtimes,seq(0,1,1/(nknots01-1)))
+                knots02 <- quantile(abstime,seq(0,1,1/(nknots02-1)))
+                knots12 <- quantile(abstime,seq(0,1,1/(nknots12-1)))
+            }
+            if (knots!="equidistant")
+                warning("Unknown specification of knots. Fall back to equidistant.")
+            knots01 <- seq(amin,amax,(amax-amin)/(nknots01-1))
+            knots02 <- seq(amin,amax,(amax-amin)/(nknots02-1))
+            knots12 <- seq(amin,amax,(amax-amin)/(nknots12-1))
+        } else{## user specified knots
+            if (!is.list(knots) || length(knots)==1)
+                knots <- list(knots,knots,knots)
+            if (length(knots)==2) ## re-use knots from 0->1 for 1->2
+                knots <- c(knots,knots[1])
+            if (!all(sapply(knots,is.numeric)))
+                stop("Incorrect form of argument knots. See help(idm).")
+            knots01 <- sort(knots[[1]])
+            knots02 <- sort(knots[[2]])
+            knots12 <- sort(knots[[3]])
+            if (knots01[1]< amin - 0.05*amin) stop(paste("Transition 0->1: Smallest knot should not be smaller than the time point:",amin))
+            if (knots01[length(knots01)]> amax + 0.05*amax) stop(paste("Transition 0->1: Largest knot should not be larger than the time point:",amax))
+            if (knots02[1]< amin - 0.05*amin) stop(paste("Transition 0->2: Smallest knot should not be smaller than the time point:",amin))
+            if (knots02[length(knots02)]> amax + 0.05*amax) stop(paste("Transition 0->2: Largest knot should not be larger than the time point:",amax))
+            if (knots12[1]< amin - 0.05*amin) stop(paste("Transition 1->2: Smallest knot should not be smaller than the time point:",amin))
+            if (knots12[length(knots12)]> amax + 0.05*amax) stop(paste("Transition 1->2: Largest knot should not be larger than the time point:",amax))
+            ## FIXME: check if knots within amin, amax
+            ## if (knots01[[1]] < amin) stop("Smallest knot ")
+            nknots01 <- length(knots01)
+            nknots02 <- length(knots02)
+            nknots12 <- length(knots12)
+        }
+        ## double check to avoid crash
+        if (any(c(nknots01,nknots02,nknots12)<5)) {
+            stop("Need at least 5 knots.")
+        }
+        if (any(c(nknots01,nknots02,nknots12)>20)){
+            stop("Cannot handle more than 20 knots.")
+        }
+        ## make sure min and max times are knots
+        if (min(knots01)>amin) knots01 <- c(amin,knots01)
+        ## warning("The first knot for the 0->1 transition has to be before or at the smallest entrytime")
+        if (min(knots02)>amin) knots02 <- c(amin,knots02)
+        ## stop("The first knot for the 0->2 transition has to be before or at the smallest entrytime")
+        if (min(knots12)>min(Ltime)) knots02 <- c(min(Ltime,knots02))
+        ## stop("The first knot for the 1->2 transition has to be before or at the first (in time) observation in the ill-state.")
+        ## make fake knots needed for M-splines
+        knots01 <- c(rep(knots01[1],3),knots01,rep(knots01[length(knots01)],3))
+        knots02 <- c(rep(knots02[1],3),knots02,rep(knots02[length(knots02)],3))
+        knots12 <- c(rep(knots12[1],3),knots12,rep(knots12[length(knots12)],3))
+        size1 <- NC01 + NC02 + NC12
+        size_V <- size1 + nknots01+nknots02+nknots12 + 6
+        size2 <- size1**2
+        ffit <- .Fortran("idmPl",
+                         ## input
+                         as.double(entrytime),               #entrytime=
+                         as.double(Ltime),                   #l=
+                         as.double(Rtime),                   #r=
+                         as.double(abstime),                 #d=
+                         as.integer(idm),                    #idm=
+                         as.integer(idd),                    #idd=
+                         as.double(x01),                     #x01=
+                         as.double(x02),                     #x02=
+                         as.double(x12),                     #x12=
+                         as.integer(N),                      #N
+                         as.integer(NC01),                   #P01= 
+                         as.integer(NC02),                   #P02= 
+                         as.integer(NC12),                   #P12= 
+                         as.integer(truncated),              #truncated=
+                         ## interval=as.integer(isIntervalCensored),
+                         as.integer(eps),   #eps=
+                         as.integer(maxiter),
+                         ## output
+                         loglik=as.double(rep(0,2)),
+                         regpar=as.double(rep(0,size1)),
+                         v=as.double(rep(0,size2)),
+                         converged=as.integer(rep(0,2)),
+                         cv=as.double(rep(0,3)),
+                         niter=as.integer(0),
+                         t=as.double(matrix(0,nrow=99,ncol=3)),
+                         a01=as.double(rep(0,99)),
+                         a01_l=as.double(rep(0,99)),
+                         a01_u=as.double(rep(0,99)),
+                         a02=as.double(rep(0,99)),
+                         a02_l=as.double(rep(0,99)),
+                         a02_u=as.double(rep(0,99)),
+                         a12=as.double(rep(0,99)),
+                         a12_l=as.double(rep(0,99)),
+                         a12_u=as.double(rep(0,99)),	
+                         as.integer(nknots01),
+                         as.double(knots01),
+                         as.integer(nknots02),
+                         as.double(knots02),
+                         as.integer(nknots12),
+                         as.double(knots12),
+                         as.integer(CV),
+                         as.double(kappa),
+                         kappa=as.double(rep(0,3)),
+                         as.integer(do.conf.int),
+                         as.double(conf.int),
+                         CVcrit=as.double(0),
+                         mdf=as.double(0),
+                         theta01=as.double(rep(0,(nknots01+2))),
+                         theta02=as.double(rep(0,(nknots02+2))),
+                         theta12=as.double(rep(0,(nknots12+2))),
+                         as.integer(print.iter),
+                         V_tot=as.double(matrix(0,nrow=size_V,ncol=size_V)),
+                         PACKAGE="SmoothHazard")
+    }
     # ffit$converged[[1]]  without covariates
     # ffit$converged[[2]]  with covariates
     if (any(ffit$converged == 4)){
@@ -545,8 +550,8 @@ idm <- function(formula01,
     if(method=="splines"){
         fit$time <- matrix(ffit$t,ncol=3) 
     }else{
-         fit$time <- ffit$t 
-     }
+        fit$time <- ffit$t 
+    }
     fit$intensity01 <- ffit$a01
     fit$lowerIntensity01 <- ffit$a01_l
     fit$upperIntensity01 <- ffit$a01_u
@@ -574,11 +579,11 @@ idm <- function(formula01,
         colnames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
         rownames(V) <- c("sqrt(a01)","sqrt(b01)","sqrt(a02)","sqrt(b02)","sqrt(a12)","sqrt(b12)",c(Xnames01,Xnames02,Xnames12))
     }else{
-         theta_names <- cbind(c(rep("theta01",(nknots01+2)),rep("theta02",(nknots02+2)),rep("theta12",(nknots12+2))),c((1:(nknots01+2)),(1:(nknots02+2)),(1:(nknots12+2))))
-         theta_names <- as.vector(apply(theta_names,1,paste,collapse=" "))
-         colnames(V) <- c(theta_names,c(Xnames01,Xnames02,Xnames12))	
-         rownames(V) <- c(theta_names,c(Xnames01,Xnames02,Xnames12))	
-     }
+        theta_names <- cbind(c(rep("theta01",(nknots01+2)),rep("theta02",(nknots02+2)),rep("theta12",(nknots12+2))),c((1:(nknots01+2)),(1:(nknots02+2)),(1:(nknots12+2))))
+        theta_names <- as.vector(apply(theta_names,1,paste,collapse=" "))
+        colnames(V) <- c(theta_names,c(Xnames01,Xnames02,Xnames12))	
+        rownames(V) <- c(theta_names,c(Xnames01,Xnames02,Xnames12))	
+    }
     fit$V <- V
     if(NC01>0) fit$Xnames01 <- Xnames01
     if(NC02>0) fit$Xnames02 <- Xnames02
@@ -600,8 +605,8 @@ idm <- function(formula01,
         if(CV){	
             fit$kappa <- ffit$kappa	
         }else{
-             fit$kappa <- kappa
-         }
+            fit$kappa <- kappa
+        }
     }
     fit$na.action <- "na.fail"
     # }}}

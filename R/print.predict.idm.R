@@ -3,9 +3,9 @@
 ## author: Thomas Alexander Gerds
 ## created: Feb 16 2016 (09:50) 
 ## Version: 
-## last-updated: Feb 16 2016 (16:03) 
+## last-updated: Feb 25 2016 (08:26) 
 ##           By: Thomas Alexander Gerds
-##     Update #: 4
+##     Update #: 15
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -15,11 +15,9 @@
 ## 
 ### Code:
 #' @export
-print.predict.idm <- function(x,...){
-    tab <- cbind(Parameter=names(x$transprob),data.frame(matrix(unlist(x$transprob),ncol=3,byrow=TRUE)))
-    colnames(tab)[2:4] <- c("Estimate","lower.95","upper.95")
-    print(tab,...)
-    invisible(tab)
+print.predict.idm <- function(x,digits=3,...){
+    print(x$transprob,digits=digits,...)
+    invisible(x$transprob)
 }
 
 

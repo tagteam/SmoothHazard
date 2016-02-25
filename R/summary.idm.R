@@ -5,7 +5,7 @@
 #' 
 #' @param object a \code{idmSplines} object, i.e., the result of a call to the
 #' \code{\link{idm}} function with \code{intensities}="Splines".
-#' @param conf.int confiance level.
+#' @param conf.int  The level of confidence for the hazard ratios. The default is \code{0.95}.
 #' @param digits number of digits to print.
 #' @param pvalDigits number of digits to print for p-values.
 #' @param eps convergence criterion used for p-values.
@@ -45,8 +45,9 @@ summary.idm <- function(object,conf.int=.95,digits=4,pvalDigits=4,eps=.0001, ...
             z <- abs(qnorm((1 + conf.int)/2))
             out <- data.frame("Hazard ratio"=format(round(exp(object$coef),digits)),
                               "Standard error"=format(round(object$se,digits)),
-                              "CI.95"=paste("[",format(round(exp(object$coef - z * object$se),2)),";",format(round(exp(object$coef + z * object$se),2)),"]",sep=""),
+                              "CI"=paste("[",format(round(exp(object$coef - z * object$se),2)),";",format(round(exp(object$coef + z * object$se),2)),"]",sep=""),
                               "P-value"=format.pval(1 - pchisq(wald, 1),digits=pvalDigits,eps=eps))
+            names(out)[3] <- paste("CI",round(100*conf.int),sep=".")
             Xnames <- NULL
             if(object$NC[1]>0) Xnames <- c(Xnames,paste(object$Xnames01,"_01",sep=""))
             if(object$NC[2]>0) Xnames <- c(Xnames,paste(object$Xnames02,"_02",sep=""))

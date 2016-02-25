@@ -11,7 +11,7 @@
 \item{object}{a \code{idmSplines} object, i.e., the result of a call to the
 \code{\link{idm}} function with \code{intensities}="Splines".}
 
-\item{conf.int}{confiance level.}
+\item{conf.int}{The level of confidence for the hazard ratios. The default is \code{0.95}.}
 
 \item{digits}{number of digits to print.}
 

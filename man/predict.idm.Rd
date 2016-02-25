@@ -6,7 +6,7 @@
 approach or a Weibull parametrization.}
 \usage{
 \method{predict}{idm}(object, s, t, newdata, nsim = 200, seed = 21,
-  conf.int = TRUE, level = 0.95, lifeExpect = FALSE, ...)
+  conf.int = 0.95, lifeExpect = FALSE, ...)
 }
 \arguments{
 \item{object}{an \code{idm} class objects returned by a call to the
@@ -24,11 +24,9 @@ calculations.  The default is 200.}
 \item{seed}{Seed passed to \code{set.seed} for Monte Carlo
 simulation of confidence intervals.}
 
-\item{conf.int}{Logical: with (\code{TRUE}) or without
-(\code{FALSE}) confidence intervals for the predicted values. The
-default is \code{TRUE}.}
-
-\item{level}{Value between 0 and 1, the level of confidence. Default is .95.}
+\item{conf.int}{Level of confidence, i.e., a value between 0 and 1, the default is \code{0.95}.
+The default is also used when \code{conf.int=TRUE}.
+To avoid computation of confidence intervals, set \code{conf.int} to FALSE or NULL.}
 
 \item{lifeExpect}{Logical. If \code{TRUE} compute life
 expectancies, i.e., \code{t=Inf}.}
@@ -58,7 +56,7 @@ d=simulateIDM(n = 100)
 fit <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2+X3,
                formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2+X3,
                data=d,conf.int=FALSE)
-predict(fit,s=0,t=80,nsim=3,conf.int=FALSE,lifeExpect=FALSE)
+predict(fit,s=0,t=80,conf.int=FALSE,lifeExpect=FALSE)
 predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=FALSE)
 ## predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=TRUE)
 

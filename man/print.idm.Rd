@@ -11,7 +11,7 @@
 \item{x}{Class \code{idm} object, i.e. the result of a call to the
 \code{\link{idm}} function with \code{intensities}="Weib".}
 
-\item{conf.int}{Confidence level.}
+\item{conf.int}{The level of confidence for the hazard ratios. The default is \code{0.95}.}
 
 \item{digits}{Number of digits to print.}
 

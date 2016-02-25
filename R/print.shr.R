@@ -6,7 +6,7 @@
 #' 
 #' @param x a \code{shr} object, i.e., the result of a call to the
 #' \code{\link{shr}} function with \code{hazard}="Splines".
-#' @param conf.int confiance level.
+#' @param conf.int The level of confidence for the hazard ratios. The default is \code{0.95}.
 #' @param digits number of digits to print.
 #' @param pvalDigits number of digits to print for p-values.
 #' @param eps convergence criterion used for p-values.

@@ -11,7 +11,7 @@
 \item{object}{a \code{shr} object, i.e., the result of a call to the
 \code{\link{shr}} function.}
 
-\item{conf.int}{The confidence level.}
+\item{conf.int}{The level of confidence for the hazard ratios. The default is \code{0.95}.}
 
 \item{digits}{number of digits to print.}
 

@@ -5,9 +5,8 @@
 \title{Fit a survival model}
 \usage{
 shr(formula, data, eps = c(5, 5, 3), n.knots = 7, knots = "equidistant",
-  CV = FALSE, kappa = 10000, conf.int = TRUE, level = 0.95,
-  maxiter = 200, method = "Weib", print.iter = FALSE,
-  na.action = na.omit)
+  CV = FALSE, kappa = 10000, conf.int = 0.95, maxiter = 200,
+  method = "Weib", print.iter = FALSE, na.action = na.omit)
 }
 \arguments{
 \item{formula}{a formula object with the response on the left of a
@@ -49,12 +48,10 @@ A positive number (smoothing parameter)
 If CV=1 the value is used as a starting value 
 for a cross validation search to optimize \code{kappa}.}
 
-\item{conf.int}{Boolean parameter. Equals to \code{TRUE} to
-calculate pointwise confidence intervals for the survival or hazard
-curves, \code{FALSE} otherwise. Default is \code{TRUE}.}
-
-\item{level}{confidence level for the pointwise confidence intervals 
-of the curves. Default is 0.95.}
+\item{conf.int}{Level of confidence pointwise confidence intervals of the survival and hazard functions, i.e.,
+a value between 0 and 1, the default is \code{0.95}.
+The default is also used when \code{conf.int=TRUE}.
+To avoid computation of confidence intervals, set \code{conf.int} to FALSE or NULL.}
 
 \item{maxiter}{maximum number of iterations. The default is 200.}
 
