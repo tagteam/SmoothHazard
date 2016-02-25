@@ -58,7 +58,7 @@ fit <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2+X3,
                data=d,conf.int=FALSE)
 predict(fit,s=0,t=80,conf.int=FALSE,lifeExpect=FALSE)
 predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=FALSE)
-## predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=TRUE)
+predict(fit,s=0,t=80,nsim=4,conf.int=FALSE,lifeExpect=TRUE)
 
 data(Paq1000)
 library(prodlim)

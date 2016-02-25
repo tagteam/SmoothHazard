@@ -45,7 +45,7 @@
 #'                data=d,conf.int=FALSE)
 #' predict(fit,s=0,t=80,conf.int=FALSE,lifeExpect=FALSE)
 #' predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=FALSE)
-#' predict(fit,s=0,t=80,nsim=4,conf.int=FALSE,lifeExpect=TRUE)
+#' # predict(fit,s=0,t=80,nsim=4,conf.int=FALSE,lifeExpect=TRUE)
 #' 
 #' data(Paq1000)
 #' library(prodlim)
@@ -248,17 +248,6 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
             if (lifeExpect==TRUE){
                 simResults <- do.call("rbind",
                                       lapply(1:nsim,function(i){
-                                          print(i)
-                                          print(list(s,
-                                                     a01=Xa01[[i]],
-                                                     b01=Xb01[[i]],
-                                                     a02=Xa02[[i]],
-                                                     b02=Xb02[[i]],
-                                                     a12=Xa12[[i]],
-                                                     b12=Xb12[[i]],
-                                                     bZ01=linPred01[[i]],
-                                                     bZ02=linPred02[[i]],
-                                                     bZ12=linPred12[[i]]))
                                           lifexpect0.idmWeib(s,
                                                              a01=Xa01[[i]],
                                                              b01=Xb01[[i]],

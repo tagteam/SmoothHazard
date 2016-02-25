@@ -3,9 +3,9 @@
 ## author: Thomas Alexander Gerds
 ## created: Feb  6 2016 (08:47) 
 ## Version: 
-## last-updated: Feb  9 2016 (09:45) 
+## last-updated: Feb 25 2016 (13:17) 
 ##           By: Thomas Alexander Gerds
-##     Update #: 26
+##     Update #: 27
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -46,15 +46,18 @@
 ##' @seealso \code{\link{shr}}, \code{\link{idm}} 
 ##' @examples
 ##' data(testdata)
-##' fit.su <- shr(Hist(time=list(l, r), id) ~ cov, data = testdata, method = "Splines", CV = TRUE)
-##' intensity(times = fit.su$time, knots = fit.su$knots, number.knots = fit.su$nknots, theta = fit.su$theta^2)
+##' fit.su <- shr(Hist(time=list(l, r), id) ~ cov,
+##'               data = testdata,method = "Splines",CV = TRUE)
+##' intensity(times = fit.su$time, knots = fit.su$knots,
+##'            number.knots = fit.su$nknots, theta = fit.su$theta^2)
 ##' 
 ##' \dontrun{
 ##'   data(Paq1000)
 ##'   fit.idm <-  idm(formula02 = Hist(time = t, event = death, entry = e) ~ certif,
 ##'                   formula01 = Hist(time = list(l,r), event = dementia) ~ certif,
 ##'                   formula12 = ~ certif, method = "Splines", data = Paq1000)
-##'   # Probability of survival in state 0 at age 80 for a subject with no cep given that he is in state 0 at 70
+##'   # Probability of survival in state 0 at age 80 for a subject with no cep given
+##'     that he is in state 0 at 70
 ##'   su0 <- (intensity(times = 80, knots = fit.idm$knots01, 
 ##'                    number.knots = fit.idm$nknots01, 
 ##'                    theta = fit.idm$theta01^2)$survival
