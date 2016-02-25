@@ -45,7 +45,7 @@
 #'                data=d,conf.int=FALSE)
 #' predict(fit,s=0,t=80,conf.int=FALSE,lifeExpect=FALSE)
 #' predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=FALSE)
-#' ## predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=TRUE)
+#' predict(fit,s=0,t=80,nsim=4,conf.int=FALSE,lifeExpect=TRUE)
 #' 
 #' data(Paq1000)
 #' library(prodlim)
@@ -248,6 +248,17 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
             if (lifeExpect==TRUE){
                 simResults <- do.call("rbind",
                                       lapply(1:nsim,function(i){
+                                          print(i)
+                                          print(list(s,
+                                                     a01=Xa01[[i]],
+                                                     b01=Xb01[[i]],
+                                                     a02=Xa02[[i]],
+                                                     b02=Xb02[[i]],
+                                                     a12=Xa12[[i]],
+                                                     b12=Xb12[[i]],
+                                                     bZ01=linPred01[[i]],
+                                                     bZ02=linPred02[[i]],
+                                                     bZ12=linPred12[[i]]))
                                           lifexpect0.idmWeib(s,
                                                              a01=Xa01[[i]],
                                                              b01=Xb01[[i]],
@@ -288,42 +299,19 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
     if (do.conf.int==TRUE){
         transprob <- data.frame(cbind(transprob,t(ci)))
         names(transprob) <- c("Estimate",paste("Lower",round(100*conf.int),sep="."),paste("Upper",round(100*conf.int),sep="."))
+        transprob <- cbind("Parameter"=rownames(transprob),transprob)
+        rownames(transprob) <- NULL
+    }else{
+        transprob <- data.frame(cbind(transprob))
+        names(transprob) <- c("Estimate")
+        transprob <- cbind("Parameter"=rownames(transprob),transprob)
+        rownames(transprob) <- NULL
     }
     out <- list(transprob=transprob)
     out <- c(out,list(newdata=newdata))
     out <- c(out,list(s=s,t=t,conf.int=conf.int))
     class(out) <- "predict.idm"
     out
-}
-
-print.predict.idm <- function(x,digits=2,...){
-    lifeExpect <- is.infinite(x$t)
-    cat("Predictions of an irreversible illness-death model with states (0,1,2).\n")
-    cat("For covariate values:\n")
-    print(x$newdata,row.names=FALSE)
-    cat("\n")
-    fmt <- paste0("%1.", digits[[1]], "f")
-    nix <- lapply(names(x$transprob),function(ntp){
-                           tp <- x$transprob[[ntp]]
-                           if (length(tp)==3)
-                               paste(sprintf(tp[[1]],fmt=fmt)," [",sprintf(tp[[2]],fmt=fmt),",",sprintf(tp[[3]],fmt=fmt),"]",sep="")
-                           else
-                               sprintf(tp[[1]],fmt=fmt)
-                       })
-    px <- data.frame(Parameter=names(x$transprob),Estimate=do.call(rbind,nix))
-    rownames(px) <- NULL
-    if (lifeExpect==TRUE){
-        cat("Remaining life expected sojourn times (starting at time ",x$s,"):\n\n")
-        print(cbind("State"=c(0,1,2),px[px$Parameter %in% c("LE.0","LE.nondiseased","LE.diseased"),]),row.names=FALSE)
-    }else{
-         cat("For a subject in state '0' at time ",x$s,",\npredicted state occupation probability at time ",x$t,":\n\n",sep="")
-         print(cbind("State"=c(0,1,2),px[px$Parameter %in% c("p00","p01","p02"),]),row.names=FALSE)
-         cat("\nFor a subject in state '0' at time ",x$s,",\npredicted probability of exit from state 0 until time ",x$t,":\n\n",sep="")
-         print(cbind("Path"=c("via state 1","any"),px[px$Parameter %in% c("F01","F0."),]),row.names=FALSE)
-         cat("\nFor a subject in state '1' at time ",x$s,",\npredicted state occupation probability at time ",x$t,":\n\n",sep="")
-         print(cbind("State"=c(1,2),px[px$Parameter %in% c("p11","p12"),]),row.names=FALSE)
-     }
-    invisible(px)
 }
 
 Predict0.idmPl <- function(s,t,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01=0,bZ12=0,bZ02=0) {
