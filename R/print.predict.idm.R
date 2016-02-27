@@ -3,9 +3,9 @@
 ## author: Thomas Alexander Gerds
 ## created: Feb 16 2016 (09:50) 
 ## Version: 
-## last-updated: Feb 27 2016 (08:41) 
+## last-updated: Feb 27 2016 (09:24) 
 ##           By: Thomas Alexander Gerds
-##     Update #: 30
+##     Update #: 34
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -16,21 +16,16 @@
 ### Code:
 #' @export
 
-print.predict.idm <- function(x,digits=2,...){
+print.predict.idm <- function(x,digits=3,...){
     lifeExpect <- is.infinite(x$t)
     cat("Predictions of an irreversible illness-death model with states (0,1,2).\n\n")
     cat("For covariate values:\n\n")
     print(x$newdata,row.names=FALSE)
     cat("\n")
     fmt <- paste0("%1.", digits[[1]], "f")
-    ## nix <- lapply(names(x$transprob),function(ntp){
-    ## tp <- x$transprob[[ntp]]
-    ## if (length(tp)==3)
-    ## paste(sprintf(tp[[1]],fmt=fmt)," [",sprintf(tp[[2]],fmt=fmt),",",sprintf(tp[[3]],fmt=fmt),"]",sep="")
-    ## else
-    ## sprintf(tp[[1]],fmt=fmt)
-    ## })
     px <- x$transprob
+    for (j in 2:NCOL(px))
+        px[,j] <- sprintf(px[,j],fmt=fmt)
     rownames(px) <- NULL
     if (lifeExpect==TRUE){
         cat("Remaining life expected sojourn times (starting at time ",x$s,"):\n\n",sep="")

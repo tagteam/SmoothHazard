@@ -298,7 +298,7 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
     }
     out <- list(transprob=transprob)
     out <- c(out,list(newdata=newdata))
-    out <- c(out,list(s=s,t=t,conf.int=conf.int))
+    out <- c(out,list(s=s,t=t,conf.int=ifelse(do.conf.int,conf.int,FALSE)))
     class(out) <- "predict.idm"
     out
 }
