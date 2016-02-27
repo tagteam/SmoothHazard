@@ -303,7 +303,17 @@ idm <- function(formula01,
         Ltime[idm==0] <- abstime[idm==0]
         Rtime[idm==0] <- abstime[idm==0]
     }
-    ## print(head(cbind(Ltime,Rtime)))
+    ## find time bounderies
+    if (length(entrytime)>0){
+        alltimes <- sort(unique(c(Ltime, Rtime,entrytime,abstime)))
+        amax <- max(alltimes)
+        amin <- min(alltimes)
+    }
+    else{
+        alltimes <- sort(unique(c(Ltime, Rtime,abstime)))
+        amax <- max(alltimes)
+        amin <- min(alltimes)
+    }
     method <- tolower(method)
     if(!(method %in% c("weib","splines"))) stop("The method argument must be 'Weib' or 'Splines'")
     # }}}
@@ -382,16 +392,6 @@ idm <- function(formula01,
     }else{
         #  	cat("------ Program Splines ------ \n")
         ## check knots
-        if (length(entrytime)>0){
-            alltimes <- sort(unique(c(Ltime, Rtime,entrytime,abstime)))
-            amax <- max(alltimes)
-            amin <- min(alltimes)
-        }
-        else{
-            alltimes <- sort(unique(c(Ltime, Rtime,abstime)))
-            amax <- max(alltimes)
-            amin <- min(alltimes)
-        }
         if (is.character(knots)){
             if ((length(n.knots)>3) || (length(n.knots)<1)) stop("Argument n.knots has to be a vector of at least one positive integer and at most 3 positive integers.")
             if (length(n.knots)==1) n.knots <- c(n.knots,n.knots,n.knots)
@@ -611,6 +611,8 @@ idm <- function(formula01,
     fit$na.action <- "na.fail"
     # }}}
     if (method=="weib") fit$method <- "Weib" else fit$method <- "Splines"
+    fit$maxtime <- amax
+    fit$mintime <- amin
     class(fit) <- "idm"
     fit$runtime <- proc.time()-ptm
     fit

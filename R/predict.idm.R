@@ -8,44 +8,51 @@
 #' of class \code{idmSplines} with confidence intervals are calculated.
 #' 
 #' @param object an \code{idm} class objects returned by a call to the
-#' \code{\link{idm}} function
+#'     \code{\link{idm}} function
 #' @param s time point at which prediction is made.
 #' @param t time horizon for prediction.
-#' @param newdata A data frame with covariate values for prediction.  
+#' @param newdata A data frame with covariate values for prediction.
 #' @param nsim number of simulations for the confidence intervals
-#' calculations.  The default is 200.
+#'     calculations.  The default is 200.
 #' @param seed Seed passed to \code{set.seed} for Monte Carlo
-#' simulation of confidence intervals.
-#' @param conf.int Level of confidence, i.e., a value between 0 and 1, the default is \code{0.95}.
-#' The default is also used when \code{conf.int=TRUE}.
-#' To avoid computation of confidence intervals, set \code{conf.int} to FALSE or NULL.
+#'     simulation of confidence intervals.
+#' @param conf.int Level of confidence, i.e., a value between 0 and 1,
+#'     the default is \code{0.95}.  The default is also used when
+#'     \code{conf.int=TRUE}.  To avoid computation of confidence
+#'     intervals, set \code{conf.int} to FALSE or NULL.
 #' @param lifeExpect Logical. If \code{TRUE} compute life
-#' expectancies, i.e., \code{t=Inf}.
+#'     expectancies, i.e., \code{t=Inf}.
+#' @param maxtime The upper limit of integration for calculations of life expectancies from Weibull parametrizations.
 #' @param ... other parameters.
 #' @return a list containing the following predictions with pointwise
-#' confidence intervals: \item{p00}{the transition probability \eqn{p_{00}}.}
-#' \item{p01}{the transition probability \eqn{p_{01}}.} \item{p11}{the
-#' transition probability \eqn{p_{11}}.} \item{p12}{the transition probability
-#' \eqn{p_{12}}.} \item{p02_0}{the probability of direct transition from state
-#' 0 to state 2.} \item{p02_1}{the probability of transition from state 0 to
-#' state 2 via state 1.} \item{p02}{transition probability \eqn{p_{02}}. Note
-#' that \code{p02}=\code{p_02_0}+\code{p02_1}.} \item{F01}{the lifetime risk of
-#' disease. \code{F01}=\code{p01}+\code{p02_1}.} \item{F0.}{the probability of
-#' exit from state 0. \code{F0.}=\code{p02_0}+\code{p01}+\code{p02_1}.}
-#' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr> and Thomas Alexander Gerds <tag@@biostat.ku.dk> Fortran:
-#' Pierre Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
-#' @seealso \code{\link{idm}} 
+#'     confidence intervals: \item{p00}{the transition probability
+#'     \eqn{p_{00}}.}  \item{p01}{the transition probability
+#'     \eqn{p_{01}}.} \item{p11}{the transition probability
+#'     \eqn{p_{11}}.} \item{p12}{the transition probability
+#'     \eqn{p_{12}}.} \item{p02_0}{the probability of direct
+#'     transition from state 0 to state 2.} \item{p02_1}{the
+#'     probability of transition from state 0 to state 2 via state 1.}
+#'     \item{p02}{transition probability \eqn{p_{02}}. Note that
+#'     \code{p02}=\code{p_02_0}+\code{p02_1}.} \item{F01}{the lifetime
+#'     risk of disease. \code{F01}=\code{p01}+\code{p02_1}.}
+#'     \item{F0.}{the probability of exit from state
+#'     0. \code{F0.}=\code{p02_0}+\code{p01}+\code{p02_1}.}
+#' @author R: Celia Touraine <Celia.Touraine@@isped.u-bordeaux2.fr>
+#'     and Thomas Alexander Gerds <tag@@biostat.ku.dk> Fortran: Pierre
+#'     Joly <Pierre.Joly@@isped.u-bordeaux2.fr>
+#' @seealso \code{\link{idm}}
 #' @keywords methods
 #' @examples
 #'
 #' \dontrun{
+#' set.seed(100)
 #' d=simulateIDM(n = 100)
 #' fit <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2+X3,
 #'                formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2+X3,
 #'                data=d,conf.int=FALSE)
 #' predict(fit,s=0,t=80,conf.int=FALSE,lifeExpect=FALSE)
 #' predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=FALSE)
-#' # predict(fit,s=0,t=80,nsim=4,conf.int=FALSE,lifeExpect=TRUE)
+#' predict(fit,s=0,t=80,nsim=4,conf.int=FALSE,lifeExpect=TRUE)
 #' 
 #' data(Paq1000)
 #' library(prodlim)
@@ -53,7 +60,7 @@
 #' formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000)
 #' 
 #' predict(fit.paq,s=70,t=80,newdata=data.frame(certif=1))
-#' predict(fit.paq,s=70,lifeExpect=TRUE,t=80,newdata=data.frame(certif=1))
+#' predict(fit.paq,s=70,lifeExpect=TRUE,newdata=data.frame(certif=1))
 #' 
 #' fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 #' 		formula01=Hist(time=list(l,r),event=dementia)~certif,
@@ -67,8 +74,16 @@
 #' }
 #'
 #' @export
-predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExpect=FALSE,...) {
-    if (lifeExpect==TRUE) t <- Inf
+predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExpect=FALSE,maxtime,...) {
+    ## if (lifeExpect==TRUE) t <- Inf
+    if (lifeExpect==TRUE) {
+        t <- Inf
+        if (!missing(maxtime) && is.numeric(maxtime)) {
+            maxtime <- min(maxtime,object$maxtime)
+        } else {
+            maxtime <- object$maxtime
+        }
+    }
     if (any(s>t)) {stop("You must respect the condition 's<t' to calculate p(s,t)")}
     do.conf.int <- !is.null(conf.int) && !is.na(conf.int) && !conf.int==FALSE
     if (is.logical(conf.int)) conf.int <- .95
@@ -207,7 +222,19 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
             ci <- apply(simResults,2,function(x)quantile(unlist(x),c(q.lower,q.upper)))
         }
         if (lifeExpect==TRUE){
-            transprob <- unlist(lifexpect0.idmPl(s,knots01,nknots01,the01^2,knots12,nknots12,the12^2,knots02,nknots02,the02^2,bZ01,bZ12,bZ02))
+            transprob <- unlist(lifexpect0.idmPl(s,
+                                                 knots01,
+                                                 nknots01,
+                                                 the01^2,
+                                                 knots12,
+                                                 nknots12,
+                                                 the12^2,
+                                                 knots02,
+                                                 nknots02,
+                                                 the02^2,
+                                                 bZ01,
+                                                 bZ12,
+                                                 bZ02))
         }else{
             transprob <- unlist(Predict0.idmPl(s,t,knots01,nknots01,the01^2,knots12,nknots12,the12^2,knots02,nknots02,the02^2,bZ01,bZ12,bZ02))
         }
@@ -257,7 +284,7 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
                                                              b12=Xb12[[i]],
                                                              bZ01=linPred01[[i]],
                                                              bZ02=linPred02[[i]],
-                                                             bZ12=linPred12[[i]])
+                                                             bZ12=linPred12[[i]],max=maxtime)
                                       }))
             }else{
                 simResults <- do.call("rbind",
@@ -280,9 +307,28 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
             ci <- apply(simResults,2,function(x)quantile(unlist(x),c(q.lower,q.upper)))
         }
         if (lifeExpect==TRUE){
-            transprob <- unlist(lifexpect0.idmWeib(s,a01,1/b01,a02,1/b02,a12,1/b12,bZ01,bZ02,bZ12))
+            transprob <- unlist(lifexpect0.idmWeib(s,
+                                                   a01,
+                                                   1/b01,
+                                                   a02,
+                                                   1/b02,
+                                                   a12,
+                                                   1/b12,
+                                                   bZ01,
+                                                   bZ02,
+                                                   bZ12,max=maxtime))
         }else{
-            transprob <- unlist(Predict0.idmWeib(s,t,a01,1/b01,a02,1/b02,a12,1/b12,bZ01,bZ02,bZ12))
+            transprob <- unlist(Predict0.idmWeib(s,
+                                                 t,
+                                                 a01,
+                                                 1/b01,
+                                                 a02,
+                                                 1/b02,
+                                                 a12,
+                                                 1/b12,
+                                                 bZ01,
+                                                 bZ02,
+                                                 bZ12))
         }
     }
     if (do.conf.int==TRUE){
@@ -389,21 +435,22 @@ S.pl <- function(s,t,zi,nknots,the,bZ=0) {
 
 
 
-lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
+lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0,max) {
     ## print("lifexpect0.idmWeib")
+    max <- 100
     ET12 = integrate(
         f=function(x) {
             S.weib(s,x,a12,b12,bZ12)
-        },s,Inf)
+        },s,max)
     ET0dot = integrate(f=function(x) {
-                           S.weib(s,x,a01,b01,bZ01)*S.weib(s,x,a02,b02,bZ02)
-                       },s,Inf)
+        S.weib(s,x,a01,b01,bZ01)*S.weib(s,x,a02,b02,bZ02)
+    },s,Inf)
     ET01 = integrate(f=function(x){
-                         sapply(x,function(x){
-                                    integrate(f=function(y){
-                                                  S.weib(s,y,a01,b01,bZ01)*S.weib(s,y,a02,b02,bZ02)*iweibull(y,a01,b01,bZ01)*S.weib(y,x,a12,b12,bZ12)},
-                                              lower=s,
-                                              upper=x)$value})},s,Inf)
+        sapply(x,function(x){
+            integrate(f=function(y){
+                S.weib(s,y,a01,b01,bZ01)*S.weib(s,y,a02,b02,bZ02)*iweibull(y,a01,b01,bZ01)*S.weib(y,x,a12,b12,bZ12)},
+                lower=s,
+                upper=x)$value})},s,max)
     list(LE.0=ET0dot$value,
          LE.nondiseased=ET01$value+ET0dot$value,
          LE.diseased=ET12$value)

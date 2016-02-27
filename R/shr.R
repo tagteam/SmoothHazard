@@ -215,8 +215,19 @@ shr <- function(formula,
   # }}}
   # {{{ call Fortran function weib and collect results
 
-  # do not give infinite values to fortran
-  Rtime[is.infinite(Rtime)] <- Ltime[is.infinite(Rtime)]
+    # do not give infinite values to fortran
+    Rtime[is.infinite(Rtime)] <- Ltime[is.infinite(Rtime)]
+    # find time bounderies
+    if (length(entrytime)>0){
+        alltimes <- sort(unique(c(Ltime, Rtime,entrytime)))
+        amax <- max(alltimes)
+        amin <- min(alltimes)
+    }
+    else{
+        alltimes <- sort(unique(c(Ltime, Rtime)))
+        amax <- max(alltimes)
+        amin <- min(alltimes)
+    }
 
   if (method == "weib"){	
       size1 <- NC
@@ -255,16 +266,6 @@ shr <- function(formula,
                        PACKAGE="SmoothHazard")
   }else{
        #  	cat("------ Program Splines ------ \n")
-       if (length(entrytime)>0){
-           alltimes <- sort(unique(c(Ltime, Rtime,entrytime)))
-           amax <- max(alltimes)
-           amin <- min(alltimes)
-       }
-       else{
-           alltimes <- sort(unique(c(Ltime, Rtime)))
-           amax <- max(alltimes)
-           amin <- min(alltimes)
-       }
        if (is.character(knots)){
            if (length(n.knots)!=1) stop("Argument n.knots has to be a single positive integer")
            if((!is.numeric(n.knots) && !is.integer(n.knots)) || (n.knots < 5) || (n.knots >20))
@@ -428,11 +429,13 @@ shr <- function(formula,
       fit$kappa <- kappa
     }
 
-}
-  fit$na.action <- na.action
-  # }}}
-  if (method=="weib") fit$method <- "Weib" else fit$method <- "Splines"
-  class(fit) <- "shr"
-  fit$runtime <- proc.time()-ptm
-  fit
+  }
+    fit$na.action <- na.action
+    # }}}
+    if (method=="weib") fit$method <- "Weib" else fit$method <- "Splines"
+    fit$maxtime <- amax
+    fit$mintime <- amin
+    class(fit) <- "shr"
+    fit$runtime <- proc.time()-ptm
+    fit
 }

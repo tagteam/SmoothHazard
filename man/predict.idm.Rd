@@ -6,7 +6,7 @@
 approach or a Weibull parametrization.}
 \usage{
 \method{predict}{idm}(object, s, t, newdata, nsim = 200, seed = 21,
-  conf.int = 0.95, lifeExpect = FALSE, ...)
+  conf.int = 0.95, lifeExpect = FALSE, maxtime, ...)
 }
 \arguments{
 \item{object}{an \code{idm} class objects returned by a call to the
@@ -24,26 +24,32 @@ calculations.  The default is 200.}
 \item{seed}{Seed passed to \code{set.seed} for Monte Carlo
 simulation of confidence intervals.}
 
-\item{conf.int}{Level of confidence, i.e., a value between 0 and 1, the default is \code{0.95}.
-The default is also used when \code{conf.int=TRUE}.
-To avoid computation of confidence intervals, set \code{conf.int} to FALSE or NULL.}
+\item{conf.int}{Level of confidence, i.e., a value between 0 and 1,
+the default is \code{0.95}.  The default is also used when
+\code{conf.int=TRUE}.  To avoid computation of confidence
+intervals, set \code{conf.int} to FALSE or NULL.}
 
 \item{lifeExpect}{Logical. If \code{TRUE} compute life
 expectancies, i.e., \code{t=Inf}.}
+
+\item{maxtime}{The upper limit of integration for calculations of life expectancies from Weibull parametrizations.}
 
 \item{...}{other parameters.}
 }
 \value{
 a list containing the following predictions with pointwise
-confidence intervals: \item{p00}{the transition probability \eqn{p_{00}}.}
-\item{p01}{the transition probability \eqn{p_{01}}.} \item{p11}{the
-transition probability \eqn{p_{11}}.} \item{p12}{the transition probability
-\eqn{p_{12}}.} \item{p02_0}{the probability of direct transition from state
-0 to state 2.} \item{p02_1}{the probability of transition from state 0 to
-state 2 via state 1.} \item{p02}{transition probability \eqn{p_{02}}. Note
-that \code{p02}=\code{p_02_0}+\code{p02_1}.} \item{F01}{the lifetime risk of
-disease. \code{F01}=\code{p01}+\code{p02_1}.} \item{F0.}{the probability of
-exit from state 0. \code{F0.}=\code{p02_0}+\code{p01}+\code{p02_1}.}
+    confidence intervals: \item{p00}{the transition probability
+    \eqn{p_{00}}.}  \item{p01}{the transition probability
+    \eqn{p_{01}}.} \item{p11}{the transition probability
+    \eqn{p_{11}}.} \item{p12}{the transition probability
+    \eqn{p_{12}}.} \item{p02_0}{the probability of direct
+    transition from state 0 to state 2.} \item{p02_1}{the
+    probability of transition from state 0 to state 2 via state 1.}
+    \item{p02}{transition probability \eqn{p_{02}}. Note that
+    \code{p02}=\code{p_02_0}+\code{p02_1}.} \item{F01}{the lifetime
+    risk of disease. \code{F01}=\code{p01}+\code{p02_1}.}
+    \item{F0.}{the probability of exit from state
+    0. \code{F0.}=\code{p02_0}+\code{p01}+\code{p02_1}.}
 }
 \description{
 Predict transition probabilities and cumulative probabilities from an object
@@ -66,7 +72,7 @@ fit.paq <- idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 formula01=Hist(time=list(l,r),event=dementia)~certif,data=Paq1000)
 
 predict(fit.paq,s=70,t=80,newdata=data.frame(certif=1))
-predict(fit.paq,s=70,lifeExpect=TRUE,t=80,newdata=data.frame(certif=1))
+predict(fit.paq,s=70,lifeExpect=TRUE,newdata=data.frame(certif=1))
 
 fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 		formula01=Hist(time=list(l,r),event=dementia)~certif,
@@ -81,8 +87,9 @@ predict(fit.splines,s=70,t=80,lifeExpect=TRUE,newdata=data.frame(certif=1),nsim=
 
 }
 \author{
-R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> and Thomas Alexander Gerds <tag@biostat.ku.dk> Fortran:
-Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
+R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>
+    and Thomas Alexander Gerds <tag@biostat.ku.dk> Fortran: Pierre
+    Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 }
 \seealso{
 \code{\link{idm}}
