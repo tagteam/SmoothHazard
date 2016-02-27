@@ -3,9 +3,9 @@
 ## author: Thomas Alexander Gerds
 ## created: Feb 16 2016 (09:50) 
 ## Version: 
-## last-updated: Feb 25 2016 (13:13) 
+## last-updated: Feb 27 2016 (08:41) 
 ##           By: Thomas Alexander Gerds
-##     Update #: 25
+##     Update #: 30
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -38,6 +38,8 @@ print.predict.idm <- function(x,digits=2,...){
     }else{
         cat("For a subject in state '0' at time ",x$s,",\npredicted state occupation probability at time ",x$t,":\n\n",sep="")
         print(cbind("State"=c(0,1,2),px[px$Parameter %in% c("p00","p01","p02"),]),row.names=FALSE)
+        cat("\nThe probability p02 can be further decomposed into\ndirect and indirect transition probabilities:\n\n")
+        print(cbind("Path"=c("direct","via state 1","total"),px[px$Parameter %in% c("p02_0","p02_1","p02"),]),row.names=FALSE)
         cat("\nFor a subject in state '0' at time ",x$s,",\npredicted probability of exit from state 0 until time ",x$t,":\n\n",sep="")
         print(cbind("Path"=c("via state 1","any"),px[px$Parameter %in% c("F01","F0."),]),row.names=FALSE)
         cat("\nFor a subject in state '1' at time ",x$s,",\npredicted state occupation probability at time ",x$t,":\n\n",sep="")
