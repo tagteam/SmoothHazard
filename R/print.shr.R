@@ -76,7 +76,7 @@ print.shr <- function(x,conf.int=.95,digits=4,pvalDigits=4,eps=0.0001,...){
         cat("                    : likelihood=", signif(x$cv[2],2), "\n") 
         cat("                    : second derivatives=", signif(x$cv[3],2), "\n")
     }else{
-        switch(as.character(x$converged),
+        switch(as.character(x$converged[1]),
                "2"={ warning("Maximum number of iterations reached.",call.=FALSE)},
                "3"={ warning("Model did not converge.",call.=FALSE)})
     }
