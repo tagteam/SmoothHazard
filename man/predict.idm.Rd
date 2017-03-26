@@ -58,13 +58,14 @@ of class \code{idmSplines} with confidence intervals are calculated.
 \examples{
 
 \dontrun{
+set.seed(100)
 d=simulateIDM(n = 100)
 fit <- idm(formula01=Hist(time=list(L,R),event=seen.ill)~X1+X2+X3,
                formula02=Hist(time=observed.lifetime,event=seen.exit)~X1+X2+X3,
                data=d,conf.int=FALSE)
 predict(fit,s=0,t=80,conf.int=FALSE,lifeExpect=FALSE)
 predict(fit,s=0,t=80,nsim=4,conf.int=TRUE,lifeExpect=FALSE)
-# predict(fit,s=0,t=80,nsim=4,conf.int=FALSE,lifeExpect=TRUE)
+predict(fit,s=0,t=80,nsim=4,conf.int=FALSE,lifeExpect=TRUE)
 
 data(Paq1000)
 library(prodlim)

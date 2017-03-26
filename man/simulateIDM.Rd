@@ -18,7 +18,7 @@ and covariates for the purpose of illustrating the help pages of the SmoothHazar
 See the body of the function for details, i.e., evaluate simulateIDM
 }
 \examples{
-simulateIDM
+# simulateIDM
 simulateIDM(100)
 }
 \seealso{

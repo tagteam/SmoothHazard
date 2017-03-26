@@ -31,7 +31,7 @@
 ##' set.seed(18)
 ##' d <- sim(m,100,latent=FALSE)
 ##' d$uncensored.status <- 1
-##' f <- shr(Hist(time=time,event=uncensored.status)~1,
+##' f <- shr(Hist(time=list(L,R),event=uncensored.status)~1,
 ##'          data=d,
 ##'          conf.int=FALSE)
 ##' print(f)

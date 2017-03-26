@@ -98,7 +98,8 @@
 ##'\dontrun{
 ##' shr.spline <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",n.knots=6)
 ##' shr.spline
-##' shr.spline.q <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",n.knots=6,knots="quantiles")
+##' shr.spline.q <- shr(Hist(time=list(l,r),id)~cov,data=testdata,
+##'                     method="splines",n.knots=6,knots="quantiles")
 ##' plot(shr.spline.q)
 ##'
 ##' ## manual placement of knots
@@ -339,25 +340,24 @@ shr <- function(formula,
 
 
   }
-  ## Fortran delivers
-  ## Variable name 	Explanation 	Dimension 	Storage mode 	Remark
-  ## loglik 	log-likelihood without and with covariate 	length 2 	double 	
-  ## basepar 	Weibull parameters 	length 2 	double 	
-  ## regpar 	Regression coefficients 	length P 	double 	
-  ## v 	covariance matrix 	length P*P 	double 	
-  ## converged 	0=converged,1=invert fails,2=no 	length 1 	integer 	
-  ## t 	time to plot S(t) and h(t) 	length 100 	double 	
-  ## S 	survival function 	length 100 	double 	
-  ## S_l 	lower confidence limit for S 	length 100 	double 	
-  ## S_u 	Upper confidence limit for S 	length 100 	double 	
-  ## h 	hazard function 	length 100 	double 	
-  ## h_l 	lower confidence limit for h function 	length 100 	double 	
-  ## h_u 	upper confidence limit for h 	length 100 	double 	
-
-  if (any(ffit$converged == 4)){
+    ## Fortran delivers
+    ## Variable name 	Explanation 	Dimension 	Storage mode 	Remark
+    ## loglik 	log-likelihood without and with covariate 	length 2 	double 	
+    ## basepar 	Weibull parameters 	length 2 	double 	
+    ## regpar 	Regression coefficients 	length P 	double 	
+    ## v 	covariance matrix 	length P*P 	double 	
+    ## converged 	0=converged,1=invert fails,2=no 	length 1 	integer 	
+    ## t 	time to plot S(t) and h(t) 	length 100 	double 	
+    ## S 	survival function 	length 100 	double 	
+    ## S_l 	lower confidence limit for S 	length 100 	double 	
+    ## S_u 	Upper confidence limit for S 	length 100 	double 	
+    ## h 	hazard function 	length 100 	double 	
+    ## h_l 	lower confidence limit for h function 	length 100 	double 	
+    ## h_u 	upper confidence limit for h 	length 100 	double 	
+  if (any(ffit$converged[1] == 4)){
       warning("Problem in the loglikelihood computation. The program stopped abnormally. Please check your dataset. \n")    
   }
-  if (any(ffit$converged == 2)){
+  if (any(ffit$converged[1] == 2)){
       if (CV==0) 
           warning("Model did not converge. You could try to increase the 'maxit' parameter and set 'CV=1'.")
       else

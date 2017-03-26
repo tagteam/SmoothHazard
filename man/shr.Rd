@@ -115,7 +115,8 @@ summary(fit.su)
 \dontrun{
 shr.spline <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",n.knots=6)
 shr.spline
-shr.spline.q <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",n.knots=6,knots="quantiles")
+shr.spline.q <- shr(Hist(time=list(l,r),id)~cov,data=testdata,
+                    method="splines",n.knots=6,knots="quantiles")
 plot(shr.spline.q)
 
 ## manual placement of knots

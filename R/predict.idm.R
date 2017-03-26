@@ -115,7 +115,7 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
             Z12 <- 0
     }else{
         vars <- unique(c(object$Xnames01,object$Xnames02,object$Xnames12))
-        newdata <- data.frame(matrix(0,ncol=length(vars)))
+        newdata <- data.frame(matrix(0,ncol=pmax(1,length(vars))))
         names(newdata) <- vars
         Z01 <- matrix(rep(0,length(object$Xnames01)),nrow=1)
         Z02 <- matrix(rep(0,length(object$Xnames02)),nrow=1)

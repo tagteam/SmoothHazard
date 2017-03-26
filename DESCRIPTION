@@ -1,11 +1,11 @@
 Package: SmoothHazard
 Title: Estimation of Smooth Hazard Models for Interval-Censored Data with
     Applications to Survival and Illness-Death Models
-Version: 1.3.1
+Version: 1.3.5
 Author: Celia Touraine, Pierre Joly, Thomas A. Gerds
 Description: Estimation of two-state (survival) models and irreversible illness-
     death models with possibly interval-censored,left-truncated and right-censored
-    data. Proportional intensities regression models can be specificed to allow for
+    data. Proportional intensities regression models can be specified to allow for
     covariates effects separately for each transition. We use either a parametric
     approach with Weibull baseline intensities or a semi-parametric approach with
     M-splines approximation of baseline intensities in order to obtain smooth

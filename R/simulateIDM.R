@@ -304,7 +304,7 @@ sim.idmModel <- function(x,
 ##' @seealso idmModel sim.idmModel
 ##' @title Sample illness-death model data
 ##' @examples
-##' simulateIDM
+##' # simulateIDM
 ##' simulateIDM(100)
 #' @export
 #' @param n number of observations
