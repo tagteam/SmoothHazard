@@ -5,7 +5,7 @@ FSRC = bgos.f90 cdfnor.f90 distance.f90 estimv.f90 fonct.f90 idmLikelihood.f90 i
 CSRC= init.c
 
 # Define the order of compilation
-OBJECTS = $(CSRC:.c=.o) $(FMODSRC:.f90=.o) $(FSRC:.f90=.o)
+OBJECTS = $(FMODSRC:.f90=.o) $(FSRC:.f90=.o) $(CSRC:.c=.o)
 
 $(SHLIB): $(OBJECTS)
 
