@@ -1,3 +1,12 @@
 manuscript/
 .git/
-Mailbox/
+src/commun.mod
+src/reckappa.mod
+src/propre.mod
+src/fichiers.mod
+src/idmcommun.mod
+src/survcommun.mod
+src/type.mod
+src/tailles.mod
+src/optim.mod
+src/parameters.mod
