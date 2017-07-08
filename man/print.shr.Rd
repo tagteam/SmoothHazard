@@ -35,12 +35,11 @@ fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="Splines")
 print(fit.su) 
 }
 }
+\seealso{
+\code{\link{summary.shr}}, \code{\link{plot.shr}}
+}
 \author{
 R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
 Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 }
-\seealso{
-\code{\link{summary.shr}}, \code{\link{plot.shr}}
-}
 \keyword{methods}
-

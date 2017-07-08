@@ -69,12 +69,11 @@ plot(fit.su,confint=FALSE)
 
 
 }
+\seealso{
+\code{\link{plot.shr}}
+}
 \author{
 R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
 Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 }
-\seealso{
-\code{\link{plot.shr}}
-}
 \keyword{methods}
-

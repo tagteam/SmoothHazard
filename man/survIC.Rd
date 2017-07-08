@@ -59,4 +59,3 @@ print(f)
 \author{
 Thomas Alexander Gerds
 }
-

@@ -150,4 +150,3 @@ cbind(uncensored=F1$coef,right.censored=F2$coef,interval.censored=F3$coef)
 \author{
 Thomas Alexander Gerds
 }
-

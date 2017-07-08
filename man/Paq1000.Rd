@@ -25,4 +25,3 @@ data(Paq1000)
 
 }
 \keyword{datasets}
-

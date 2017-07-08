@@ -84,16 +84,16 @@ fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 predict(fit.splines,s=70,t=80,newdata=data.frame(certif=1))
 predict(fit.splines,s=70,t=80,lifeExpect=TRUE,newdata=data.frame(certif=1),nsim=20)
 
+
 }
 
+}
+\seealso{
+\code{\link{idm}}
 }
 \author{
 R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>
     and Thomas Alexander Gerds <tag@biostat.ku.dk> Fortran: Pierre
     Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 }
-\seealso{
-\code{\link{idm}}
-}
 \keyword{methods}
-

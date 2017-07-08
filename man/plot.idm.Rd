@@ -77,4 +77,3 @@ plot(fit.weib)
 \code{\link{idm}}
 }
 \keyword{methods}
-

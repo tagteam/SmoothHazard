@@ -123,10 +123,6 @@ plot(shr.spline.q)
 shr.spline.man <- shr(Hist(time=list(l,r),id)~cov,data=testdata,method="splines",knots=seq(0,7,1))
 }
 }
-\author{
-R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
-Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
-}
 \references{
 D. Marquardt (1963). An algorithm for least-squares estimation
 of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
@@ -136,5 +132,8 @@ of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 \code{\link{shr}}, \code{\link{print.shr}},
 \code{\link{summary.shr}}, \code{\link{print.shr}},
 }
+\author{
+R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
+Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
+}
 \keyword{methods}
-

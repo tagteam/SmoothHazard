@@ -40,12 +40,11 @@ fit.su <- shr(Hist(time=list(l,r),id)~cov,data=testdata)
 summary(fit.su) 
 }
 }
-\author{
-Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>
-}
 \seealso{
 \code{\link{shr}}, \code{\link{print.shr}},
 \code{\link{plot.shr}}
 }
+\author{
+Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>
+}
 \keyword{methods}
-

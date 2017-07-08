@@ -38,13 +38,12 @@ fit.splines <-  idm(formula02=Hist(time=t,event=death,entry=e)~certif,
 summary(fit.splines) 
 }
 }
-\author{
-R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
-Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
-}
 \seealso{
 \code{\link{idm}}, \code{\link{print.idm}},
 \code{\link{plot.idm}}
 }
+\author{
+R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
+Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
+}
 \keyword{methods}
-

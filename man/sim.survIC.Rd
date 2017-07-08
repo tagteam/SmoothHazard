@@ -41,4 +41,3 @@ dat.ol <- sim(ol,10)
 \author{
 Thomas Alexander Gerds
 }
-

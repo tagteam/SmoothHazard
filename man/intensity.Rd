@@ -72,11 +72,10 @@ intensity(times = fit.su$time, knots = fit.su$knots,
   predict(fit.idm, s = 70, t = 80, conf.int = FALSE) # see first element               
 }
 }
+\seealso{
+\code{\link{shr}}, \code{\link{idm}}
+}
 \author{
 R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> and Thomas Alexander Gerds <tag@biostat.ku.dk>
 Fortran: Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
 }
-\seealso{
-\code{\link{shr}}, \code{\link{idm}}
-}
-

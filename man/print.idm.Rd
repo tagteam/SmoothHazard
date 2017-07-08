@@ -38,11 +38,10 @@ print(fit.splines)
 
 }
 }
-\author{
-Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>, Thomas A. Gerds <tag@biostat.ku.dk>
-}
 \seealso{
 \code{\link{summary.idm}}, \code{\link{plot.idm}}
 }
+\author{
+Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr>, Thomas A. Gerds <tag@biostat.ku.dk>
+}
 \keyword{methods}
-

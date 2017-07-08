@@ -41,4 +41,3 @@ help(idmModel)
 \author{
 Thomas Alexander Gerds
 }
-

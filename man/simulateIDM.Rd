@@ -24,4 +24,3 @@ simulateIDM(100)
 \seealso{
 idmModel sim.idmModel
 }
-

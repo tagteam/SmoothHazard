@@ -211,10 +211,6 @@ fitIC
 }
 
 }
-\author{
-R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
-Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
-}
 \references{
 D. Marquardt (1963). An algorithm for least-squares estimation
 of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
@@ -225,5 +221,8 @@ of nonlinear parameters.  \emph{SIAM Journal of Applied Mathematics},
 \code{\link{summary.idm}}
 \code{\link{predict.idm}}
 }
+\author{
+R: Celia Touraine <Celia.Touraine@isped.u-bordeaux2.fr> Fortran:
+Pierre Joly <Pierre.Joly@isped.u-bordeaux2.fr>
+}
 \keyword{illness-death}
-
