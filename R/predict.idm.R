@@ -71,6 +71,7 @@
 #' predict(fit.splines,s=70,t=80,newdata=data.frame(certif=1))
 #' predict(fit.splines,s=70,t=80,lifeExpect=TRUE,newdata=data.frame(certif=1),nsim=20)
 #' 
+#' 
 #' }
 #'
 #' @export
