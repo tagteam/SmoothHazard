@@ -157,9 +157,9 @@ predict.idm <- function(object,s,t,newdata,nsim=200,seed=21,conf.int=.95,lifeExp
         the01 <- object$theta01
         names(the01) <- paste0("the01.",1:length(the01))
         the02 <- object$theta02
-        names(the02) <- paste0("the02.",1:length(the01))
+        names(the02) <- paste0("the02.",1:length(the02))
         the12 <- object$theta12
-        names(the12) <- paste0("the12.",1:length(the01))
+        names(the12) <- paste0("the12.",1:length(the12))
         if (do.conf.int == TRUE){
             ### conf.int prediction by Monte-Carlo
             Vmean <- c(the01,the02,the12,beta01,beta02,beta12) # vector of estimates
