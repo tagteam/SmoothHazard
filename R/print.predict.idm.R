@@ -32,7 +32,7 @@ print.predict.idm <- function(x,digits=3,...){
         print(cbind("State at time s"=c("0","0","0","1"),"Expected years in states 0,1"=c("Total","In state 0","In state 1","Total"),px[px$Parameter %in% c("LE.0","LE.nondiseased","LE.01","LE.diseased"),]),row.names=FALSE)
     }else{
         cat("For a subject in state '0' at time ",x$s,",\npredicted state occupation probability at time ",x$t,":\n\n",sep="")
-        print(cbind("State"=c(0,1,2),px[px$Parameter %in% c("p00","p01","p02"),]),row.names=FALSE)
+        print(cbind("State"=c(0,1,2,0),px[px$Parameter %in% c("p00","p01","p02","RM"),]),row.names=FALSE)
         cat("\nThe probability p02 can be further decomposed into\ndirect and indirect transition probabilities:\n\n")
         print(cbind("Path"=c("direct","via state 1","total"),px[px$Parameter %in% c("p02_0","p02_1","p02"),]),row.names=FALSE)
         cat("\nFor a subject in state '0' at time ",x$s,",\npredicted probability of exit from state 0 until time ",x$t,":\n\n",sep="")
