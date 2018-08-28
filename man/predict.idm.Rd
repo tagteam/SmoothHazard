@@ -50,6 +50,7 @@ a list containing the following predictions with pointwise
     risk of disease. \code{F01}=\code{p01}+\code{p02_1}.}
     \item{F0.}{the probability of exit from state
     0. \code{F0.}=\code{p02_0}+\code{p01}+\code{p02_1}.}
+    \item{RM}{the restricted mean survival time without disease.}
 }
 \description{
 Predict transition probabilities and cumulative probabilities from an object
