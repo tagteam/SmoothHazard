@@ -456,6 +456,7 @@ lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0,ma
                 upper=x)$value})},s,max)
     list(LE.0=ET0dot$value,
          LE.nondiseased=ET01$value+ET0dot$value,
+         LE.01=ET01$value,
          LE.diseased=ET12$value)
 
 }
@@ -472,5 +473,6 @@ lifexpect0.idmPl <- function(s,knots01,nknots01,the01,knots12,nknots12,the12,kno
                      },s,knots01[nknots01+6])
     list(LE.0=ET0dot$value,
          LE.nondiseased=ET01$value+ET0dot$value,
+         LE.01=ET01$value,
          LE.diseased=ET12$value)
 }
