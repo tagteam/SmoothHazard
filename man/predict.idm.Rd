@@ -55,7 +55,8 @@ a list containing the following predictions with pointwise
   \item{LE.0.}{Total life expectancy}
 \item{LE.00}{Life expectancy free of the disease (ie. Healthy life expectancy)}
 \item{LE.01}{Life expectancy with the disease (for a non-disease subject at time=s) (Note that \code{LE.01}=\code{LE.0.}-\code{LE.00}).}
-\item{LE.11}{Life expectancy for diseased subject at time=s.}
+\item{LE.11}{Life expectancy for diseased subject at time=s}
+\item{LTR}{Life-time risk of the disease.}
   
 }
 \description{
