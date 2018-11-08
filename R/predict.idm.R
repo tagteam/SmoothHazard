@@ -454,10 +454,13 @@ lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0,ma
                 S.weib(s,y,a01,b01,bZ01)*S.weib(s,y,a02,b02,bZ02)*iweibull(y,a01,b01,bZ01)*S.weib(y,x,a12,b12,bZ12)},
                 lower=s,
                 upper=x)$value})},s,max)
+    LTR=integrate(f=function(x){
+      S.weib(s,x,a01,b01,bZ01)*S.weib(s,x,a02,b02,bZ02)*iweibull(x,a01,b01,bZ01)},s,max)
     list(LE.00=ET0dot$value,
          LE.0.=ET01$value+ET0dot$value,
          LE.01=ET01$value,
-         LE.11=ET12$value)
+         LE.11=ET12$value,
+         LTR=LTR)
 
 }
 
@@ -471,8 +474,10 @@ lifexpect0.idmPl <- function(s,knots01,nknots01,the01,knots12,nknots12,the12,kno
     ET01 = integrate(f=function(x) {
                          Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p01"]]
                      },s,knots01[nknots01+6])
+    LTR=Predict0.idmPl(s,knots01[nknots01+6],knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["F01"]]
     list(LE.00=ET0dot$value,
          LE.0.=ET01$value+ET0dot$value,
          LE.01=ET01$value,
-         LE.11=ET12$value)
+         LE.11=ET12$value,
+         LTR=LTR)
 }
