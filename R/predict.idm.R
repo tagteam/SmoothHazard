@@ -471,8 +471,8 @@ lifexpect0.idmPl <- function(s,knots01,nknots01,the01,knots12,nknots12,the12,kno
     ET01 = integrate(f=function(x) {
                          Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p01"]]
                      },s,knots01[nknots01+6])
-    list(LE.0=ET0dot$value,
-         LE.nondiseased=ET01$value+ET0dot$value,
+    list(LE.00=ET0dot$value,
+         LE.0.=ET01$value+ET0dot$value,
          LE.01=ET01$value,
-         LE.diseased=ET12$value)
+         LE.11=ET12$value)
 }
