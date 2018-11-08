@@ -454,10 +454,10 @@ lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0,ma
                 S.weib(s,y,a01,b01,bZ01)*S.weib(s,y,a02,b02,bZ02)*iweibull(y,a01,b01,bZ01)*S.weib(y,x,a12,b12,bZ12)},
                 lower=s,
                 upper=x)$value})},s,max)
-    list(LE.0=ET0dot$value,
-         LE.nondiseased=ET01$value+ET0dot$value,
+    list(LE.00=ET0dot$value,
+         LE.0.=ET01$value+ET0dot$value,
          LE.01=ET01$value,
-         LE.diseased=ET12$value)
+         LE.11=ET12$value)
 
 }
 
