@@ -52,13 +52,10 @@ a list containing the following predictions with pointwise
     0. \code{F0.}=\code{p02_0}+\code{p01}+\code{p02_1}.}
     \item{RM}{the restricted mean survival time without disease.}
   or a list containing the following life expectancies with pointwise confidence intervals (when \code{lifeExpect=TRUE}):
-  \item{LE.0}{life
-expectancy in state 0 and confidence interval.}
-\item{LE.nondiseased}{life expectancy of a
-non-diseased subject and confidence interval (free of disease.}
-\item{LE.01}{life expectancy with disease (Note that \code{LE.01}=\code{LE.0}-\code{LE.nondisease}.}
-\item{LE.disease}{life expectancy of a diseased
-subject and confidence interval.}
+  \item{LE.0.}{Total life expectancy}
+\item{LE.00}{Life expectancy free of the disease (ie. Healthy life expectancy)}
+\item{LE.01}{Life expectancy with the disease (for a non-disease subject at time=s) (Note that \code{LE.01}=\code{LE.0.}-\code{LE.00}).}
+\item{LE.11}{Life expectancy for diseased subject at time=s.}
   
 }
 \description{
