@@ -29,7 +29,9 @@ print.predict.idm <- function(x,digits=3,...){
     rownames(px) <- NULL
     if (lifeExpect==TRUE){
         cat("Remaining life expected sojourn times (starting at time ",x$s,"):\n\n",sep="")
-        print(cbind("State at time s"=c("0","0","0","1"),"Expected years in states 0,1"=c("Total","In state 0","In state 1","Total"),px[px$Parameter %in% c("LE.0","LE.nondiseased","LE.01","LE.diseased"),]),row.names=FALSE)
+        print(cbind("State at time s"=c("0","0","0","1"),"Expected years in states 0,1"=c("In state 0","Total","In state 1","Total"),px[px$Parameter %in% c("LE.00","LE.0.","LE.01","LE.11"),]),row.names=FALSE)
+        cat("Life time risk at time ",x$s,":\n",sep="")
+        print(cbind(px[px$Parameter %in% c("LTR"),]),row.names=FALSE)
     }else{
         cat("For a subject in state '0' at time ",x$s,",\npredicted state occupation probability at time ",x$t,":\n\n",sep="")
         print(cbind("State"=c(0,1,2,0),px[px$Parameter %in% c("p00","p01","p02","RM"),]),row.names=FALSE)
