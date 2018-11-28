@@ -460,7 +460,7 @@ lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0,ma
          LE.0.=ET01$value+ET0dot$value,
          LE.01=ET01$value,
          LE.11=ET12$value,
-         LTR=LTR)
+         LTR=LTR$value)
 
 }
 
@@ -479,5 +479,5 @@ lifexpect0.idmPl <- function(s,knots01,nknots01,the01,knots12,nknots12,the12,kno
          LE.0.=ET01$value+ET0dot$value,
          LE.01=ET01$value,
          LE.11=ET12$value,
-         LTR=LTR)
+         LTR=LTR$value)
 }
