@@ -440,7 +440,7 @@ S.pl <- function(s,t,zi,nknots,the,bZ=0) {
 
 lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0,max) {
     ## print("lifexpect0.idmWeib")
-    max <- 100
+    # max <- 100
     ET12 = integrate(
         f=function(x) {
             S.weib(s,x,a12,b12,bZ12)
