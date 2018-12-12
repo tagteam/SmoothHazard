@@ -447,7 +447,7 @@ lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0,ma
         },s,max)
     ET0dot = integrate(f=function(x) {
         S.weib(s,x,a01,b01,bZ01)*S.weib(s,x,a02,b02,bZ02)
-    },s,Inf)
+    },s,max)
     ET01 = integrate(f=function(x){
         sapply(x,function(x){
             integrate(f=function(y){
