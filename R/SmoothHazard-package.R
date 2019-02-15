@@ -16,7 +16,7 @@
 #' diagnostic visit; for non-demented subjects: age at the last visit
 #' (censoring age)} \item{t}{for dead subjects: age at death; for alive
 #' subject: age at the latest news} \item{certif}{primary school
-#' certificate:\code{0=with certificate}, \code{1=without certificate}}
+#' certificate:\code{0=without certificate}, \code{1=with certificate}}
 #' \item{gender}{gender: \code{0=female}, \code{1=male}} }
 #' @importFrom lava sim regression
 #' @importFrom grDevices col2rgb
