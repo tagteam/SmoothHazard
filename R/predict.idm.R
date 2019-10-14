@@ -375,8 +375,9 @@ Predict0.idmWeib <- function(s,t,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
     p02_1 = 1-p00-p02_0-p01
     p02 = p02_0+p02_1
     RM= integrate(f = function(x) {S.weib(s, x, a01, b01, bZ01) * S.weib(s, x, a02, b02, bZ02)}, lower = s, upper = t)$value
+    F01= integrate(f = function(x) {S.weib(s, x, a01, b01, bZ01) * S.weib(s, x, a02, b02, bZ02)*iweibull(x,a01,b01,bZ01)}, lower = s, upper = t)$value
     ## return(list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1))
-    list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1, RM=RM)
+    list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=F01,F0.=p02_0+p01+p02_1, RM=RM)
 }
 
 # a = shape parameter
@@ -480,5 +481,5 @@ lifexpect0.idmPl <- function(s,knots01,nknots01,the01,knots12,nknots12,the12,kno
          LE.0.=ET01$value+ET0dot$value,
          LE.01=ET01$value,
          LE.11=ET12$value,
-         LTR=LTR$value)
+         LTR=LTR)
 }
