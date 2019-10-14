@@ -374,7 +374,7 @@ Predict0.idmWeib <- function(s,t,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0) {
     p01 = sapply(t,function(t) {integrate(f=function(x){S.weib(s,x,a01,b01,bZ01)*S.weib(s,x,a02,b02,bZ02)*iweibull(x,a01,b01,bZ01)*S.weib(x,t,a12,b12,bZ12)},lower=s,upper=t)$value})
     p02_1 = 1-p00-p02_0-p01
     p02 = p02_0+p02_1
-    RM= sapply(t, function(t) {integrate(f = function(x) {S.weib(s, x, a01, b01, bZ01) * S.weib(s, x, a02, b02, bZ02)}, lower = s, upper = t)$value})
+    RM= integrate(f = function(x) {S.weib(s, x, a01, b01, bZ01) * S.weib(s, x, a02, b02, bZ02)}, lower = s, upper = t)$value
     ## return(list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1))
     list(p00=p00,p01=p01,p11=p11,p12=p12,p02_0=p02_0,p02_1=p02_1,p02=p02,F01=p01+p02_1,F0.=p02_0+p01+p02_1, RM=RM)
 }
