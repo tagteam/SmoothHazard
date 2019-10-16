@@ -237,6 +237,14 @@ idm <- function(formula01,
     m02$formula <- formula02
     m12$formula <- formula12
     m01[[1]] <- m02[[1]] <- m12[[1]] <- as.name("model.frame")
+    ## dealing with missing data if no covariate on transition 0->2
+    if(anyNA(data)){
+      variables=unique(c(all.vars(formula01),all.vars(formula02),all.vars(formula12)))
+      data=data[,variables]
+      data=na.omit(data)
+      m01[[2]] <- m02[[2]] <- m12[[2]] <- data
+    }
+    
     m01 <- eval(m01,parent.frame())
     m02 <- eval(m02,parent.frame())
     m12 <- eval(m12,parent.frame())
