@@ -259,7 +259,7 @@ idm <- function(formula01,
     ## formula02
     x02 <- model.matrix(formula02,data=m02)[, -1, drop = FALSE]
     NC02 <- NCOL(x02)
-    if (NC01>0)
+    if (NC02>0)
         Xnames02 <- colnames(x02)
     else
         Xnames02 <- NULL
