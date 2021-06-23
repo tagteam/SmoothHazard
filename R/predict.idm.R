@@ -467,19 +467,21 @@ lifexpect0.idmWeib <- function(s,a01,b01,a02,b02,a12,b12,bZ01=0,bZ02=0,bZ12=0,ma
 }
 
 lifexpect0.idmPl <- function(s,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01=0,bZ12=0,bZ02=0) {
-    ET12 = integrate(f=function(x) {
-                         Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p11"]]
-                     },s,knots12[nknots12+6])
-    ET0dot = integrate(f=function(x) {
-                           Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p00"]]
-                       },s,knots02[nknots02+6])
-    ET01 = integrate(f=function(x) {
-                         Predict0.idmPl(s,x,knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["p01"]]
-                     },s,knots01[nknots01+6])
-    LTR=Predict0.idmPl(s,knots01[nknots01+6],knots01,nknots01,the01,knots12,nknots12,the12,knots02,nknots02,the02,bZ01,bZ12,bZ02)[["F01"]]
-    list(LE.00=ET0dot$value,
-         LE.0.=ET01$value+ET0dot$value,
-         LE.01=ET01$value,
-         LE.11=ET12$value,
-         LTR=LTR)
+  ET12 = integrate(f=function(x) {
+    S.pl(s,x,knots12,nknots12,the12,bZ12)},s,knots12[nknots12+6])
+  ET0dot = integrate(f=function(x) {
+    S.pl(s,x,knots01,nknots01,the01,bZ01)*S.pl(s,x,knots02,nknots02,the02,bZ02)  },s,knots02[nknots02+6])
+  ET01 = integrate(f=function(x) {
+    sapply(x,function(x) {integrate(f=function(y){
+      (S.pl(s,y,knots01,nknots01,the01,bZ01)
+       *S.pl(s,y,knots02,nknots02,the02,bZ02)*
+         intensity(times=y,knots=knots01,number.knots=nknots01,theta=the01,linear.predictor=bZ01)$intensity
+       *S.pl(y,x,knots12,nknots12,the12,bZ12))},
+      lower=s,upper=x)$value})},s,knots01[nknots01+6])
+  LTR=integrate(f = function(x) {S.pl(s, x, knots01, nknots01, the01, bZ01) * S.pl(s, x, knots02, nknots02, the02, bZ02) * intensity(times = x, knots = knots01, number.knots = nknots01, theta = the01,linear.predictor = bZ01)$intensity }, lower = s, upper = knots01[nknots01+6])$value
+  list(LE.00=ET0dot$value,
+       LE.0.=ET01$value+ET0dot$value,
+       LE.01=ET01$value,
+       LE.11=ET12$value,
+       LTR=LTR)
 }
